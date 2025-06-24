@@ -50,6 +50,8 @@ jobs:
     needs: [choose-runner]
     runs-on: ${{ needs.choose-runner.outputs.runner || 'ubuntu-latest' }}
     name: ${{github.event.inputs.id}}
+    permissions:
+      packages: write
     steps:
     - id: commit
       uses: prompt/actions-commit-hash@v3
