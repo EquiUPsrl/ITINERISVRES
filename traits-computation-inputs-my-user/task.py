@@ -20,6 +20,6 @@ outputs = args.outputs.replace('"','')
 
 
 
-outputs["input_datain_file"] = 'Phytoplankton__Progetto_Strategico_2009_2012_Australia.csv'
-outputs["input_operator_file"] = '2_FILEinformativo_OPERATORE.csv'
+outputs["input_datain_file"] = 'data/Phytoplankton__Progetto_Strategico_2009_2012_Australia.csv'
+outputs["input_operator_file"] = 'data/2_FILEinformativo_OPERATORE.csv'
 
