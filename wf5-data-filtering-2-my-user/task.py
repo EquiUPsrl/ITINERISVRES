@@ -31,7 +31,9 @@ taxlev = 'acceptedNameUsage'
 param = ['Density', 'totalbiovolume']
 threshold = 0.75
 
-dataset = pd.read_csv(param_datain, sep=',', decimal='.', low_memory=False)
+filepath = os.path.join("/tmp/data", param_datain)
+
+dataset = pd.read_csv(filepath, sep=',', decimal='.', low_memory=False)
 
 if 'Density' not in dataset.columns:
     dataset['Density'] = 1
