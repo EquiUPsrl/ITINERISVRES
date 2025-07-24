@@ -10,16 +10,15 @@ arg_parser = argparse.ArgumentParser()
 arg_parser.add_argument('--id', action='store', type=str, required=True, dest='id')
 
 
-arg_parser.add_argument('--datain', action='store', type=str, required=True, dest='datain')
-
+arg_parser.add_argument('--param_datain', action='store', type=str, required=True, dest='param_datain')
 
 args = arg_parser.parse_args()
 print(args)
 
 id = args.id
 
-datain = args.datain.replace('"','')
 
+param_datain = args.param_datain.replace('"','')
 
 
 output_dir = 'Output'
@@ -32,7 +31,7 @@ taxlev = 'acceptedNameUsage'
 param = ['Density', 'totalbiovolume']
 threshold = 0.75
 
-dataset = pd.read_csv(datain, sep=',', decimal='.', low_memory=False)
+dataset = pd.read_csv(param_datain, sep=',', decimal='.', low_memory=False)
 
 if 'Density' not in dataset.columns:
     dataset['Density'] = 1
