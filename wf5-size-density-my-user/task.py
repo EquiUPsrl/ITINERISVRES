@@ -1,3 +1,4 @@
+import warnings
 import os
 import pandas as pd
 import numpy as np
@@ -25,6 +26,8 @@ id = args.id
 output_file = args.output_file.replace('"','')
 
 
+
+warnings.filterwarnings("ignore")
 
 input_dir = 'data'
 output_dir = '/tmp/data/output'
@@ -132,7 +135,7 @@ if not (taxlev == 'community' and cluster[0] == 'WHOLE'):
             plt.xscale('log')
             plt.yscale('log')
             if param == 'Biovolume':
-                plt.xlabel('average Biovolume ($\mu m^3$)')
+                plt.xlabel(r'average Biovolume ($\mu m^3$)')
             elif param == 'CellCarbonContent':
                 plt.xlabel('average cell carbon content (pg C)')
             plt.ylabel('Density (cell·L⁻¹)')
