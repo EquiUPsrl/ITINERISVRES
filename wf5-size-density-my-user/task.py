@@ -14,7 +14,7 @@ arg_parser = argparse.ArgumentParser()
 arg_parser.add_argument('--id', action='store', type=str, required=True, dest='id')
 
 
-arg_parser.add_argument('--datain', action='store', type=str, required=True, dest='datain')
+arg_parser.add_argument('--output_file', action='store', type=str, required=True, dest='output_file')
 
 
 args = arg_parser.parse_args()
@@ -22,7 +22,7 @@ print(args)
 
 id = args.id
 
-datain = args.datain.replace('"','')
+output_file = args.output_file.replace('"','')
 
 
 
@@ -32,6 +32,8 @@ output_dir = '/tmp/data/output'
 print("Creo la cartella " + output_dir)
 os.makedirs(output_dir, exist_ok=True)
 
+
+datain = output_file
 
 cluster = ['country','locality','year','month','parentEventID','eventID']
 taxlev = 'acceptedNameUsage'
