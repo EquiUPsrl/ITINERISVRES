@@ -1,4 +1,5 @@
 import os
+import requests
 import pandas as pd
 
 import argparse
@@ -21,17 +22,35 @@ id = args.id
 param_datain = args.param_datain.replace('"','')
 
 
-output_dir = 'Output'
+output_dir = '/tmp/data/output'
+
+print("Creo la cartella /tmp/data")
+os.makedirs("/tmp/data", exist_ok=True)
 
 print("Creo la cartella " + output_dir)
 os.makedirs(output_dir, exist_ok=True)
+
+input_filename = 'Overalldataset-harmonized2.csv'
+
+filepath = os.path.join("/tmp/data", input_filename)
+
+response = requests.get(param_datain)
+    
+if response.status_code == 200:
+    with open(filepath, "wb") as f:
+        f.write(response.content)
+    print("File CSV salvato con successo.")
+else:
+    print(f"Errore nel download: {response.status_code}")
+
+
 
 cluster = ['country','locality','year','month','parentEventID','eventID']
 taxlev = 'acceptedNameUsage'
 param = ['Density', 'totalbiovolume']
 threshold = 0.75
 
-filepath = os.path.join("/tmp/data", param_datain)
+filepath = os.path.join("/tmp/data", input_filename)
 
 dataset = pd.read_csv(filepath, sep=',', decimal='.', low_memory=False)
 
