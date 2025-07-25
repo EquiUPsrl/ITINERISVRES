@@ -151,3 +151,6 @@ final.to_csv(output_file, index=False, sep=';', decimal='.', quoting=0)
 
 print(f"Output saved to {output_file}")
 
+file_output_file = open("/tmp/output_file_" + id + ".json", "w")
+file_output_file.write(json.dumps(output_file))
+file_output_file.close()
