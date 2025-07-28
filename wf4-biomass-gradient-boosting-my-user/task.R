@@ -84,9 +84,9 @@ library(reshape2)
 print('option_list')
 option_list = list(
 
-make_option(c("--input_training_file"), action="store", default=NA, type="character", help="my description"),
 make_option(c("--parameter_file"), action="store", default=NA, type="character", help="my description"),
 make_option(c("--prediction_file"), action="store", default=NA, type="character", help="my description"),
+make_option(c("--training_file"), action="store", default=NA, type="character", help="my description"),
 make_option(c("--id"), action="store", default=NA, type="character", help="task id")
 )
 
@@ -122,13 +122,6 @@ var_serialization <- function(var){
     )
 }
 
-print("Retrieving input_training_file")
-var = opt$input_training_file
-print(var)
-var_len = length(var)
-print(paste("Variable input_training_file has length", var_len))
-
-input_training_file <- gsub("\"", "", opt$input_training_file)
 print("Retrieving parameter_file")
 var = opt$parameter_file
 print(var)
@@ -143,6 +136,13 @@ var_len = length(var)
 print(paste("Variable prediction_file has length", var_len))
 
 prediction_file <- gsub("\"", "", opt$prediction_file)
+print("Retrieving training_file")
+var = opt$training_file
+print(var)
+var_len = length(var)
+print(paste("Variable training_file has length", var_len))
+
+training_file <- gsub("\"", "", opt$training_file)
 id <- gsub('"', '', opt$id)
 
 {'name': 'conf_base_path', 'assignation': "conf_base_path<-'/tmp/data/'"}
@@ -155,7 +155,7 @@ library(Metrics)
 library(caret)
 library(doParallel)
 
-input_file <- input_training_file
+input_file <- training_file
 
 dati <- read.table(input_file, header = TRUE, sep = '\t')
 
