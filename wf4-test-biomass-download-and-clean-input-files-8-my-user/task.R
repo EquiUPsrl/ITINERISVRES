@@ -57,8 +57,6 @@ print(paste("Variable params_path has length", var_len))
 params_path <- gsub("\"", "", opt$params_path)
 id <- gsub('"', '', opt$id)
 
-{'name': 'conf_base_path', 'assignation': "conf_base_path=''"}
-{'name': 'conf_output_path', 'assignation': "conf_output_path=''"}
 
 print("Running the cell")
 library(jsonlite)
@@ -66,8 +64,6 @@ library(jsonlite)
 param_training_file = ''
 param_prediction_file = ''
 param_parameter_file = ''
-conf_base_path = ''
-conf_output_path = ''
 
 if (file.exists(params_path)) {
   params <- fromJSON(param_file)
@@ -75,8 +71,6 @@ if (file.exists(params_path)) {
   param_training_file   = params$param_training_file
   param_prediction_file = params$param_prediction_file
   param_parameter_file  = params$param_parameter_file
-  conf_base_path        = params$conf_base_path
-  conf_output_path      = params$conf_output_path
 
   cat("✅ Parametri caricati correttamente.\n")
 } else {
