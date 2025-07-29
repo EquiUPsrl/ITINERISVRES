@@ -125,33 +125,10 @@ var_serialization <- function(var){
 
 id <- gsub('"', '', opt$id)
 
-{'name': 'conf_base_path', 'assignation': "conf_base_path=''"}
-{'name': 'conf_output_path', 'assignation': "conf_output_path=''"}
+{'name': 'conf_base_path', 'assignation': "conf_base_path='/tmp/data/'"}
+{'name': 'conf_output_path', 'assignation': "conf_output_path='/tmp/data/output/'"}
 
 print("Running the cell")
-library(jsonlite)
-param_file <- '/tmp/data/wf4-biomass-params.json'
-
-param_training_file = ''
-param_prediction_file = ''
-param_parameter_file = ''
-conf_base_path = ''
-conf_output_path = ''
-
-if (file.exists(param_file)) {
-  params <- fromJSON(param_file)
-
-  param_training_file   = params$param_training_file
-  param_prediction_file = params$param_prediction_file
-  param_parameter_file  = params$param_parameter_file
-  conf_base_path        = params$conf_base_path
-  conf_output_path      = params$conf_output_path
-
-  cat("✅ Parametri caricati correttamente.\n")
-} else {
-  stop(paste("❌ File dei parametri non trovato:", param_file))
-}
-
 download_to_folder <- function(url, folder, filename = NULL, binary = TRUE) {
   if (!dir.exists(folder)) {
     dir.create(folder, recursive = TRUE)
@@ -172,20 +149,20 @@ download_to_folder <- function(url, folder, filename = NULL, binary = TRUE) {
   return(dest_file)
 }
 
-training_url = param_training_file
+training_url <- param_training_file
 
 training_file <- download_to_folder(
   url = training_url,
   folder = conf_base_path
 )
 
-prediction_url = param_prediction_file
+prediction_url <- param_prediction_file
 prediction_file <- download_to_folder(
   url = prediction_url,
   folder = conf_base_path
 )
 
-parameter_url = param_parameter_file
+parameter_url <- param_parameter_file
 parameter_file <- download_to_folder(
   url = parameter_url,
   folder = conf_base_path
