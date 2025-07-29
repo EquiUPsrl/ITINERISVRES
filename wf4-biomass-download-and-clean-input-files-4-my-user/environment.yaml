@@ -1,0 +1,29 @@
+name: venv
+channels:
+  - conda-forge
+dependencies:
+  - pip
+  - python>=3.8
+  - nbconvert
+  - r-iml
+  - r-e1071
+  - r-scales
+  - r-future
+  - r-Metrics
+  - r-nnet
+  - r-ggplot2
+  - r-readr
+  - r-jsonlite
+  - r-doParallel
+  - r-MASS
+  - r-dplyr
+  - r-randomForest
+  - r-tidyr
+  - r-xgboost
+  - r-caret
+  - r-kernlab
+  - r-doFuture
+  - r-reshape2
+  - r-foreach
+  - papermill
+  - ipykernel
