@@ -2,34 +2,22 @@ setwd('/app')
 library(optparse)
 library(jsonlite)
 
+if (!requireNamespace("jsonlite", quietly = TRUE)) {
+	install.packages("jsonlite", repos="http://cran.us.r-project.org")
+}
+library(jsonlite)
 if (!requireNamespace("caret", quietly = TRUE)) {
 	install.packages("caret", repos="http://cran.us.r-project.org")
 }
 library(caret)
-if (!requireNamespace("doFuture", quietly = TRUE)) {
-	install.packages("doFuture", repos="http://cran.us.r-project.org")
-}
-library(doFuture)
 if (!requireNamespace("doParallel", quietly = TRUE)) {
 	install.packages("doParallel", repos="http://cran.us.r-project.org")
 }
 library(doParallel)
-if (!requireNamespace("dplyr", quietly = TRUE)) {
-	install.packages("dplyr", repos="http://cran.us.r-project.org")
-}
-library(dplyr)
 if (!requireNamespace("e1071", quietly = TRUE)) {
 	install.packages("e1071", repos="http://cran.us.r-project.org")
 }
 library(e1071)
-if (!requireNamespace("foreach", quietly = TRUE)) {
-	install.packages("foreach", repos="http://cran.us.r-project.org")
-}
-library(foreach)
-if (!requireNamespace("future", quietly = TRUE)) {
-	install.packages("future", repos="http://cran.us.r-project.org")
-}
-library(future)
 if (!requireNamespace("ggplot2", quietly = TRUE)) {
 	install.packages("ggplot2", repos="http://cran.us.r-project.org")
 }
@@ -38,52 +26,49 @@ if (!requireNamespace("iml", quietly = TRUE)) {
 	install.packages("iml", repos="http://cran.us.r-project.org")
 }
 library(iml)
-if (!requireNamespace("kernlab", quietly = TRUE)) {
-	install.packages("kernlab", repos="http://cran.us.r-project.org")
-}
-library(kernlab)
-if (!requireNamespace("MASS", quietly = TRUE)) {
-	install.packages("MASS", repos="http://cran.us.r-project.org")
-}
-library(MASS)
 if (!requireNamespace("Metrics", quietly = TRUE)) {
 	install.packages("Metrics", repos="http://cran.us.r-project.org")
 }
 library(Metrics)
-if (!requireNamespace("nnet", quietly = TRUE)) {
-	install.packages("nnet", repos="http://cran.us.r-project.org")
-}
-library(nnet)
-if (!requireNamespace("randomForest", quietly = TRUE)) {
-	install.packages("randomForest", repos="http://cran.us.r-project.org")
-}
-library(randomForest)
 if (!requireNamespace("readr", quietly = TRUE)) {
 	install.packages("readr", repos="http://cran.us.r-project.org")
 }
 library(readr)
-if (!requireNamespace("xgboost", quietly = TRUE)) {
-	install.packages("xgboost", repos="http://cran.us.r-project.org")
-}
-library(xgboost)
-if (!requireNamespace("scales", quietly = TRUE)) {
-	install.packages("scales", repos="http://cran.us.r-project.org")
-}
-library(scales)
 if (!requireNamespace("tidyr", quietly = TRUE)) {
 	install.packages("tidyr", repos="http://cran.us.r-project.org")
 }
 library(tidyr)
-if (!requireNamespace("reshape2", quietly = TRUE)) {
-	install.packages("reshape2", repos="http://cran.us.r-project.org")
+if (!requireNamespace("xgboost", quietly = TRUE)) {
+	install.packages("xgboost", repos="http://cran.us.r-project.org")
 }
-library(reshape2)
+library(xgboost)
+if (!requireNamespace("nnet", quietly = TRUE)) {
+	install.packages("nnet", repos="http://cran.us.r-project.org")
+}
+library(nnet)
+if (!requireNamespace("fastICA", quietly = TRUE)) {
+	install.packages("fastICA", repos="http://cran.us.r-project.org")
+}
+library(fastICA)
+if (!requireNamespace("randomForest", quietly = TRUE)) {
+	install.packages("randomForest", repos="http://cran.us.r-project.org")
+}
+library(randomForest)
+if (!requireNamespace("dplyr", quietly = TRUE)) {
+	install.packages("dplyr", repos="http://cran.us.r-project.org")
+}
+library(dplyr)
+if (!requireNamespace("MASS", quietly = TRUE)) {
+	install.packages("MASS", repos="http://cran.us.r-project.org")
+}
+library(MASS)
 
 
 
 print('option_list')
 option_list = list(
 
+make_option(c("--params_path"), action="store", default=NA, type="character", help="my description"),
 make_option(c("--id"), action="store", default=NA, type="character", help="task id")
 )
 
@@ -119,12 +104,39 @@ var_serialization <- function(var){
     )
 }
 
+print("Retrieving params_path")
+var = opt$params_path
+print(var)
+var_len = length(var)
+print(paste("Variable params_path has length", var_len))
+
+params_path <- gsub("\"", "", opt$params_path)
 id <- gsub('"', '', opt$id)
 
-{'name': 'conf_base_path', 'assignation': "conf_base_path<-'/tmp/data/'"}
-{'name': 'conf_output_path', 'assignation': "conf_output_path<-'/tmp/data/output/'"}
+{'name': 'conf_base_path', 'assignation': "conf_base_path='/tmp/WF4/'"}
 
 print("Running the cell")
+library(jsonlite)
+
+input_path = file.path(conf_base_path, 'data')
+
+training_url = ''
+prediction_url = ''
+parameter_url = ''
+
+if (file.exists(params_path)) {
+  params <- fromJSON(params_path)
+
+  training_url   = params$param_training_file
+  prediction_url = params$param_prediction_file
+  parameter_url  = params$param_parameter_file
+
+  cat("✅ Parametri caricati correttamente.\n")
+} else {
+  cat(paste("❌ File dei parametri non trovato:", params_path))
+}
+
+
 download_to_folder <- function(url, folder, filename = NULL, binary = TRUE) {
   if (!dir.exists(folder)) {
     dir.create(folder, recursive = TRUE)
@@ -140,26 +152,26 @@ download_to_folder <- function(url, folder, filename = NULL, binary = TRUE) {
   
   download.file(url, destfile = dest_file, mode = mode)
 
-  cat("File saved: ", dest_file)
+  cat("File saved: ", dest_file, '\n')
   
   return(dest_file)
 }
 
+
 training_file <- download_to_folder(
-  url = param_training_file,
-  folder = conf_base_path
+  url = training_url,
+  folder = input_path
 )
 
 prediction_file <- download_to_folder(
-  url = param_prediction_file,
-  folder = conf_base_path
+  url = prediction_url,
+  folder = input_path
 )
 
 parameter_file <- download_to_folder(
-  url = param_parameter_file,
-  folder = conf_base_path
+  url = parameter_url,
+  folder = input_path
 )
-
 
 
 
@@ -177,10 +189,10 @@ for (file_path in file_paths) {
     num_tabs <- length(gregexpr("\t", prima_riga)[[1]])
     
     if (num_tabs == 0) {
-    cat("❌ Nessun separatore TAB trovato: file ignorato.\n")
+    cat("❌ No TAB separator found: file ignored.\n")
     next
     }
-    cat("✅ Separatore TAB rilevato con", num_tabs + 1, "colonne.\n")
+    cat("✅ TAB separator detected with ", num_tabs + 1, "columns.\n")
     
     dati <- tryCatch({
     read.table(file_path, header = TRUE, sep = "\t", stringsAsFactors = FALSE)
@@ -215,14 +227,14 @@ for (file_path in file_paths) {
     )
     
     n_eliminate <- sum(!righe_valide)
-    cat("Righe totali:", nrow(dati), "\n")
-    cat("Righe eliminate per valori non validi:", n_eliminate, "\n")
-    cat("Righe rimanenti:", sum(righe_valide), "\n")
+    cat("Total rows:", nrow(dati), "\n")
+    cat("Deleted rows for invalid values:", n_eliminate, "\n")
+    cat("Remaining rows:", sum(righe_valide), "\n")
     
     dati_puliti <- dati[righe_valide, , drop = FALSE]
     
     write.table(dati_puliti, file_path, sep = "\t", row.names = FALSE, quote = FALSE)
-    cat("✅ File sovrascritto con dati puliti.\n")
+    cat("✅ File overwritten with clean data.\n")
 }
 
 training_file <- training_file
