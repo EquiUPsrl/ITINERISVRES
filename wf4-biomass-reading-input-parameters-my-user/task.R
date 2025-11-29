@@ -72,7 +72,6 @@ library(scales)
 print('option_list')
 option_list = list(
 
-make_option(c("--params_path"), action="store", default=NA, type="character", help="my description"),
 make_option(c("--id"), action="store", default=NA, type="character", help="task id")
 )
 
@@ -108,19 +107,11 @@ var_serialization <- function(var){
     )
 }
 
-print("Retrieving params_path")
-var = opt$params_path
-print(var)
-var_len = length(var)
-print(paste("Variable params_path has length", var_len))
-
-params_path <- gsub("\"", "", opt$params_path)
 id <- gsub('"', '', opt$id)
 
 
 print("Running the cell")
-cat("List dir /tmp/WF4/data:", list.files("/tmp/WF4/data"), "\n")
-cat("Stat directory:", file.info("/tmp/WF4/data"), "\n")
+params_path <- gsub('^"|"$', '', params_path)
 
 cat("DEBUG params_path:", params_path, "\n")
 cat("File exists?", file.exists(params_path), "\n")
