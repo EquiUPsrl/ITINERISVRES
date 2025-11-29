@@ -2,10 +2,6 @@ setwd('/app')
 library(optparse)
 library(jsonlite)
 
-if (!requireNamespace("jsonlite", quietly = TRUE)) {
-	install.packages("jsonlite", repos="http://cran.us.r-project.org")
-}
-library(jsonlite)
 if (!requireNamespace("caret", quietly = TRUE)) {
 	install.packages("caret", repos="http://cran.us.r-project.org")
 }
@@ -142,7 +138,7 @@ library(readr)
 library(tidyr)
 library(caret)
 
-config_base_path <- "/tmp/WF4/"
+config_base_path <- "/tmp/data/WF4"
 output_path = file.path(config_base_path, "output")
 
 input_file <- training_file

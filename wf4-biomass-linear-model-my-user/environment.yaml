@@ -19,7 +19,6 @@ dependencies:
   - r-fastICA
   - r-e1071
   - r-dplyr
-  - r-jsonlite
   - r-Metrics
   - papermill
   - ipykernel
