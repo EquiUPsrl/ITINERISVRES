@@ -390,6 +390,9 @@ output_path <- file.path(model_dir, "predictions_with_inputs.txt")
 write.table(prediction_data, file = output_path, row.names = FALSE, col.names = TRUE, sep = ";")
 
 cat("Tabella con dati di input e previsioni salvata in:", output_path, "\n")
+
+saveRDS(train_data, file = file.path(model_dir, "train_data.rds"))
+saveRDS(test_data,  file = file.path(model_dir, "test_data.rds"))
 # capturing outputs
 print('Serialization of model_dir')
 file <- file(paste0('/tmp/model_dir_', id, '.json'))
