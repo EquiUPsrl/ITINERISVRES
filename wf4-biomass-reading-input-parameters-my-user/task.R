@@ -119,7 +119,8 @@ id <- gsub('"', '', opt$id)
 
 
 print("Running the cell")
-cat(paste("File dei parametri:", params_path))
+cat("DEBUG params_path:", params_path, "\n")
+cat("File exists?", file.exists(params_path), "\n")
 
 library(jsonlite)
 
