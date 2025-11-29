@@ -6,14 +6,34 @@ if (!requireNamespace("caret", quietly = TRUE)) {
 	install.packages("caret", repos="http://cran.us.r-project.org")
 }
 library(caret)
+if (!requireNamespace("doFuture", quietly = TRUE)) {
+	install.packages("doFuture", repos="http://cran.us.r-project.org")
+}
+library(doFuture)
 if (!requireNamespace("doParallel", quietly = TRUE)) {
 	install.packages("doParallel", repos="http://cran.us.r-project.org")
 }
 library(doParallel)
+if (!requireNamespace("dplyr", quietly = TRUE)) {
+	install.packages("dplyr", repos="http://cran.us.r-project.org")
+}
+library(dplyr)
 if (!requireNamespace("e1071", quietly = TRUE)) {
 	install.packages("e1071", repos="http://cran.us.r-project.org")
 }
 library(e1071)
+if (!requireNamespace("fastICA", quietly = TRUE)) {
+	install.packages("fastICA", repos="http://cran.us.r-project.org")
+}
+library(fastICA)
+if (!requireNamespace("foreach", quietly = TRUE)) {
+	install.packages("foreach", repos="http://cran.us.r-project.org")
+}
+library(foreach)
+if (!requireNamespace("future", quietly = TRUE)) {
+	install.packages("future", repos="http://cran.us.r-project.org")
+}
+library(future)
 if (!requireNamespace("ggplot2", quietly = TRUE)) {
 	install.packages("ggplot2", repos="http://cran.us.r-project.org")
 }
@@ -22,42 +42,42 @@ if (!requireNamespace("iml", quietly = TRUE)) {
 	install.packages("iml", repos="http://cran.us.r-project.org")
 }
 library(iml)
-if (!requireNamespace("Metrics", quietly = TRUE)) {
-	install.packages("Metrics", repos="http://cran.us.r-project.org")
+if (!requireNamespace("jsonlite", quietly = TRUE)) {
+	install.packages("jsonlite", repos="http://cran.us.r-project.org")
 }
-library(Metrics)
-if (!requireNamespace("readr", quietly = TRUE)) {
-	install.packages("readr", repos="http://cran.us.r-project.org")
+library(jsonlite)
+if (!requireNamespace("kernlab", quietly = TRUE)) {
+	install.packages("kernlab", repos="http://cran.us.r-project.org")
 }
-library(readr)
-if (!requireNamespace("tidyr", quietly = TRUE)) {
-	install.packages("tidyr", repos="http://cran.us.r-project.org")
-}
-library(tidyr)
-if (!requireNamespace("xgboost", quietly = TRUE)) {
-	install.packages("xgboost", repos="http://cran.us.r-project.org")
-}
-library(xgboost)
-if (!requireNamespace("nnet", quietly = TRUE)) {
-	install.packages("nnet", repos="http://cran.us.r-project.org")
-}
-library(nnet)
-if (!requireNamespace("fastICA", quietly = TRUE)) {
-	install.packages("fastICA", repos="http://cran.us.r-project.org")
-}
-library(fastICA)
-if (!requireNamespace("randomForest", quietly = TRUE)) {
-	install.packages("randomForest", repos="http://cran.us.r-project.org")
-}
-library(randomForest)
-if (!requireNamespace("dplyr", quietly = TRUE)) {
-	install.packages("dplyr", repos="http://cran.us.r-project.org")
-}
-library(dplyr)
+library(kernlab)
 if (!requireNamespace("MASS", quietly = TRUE)) {
 	install.packages("MASS", repos="http://cran.us.r-project.org")
 }
 library(MASS)
+if (!requireNamespace("Metrics", quietly = TRUE)) {
+	install.packages("Metrics", repos="http://cran.us.r-project.org")
+}
+library(Metrics)
+if (!requireNamespace("nnet", quietly = TRUE)) {
+	install.packages("nnet", repos="http://cran.us.r-project.org")
+}
+library(nnet)
+if (!requireNamespace("randomForest", quietly = TRUE)) {
+	install.packages("randomForest", repos="http://cran.us.r-project.org")
+}
+library(randomForest)
+if (!requireNamespace("readr", quietly = TRUE)) {
+	install.packages("readr", repos="http://cran.us.r-project.org")
+}
+library(readr)
+if (!requireNamespace("xgboost", quietly = TRUE)) {
+	install.packages("xgboost", repos="http://cran.us.r-project.org")
+}
+library(xgboost)
+if (!requireNamespace("tidyr", quietly = TRUE)) {
+	install.packages("tidyr", repos="http://cran.us.r-project.org")
+}
+library(tidyr)
 if (!requireNamespace("scales", quietly = TRUE)) {
 	install.packages("scales", repos="http://cran.us.r-project.org")
 }
@@ -195,7 +215,7 @@ for (file_path in file_paths) {
     cat("✅ Separator detected with ", num_tabs + 1, "columns.\n")
     
     dati <- tryCatch({
-        read.table(file_path, header = TRUE, sep = "\t", stringsAsFactors = FALSE)
+        read.table(file_path, header = TRUE, sep = ";", stringsAsFactors = FALSE)
     }, error = function(e) {
         cat("❌ Errore nella lettura del file:", e$message, "\n")
         return(NULL)
@@ -234,7 +254,7 @@ for (file_path in file_paths) {
     
     dati_puliti <- dati[righe_valide, , drop = FALSE]
     
-    write.table(dati_puliti, file_path, sep = "\t", row.names = FALSE, quote = FALSE)
+    write.table(dati_puliti, file_path, sep = ";", row.names = FALSE, quote = FALSE)
     cat("✅ File overwritten with clean data.\n")
 }
 
