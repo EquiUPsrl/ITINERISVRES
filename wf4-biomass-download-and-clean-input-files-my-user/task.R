@@ -117,7 +117,7 @@ print(paste("Variable params_path has length", var_len))
 params_path <- gsub("\"", "", opt$params_path)
 id <- gsub('"', '', opt$id)
 
-{'name': 'conf_base_path', 'assignation': 'conf_base_path="/tmp/WF4/"'}
+{'name': 'conf_base_path', 'assignation': 'conf_base_path<-"/tmp/WF4/"'}
 
 print("Running the cell")
 library(jsonlite)
