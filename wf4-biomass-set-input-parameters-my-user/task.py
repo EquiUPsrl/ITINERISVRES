@@ -24,7 +24,7 @@ param_parameter_file = args.param_parameter_file.replace('"','')
 param_prediction_file = args.param_prediction_file.replace('"','')
 param_training_file = args.param_training_file.replace('"','')
 
-conf_base_path = conf_base_path = '/tmp/WF4/'
+conf_base_path = conf_base_path = '/tmp/data/WF4/'
 
 params = {
     "param_training_file": param_training_file,
