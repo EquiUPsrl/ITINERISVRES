@@ -133,7 +133,7 @@ print(paste("Variable training_file has length", var_len))
 training_file <- gsub("\"", "", opt$training_file)
 id <- gsub('"', '', opt$id)
 
-{'name': 'conf_base_path', 'assignation': "conf_base_path='/tmp/WF4/'"}
+{'name': 'conf_base_path', 'assignation': 'conf_base_path="/tmp/WF4/"'}
 
 print("Running the cell")
 library(ggplot2)
@@ -143,7 +143,7 @@ library(readr)
 library(tidyr)
 library(caret)
 
-output_path = file.path(conf_base_path, 'output')
+output_path = file.path(conf_base_path, "output")
 
 input_file <- training_file
 
