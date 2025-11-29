@@ -39,6 +39,16 @@ os.makedirs(os.path.dirname(params_path), exist_ok=True)
 with open(params_path, "w") as f:
     json.dump(params, f)
 
-file_params_path = open("/tmp/params_path_" + id + ".json", "w")
-file_params_path.write(json.dumps(params_path))
-file_params_path.close()
+remote_training_file = param_training_file
+remote_prediction_file = param_prediction_file
+remote_parameter_file = param_parameter_file
+
+file_remote_parameter_file = open("/tmp/remote_parameter_file_" + id + ".json", "w")
+file_remote_parameter_file.write(json.dumps(remote_parameter_file))
+file_remote_parameter_file.close()
+file_remote_prediction_file = open("/tmp/remote_prediction_file_" + id + ".json", "w")
+file_remote_prediction_file.write(json.dumps(remote_prediction_file))
+file_remote_prediction_file.close()
+file_remote_training_file = open("/tmp/remote_training_file_" + id + ".json", "w")
+file_remote_training_file.write(json.dumps(remote_training_file))
+file_remote_training_file.close()
