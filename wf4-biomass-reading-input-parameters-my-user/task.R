@@ -119,6 +119,9 @@ id <- gsub('"', '', opt$id)
 
 
 print("Running the cell")
+cat("List dir /tmp/WF4/data:", list.files("/tmp/WF4/data"), "\n")
+cat("Stat directory:", file.info("/tmp/WF4/data"), "\n")
+
 cat("DEBUG params_path:", params_path, "\n")
 cat("File exists?", file.exists(params_path), "\n")
 
