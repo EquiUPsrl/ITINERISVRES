@@ -72,6 +72,7 @@ library(scales)
 print('option_list')
 option_list = list(
 
+make_option(c("--params_path"), action="store", default=NA, type="character", help="my description"),
 make_option(c("--id"), action="store", default=NA, type="character", help="task id")
 )
 
@@ -107,14 +108,21 @@ var_serialization <- function(var){
     )
 }
 
+print("Retrieving params_path")
+var = opt$params_path
+print(var)
+var_len = length(var)
+print(paste("Variable params_path has length", var_len))
+
+params_path <- gsub("\"", "", opt$params_path)
 id <- gsub('"', '', opt$id)
 
 
 print("Running the cell")
-params_path <- gsub('^"|"$', '', params_path)
+params_path_clean <- gsub('^"|"$', '', params_path)
 
-cat("DEBUG params_path:", params_path, "\n")
-cat("File exists?", file.exists(params_path), "\n")
+cat("DEBUG params_path:", params_path_clean, "\n")
+cat("File exists?", file.exists(params_path_clean), "\n")
 
 library(jsonlite)
 
@@ -122,8 +130,8 @@ training_url = ''
 prediction_url = ''
 parameter_url = ''
 
-if (file.exists(params_path)) {
-    params <- fromJSON(params_path)
+if (file.exists(params_path_clean)) {
+    params <- fromJSON(params_path_clean)
     
     training_url   = params$param_training_file
     prediction_url = params$param_prediction_file
@@ -131,7 +139,7 @@ if (file.exists(params_path)) {
     
     cat("✅ Parameters loaded correctly.\n")
 } else {
-    stop("❌ Parameter file not found, aborting the task: ", params_path)
+    stop("❌ Parameter file not found, aborting the task: ", params_path_clean)
 }
 # capturing outputs
 print('Serialization of parameter_url')
