@@ -131,8 +131,8 @@ id <- gsub('"', '', opt$id)
 
 
 print("Running the cell")
-config_base_path <- "/tmp/WF4"
-input_path = file.path(config_base_path, 'data')
+config_base_path <- "/tmp/data/WF4"
+input_path = file.path(config_base_path, 'input')
 
 training_url = remote_training_file
 prediction_url = remote_prediction_file
