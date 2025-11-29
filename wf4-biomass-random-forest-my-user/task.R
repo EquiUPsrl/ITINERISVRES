@@ -221,6 +221,7 @@ if (tolower(as.character(params$value[params$Parameter == "metric_value_MAE"])) 
 if (tolower(as.character(params$value[params$Parameter == "metric_value_RMSE"])) == "true") metric <- 'RMSE'
 if (tolower(as.character(params$value[params$Parameter == "metric_value_Rsquared"])) == "true") metric <- 'Rsquared'
 
+cat("metric_value: ", metric, "\n")
 
 set.seed(123)  # Seme globale per riproducibilità
 library(caret)  # Assicurati che il pacchetto caret sia installato
@@ -273,6 +274,8 @@ for (ntree in ntree_values) {
         results[[paste0("ntree_", ntree, "_mtry_", m_value)]] <- model_rf
 
         metric_value <- min(model_rf$results[[metric]])  # Example: if optimizing MAE
+
+        cat("calculated metric_value:", metric_value, "\n")
         
         if (metric_value < best_metric) {
             best_metric <- metric_value
