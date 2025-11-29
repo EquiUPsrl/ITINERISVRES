@@ -2,10 +2,6 @@ setwd('/app')
 library(optparse)
 library(jsonlite)
 
-if (!requireNamespace("jsonlite", quietly = TRUE)) {
-	install.packages("jsonlite", repos="http://cran.us.r-project.org")
-}
-library(jsonlite)
 if (!requireNamespace("caret", quietly = TRUE)) {
 	install.packages("caret", repos="http://cran.us.r-project.org")
 }
@@ -190,20 +186,21 @@ for (file_path in file_paths) {
     cat("==============================\n")
     
     prima_riga <- readLines(file_path, n = 1)
-    num_tabs <- length(gregexpr("\t", prima_riga)[[1]])
+    num_tabs <- length(gregexpr(";", prima_riga)[[1]])
     
     if (num_tabs == 0) {
-    cat("❌ No TAB separator found: file ignored.\n")
-    next
+        cat("❌ No ; separator found: file ignored.\n")
+        next
     }
-    cat("✅ TAB separator detected with ", num_tabs + 1, "columns.\n")
+    cat("✅ Separator detected with ", num_tabs + 1, "columns.\n")
     
     dati <- tryCatch({
-    read.table(file_path, header = TRUE, sep = "\t", stringsAsFactors = FALSE)
+        read.table(file_path, header = TRUE, sep = "\t", stringsAsFactors = FALSE)
     }, error = function(e) {
-    cat("❌ Errore nella lettura del file:", e$message, "\n")
-    return(NULL)
+        cat("❌ Errore nella lettura del file:", e$message, "\n")
+        return(NULL)
     })
+    
     if (is.null(dati)) next
     
     is_empty <- dati == ""
