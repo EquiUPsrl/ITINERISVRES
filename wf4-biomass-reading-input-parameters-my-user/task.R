@@ -119,13 +119,13 @@ id <- gsub('"', '', opt$id)
 
 
 print("Running the cell")
+cat(paste("File dei parametri:", params_path))
+
 library(jsonlite)
 
 training_url = ''
 prediction_url = ''
 parameter_url = ''
-
-cat(paste("File dei parametri:", params_path))
 
 if (file.exists(params_path)) {
     params <- fromJSON(params_path)
@@ -134,7 +134,7 @@ if (file.exists(params_path)) {
     prediction_url = params$param_prediction_file
     parameter_url  = params$param_parameter_file
     
-    cat("✅ Parametri caricati correttamente.\n")
+    cat("✅ Parameters loaded correctly.\n")
 } else {
     stop("❌ Parameter file not found, aborting the task: ", params_path)
 }
