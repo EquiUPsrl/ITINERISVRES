@@ -12,6 +12,7 @@ dependencies:
   - r-iml
   - r-xgboost
   - r-nnet
+  - r-scales
   - r-MASS
   - r-ggplot2
   - r-randomForest
