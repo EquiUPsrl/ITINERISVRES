@@ -72,7 +72,9 @@ library(scales)
 print('option_list')
 option_list = list(
 
-make_option(c("--params_path"), action="store", default=NA, type="character", help="my description"),
+make_option(c("--parameter_url"), action="store", default=NA, type="character", help="my description"),
+make_option(c("--prediction_url"), action="store", default=NA, type="character", help="my description"),
+make_option(c("--training_url"), action="store", default=NA, type="character", help="my description"),
 make_option(c("--id"), action="store", default=NA, type="character", help="task id")
 )
 
@@ -108,39 +110,33 @@ var_serialization <- function(var){
     )
 }
 
-print("Retrieving params_path")
-var = opt$params_path
+print("Retrieving parameter_url")
+var = opt$parameter_url
 print(var)
 var_len = length(var)
-print(paste("Variable params_path has length", var_len))
+print(paste("Variable parameter_url has length", var_len))
 
-params_path <- gsub("\"", "", opt$params_path)
+parameter_url <- gsub("\"", "", opt$parameter_url)
+print("Retrieving prediction_url")
+var = opt$prediction_url
+print(var)
+var_len = length(var)
+print(paste("Variable prediction_url has length", var_len))
+
+prediction_url <- gsub("\"", "", opt$prediction_url)
+print("Retrieving training_url")
+var = opt$training_url
+print(var)
+var_len = length(var)
+print(paste("Variable training_url has length", var_len))
+
+training_url <- gsub("\"", "", opt$training_url)
 id <- gsub('"', '', opt$id)
 
 
 print("Running the cell")
-library(jsonlite)
-
 config_base_path <- "/tmp/WF4"
 input_path = file.path(config_base_path, 'data')
-
-training_url = ''
-prediction_url = ''
-parameter_url = ''
-
-cat(paste("File dei parametri:", params_path))
-
-if (file.exists(params_path)) {
-    params <- fromJSON(params_path)
-    
-    training_url   = params$param_training_file
-    prediction_url = params$param_prediction_file
-    parameter_url  = params$param_parameter_file
-    
-    cat("✅ Parametri caricati correttamente.\n")
-} else {
-    stop("❌ Parameter file not found, aborting the task: ", params_path)
-}
 
 
 download_to_folder <- function(url, folder, filename = NULL, binary = TRUE) {
@@ -162,7 +158,6 @@ download_to_folder <- function(url, folder, filename = NULL, binary = TRUE) {
   
   return(dest_file)
 }
-
 
 training_file <- download_to_folder(
   url = training_url,
