@@ -72,7 +72,9 @@ library(scales)
 print('option_list')
 option_list = list(
 
-make_option(c("--params_path"), action="store", default=NA, type="character", help="my description"),
+make_option(c("--remote_parameter_file"), action="store", default=NA, type="character", help="my description"),
+make_option(c("--remote_prediction_file"), action="store", default=NA, type="character", help="my description"),
+make_option(c("--remote_training_file"), action="store", default=NA, type="character", help="my description"),
 make_option(c("--id"), action="store", default=NA, type="character", help="task id")
 )
 
@@ -108,39 +110,34 @@ var_serialization <- function(var){
     )
 }
 
-print("Retrieving params_path")
-var = opt$params_path
+print("Retrieving remote_parameter_file")
+var = opt$remote_parameter_file
 print(var)
 var_len = length(var)
-print(paste("Variable params_path has length", var_len))
+print(paste("Variable remote_parameter_file has length", var_len))
 
-params_path <- gsub("\"", "", opt$params_path)
+remote_parameter_file <- gsub("\"", "", opt$remote_parameter_file)
+print("Retrieving remote_prediction_file")
+var = opt$remote_prediction_file
+print(var)
+var_len = length(var)
+print(paste("Variable remote_prediction_file has length", var_len))
+
+remote_prediction_file <- gsub("\"", "", opt$remote_prediction_file)
+print("Retrieving remote_training_file")
+var = opt$remote_training_file
+print(var)
+var_len = length(var)
+print(paste("Variable remote_training_file has length", var_len))
+
+remote_training_file <- gsub("\"", "", opt$remote_training_file)
 id <- gsub('"', '', opt$id)
 
 
 print("Running the cell")
-params_path_clean <- gsub('^"|"$', '', params_path)
-
-cat("DEBUG params_path:", params_path_clean, "\n")
-cat("File exists?", file.exists(params_path_clean), "\n")
-
-library(jsonlite)
-
-training_url = ''
-prediction_url = ''
-parameter_url = ''
-
-if (file.exists(params_path_clean)) {
-    params <- fromJSON(params_path_clean)
-    
-    training_url   = params$param_training_file
-    prediction_url = params$param_prediction_file
-    parameter_url  = params$param_parameter_file
-    
-    cat("✅ Parameters loaded correctly.\n")
-} else {
-    stop("❌ Parameter file not found, aborting the task: ", params_path_clean)
-}
+training_url = remote_training_file
+prediction_url = remote_prediction_file
+parameter_url = remote_parameter_file
 # capturing outputs
 print('Serialization of parameter_url')
 file <- file(paste0('/tmp/parameter_url_', id, '.json'))
