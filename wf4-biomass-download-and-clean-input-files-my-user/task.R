@@ -72,9 +72,9 @@ library(scales)
 print('option_list')
 option_list = list(
 
-make_option(c("--parameter_url"), action="store", default=NA, type="character", help="my description"),
-make_option(c("--prediction_url"), action="store", default=NA, type="character", help="my description"),
-make_option(c("--training_url"), action="store", default=NA, type="character", help="my description"),
+make_option(c("--remote_parameter_file"), action="store", default=NA, type="character", help="my description"),
+make_option(c("--remote_prediction_file"), action="store", default=NA, type="character", help="my description"),
+make_option(c("--remote_training_file"), action="store", default=NA, type="character", help="my description"),
 make_option(c("--id"), action="store", default=NA, type="character", help="task id")
 )
 
@@ -110,27 +110,27 @@ var_serialization <- function(var){
     )
 }
 
-print("Retrieving parameter_url")
-var = opt$parameter_url
+print("Retrieving remote_parameter_file")
+var = opt$remote_parameter_file
 print(var)
 var_len = length(var)
-print(paste("Variable parameter_url has length", var_len))
+print(paste("Variable remote_parameter_file has length", var_len))
 
-parameter_url <- gsub("\"", "", opt$parameter_url)
-print("Retrieving prediction_url")
-var = opt$prediction_url
+remote_parameter_file <- gsub("\"", "", opt$remote_parameter_file)
+print("Retrieving remote_prediction_file")
+var = opt$remote_prediction_file
 print(var)
 var_len = length(var)
-print(paste("Variable prediction_url has length", var_len))
+print(paste("Variable remote_prediction_file has length", var_len))
 
-prediction_url <- gsub("\"", "", opt$prediction_url)
-print("Retrieving training_url")
-var = opt$training_url
+remote_prediction_file <- gsub("\"", "", opt$remote_prediction_file)
+print("Retrieving remote_training_file")
+var = opt$remote_training_file
 print(var)
 var_len = length(var)
-print(paste("Variable training_url has length", var_len))
+print(paste("Variable remote_training_file has length", var_len))
 
-training_url <- gsub("\"", "", opt$training_url)
+remote_training_file <- gsub("\"", "", opt$remote_training_file)
 id <- gsub('"', '', opt$id)
 
 
@@ -138,6 +138,9 @@ print("Running the cell")
 config_base_path <- "/tmp/WF4"
 input_path = file.path(config_base_path, 'data')
 
+training_url = remote_training_file
+prediction_url = remote_prediction_file
+parameter_url = remote_parameter_file
 
 download_to_folder <- function(url, folder, filename = NULL, binary = TRUE) {
   if (!dir.exists(folder)) {
