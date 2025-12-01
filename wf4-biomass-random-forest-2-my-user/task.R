@@ -209,17 +209,10 @@ for (ntree in ntree_values) {
 
         results[[paste0("ntree_", ntree, "_mtry_", m_value)]] <- model_rf
 
-        metric_value <- min(model_rf$results[[metric]])  # Example: if optimizing MAE
-        cat("calculated metric_value:", metric_value, "\n")
-        
-        if (metric_value < best_metric) {
-            best_metric <- metric_value
-            best_model_rf <- model_rf
-        }
+        cat("selected metric:", metric, "\n")
+
     }
 }
 
-cat("Best model:\n")
-print(best_model_rf)
 
 stopCluster(cl)
