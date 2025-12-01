@@ -179,7 +179,6 @@ training_data_percentage <- as.numeric(params$value[params$Parameter == "Trainin
 
 predictors <- setdiff(names(dati), target_variable)
 
-
 ntree_row <- params[params$Parameter == "ntree", ]
 mtry_row  <- params[params$Parameter == "mtry",  ]
 
@@ -223,7 +222,7 @@ if (tolower(as.character(params$value[params$Parameter == "metric_value_Rsquared
 
 cat("metric_value: ", metric, "\n")
 
-set.seed(123)  # Seme globale per riproducibilità
+set.seed(123)  # Seme globale per riproducibilita
 library(caret)  # Assicurati che il pacchetto caret sia installato
 train_index <- createDataPartition(dati[[target_variable]], p = training_data_percentage, list = FALSE)
 train_data <- dati[train_index, ]
@@ -356,11 +355,11 @@ parametri_testo <- paste(
   "ntree:", final_ntree, "\n",
   "mtry:", final_mtry, "\n",
   "\nPerformance metrics on the training set:\n",
-  "R²:", r_squared_training, "\n",
+  "R:", r_squared_training, "\n",
   "Mean Absolute Error (MAE):", mae_training, "\n",
   "Root Mean Squared Error (RMSE):", rmse_training, "\n",
   "\nPerformance metrics on the test set:\n",
-  "R²:", r_squared_test, "\n",
+  "R:", r_squared_test, "\n",
   "Mean Absolute Error (MAE):", mae_test, "\n",
   "Root Mean Squared Error (RMSE):", rmse_test, "\n"
 )
