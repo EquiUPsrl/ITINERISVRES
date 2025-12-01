@@ -208,9 +208,6 @@ for (ntree in ntree_values) {
                           ntree = ntree,       # Use the current ntree value
 
         results[[paste0("ntree_", ntree, "_mtry_", m_value)]] <- model_rf
-
-        cat("selected metric:", metric, "\n")
-
     }
 }
 
