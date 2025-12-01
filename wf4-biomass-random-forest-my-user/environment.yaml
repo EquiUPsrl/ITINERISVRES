@@ -5,25 +5,13 @@ dependencies:
   - pip
   - python>=3.8
   - nbconvert
-  - r-tidyr
   - r-caret
   - r-readr
-  - r-doFuture
-  - r-iml
-  - r-kernlab
-  - r-foreach
+  - r-doParallel
+  - r-ggplot2
+  - r-randomForest
+  - r-fastICA
   - r-e1071
   - r-Metrics
-  - r-dplyr
-  - r-doParallel
-  - r-xgboost
-  - r-nnet
-  - r-scales
-  - r-MASS
-  - r-ggplot2
-  - r-jsonlite
-  - r-randomForest
-  - r-future
-  - r-fastICA
   - papermill
   - ipykernel
