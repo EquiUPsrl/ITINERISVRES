@@ -185,3 +185,41 @@ registerDoParallel(cl)
 results <- list()  # List to save models
 best_model_rf <- NULL  # To save the best model
 best_metric <- Inf  # Set an initial very high metric (for minimization)
+
+for (ntree in ntree_values) {
+    for (m_value in mtry_values) {
+        cat("Running the Random Forest model with ntree =", ntree, 
+            ", mtry =", m_value, "\n")
+
+        tuneGrid_rf <- expand.grid(mtry = m_value)
+
+        ctrl <- trainControl(method = "cv",
+                             number = number,         # Number of folds for CV
+                             seeds = seeds,           # Seed for reproducibility
+                             allowParallel = TRUE,    # Allow parallel processing
+                             verboseIter = TRUE)      # Print iteration details
+
+        model_rf <- train(as.formula(paste(target_variable, "~ .")), 
+                          data = train_data, 
+                          method = "rf",       # Method: Random Forest
+                          trControl = ctrl, 
+                          tuneGrid = tuneGrid_rf,
+                          preProcess=preProcSteps,
+                          ntree = ntree,       # Use the current ntree value
+
+        results[[paste0("ntree_", ntree, "_mtry_", m_value)]] <- model_rf
+
+        metric_value <- min(model_rf$results[[metric]])  # Example: if optimizing MAE
+        cat("calculated metric_value:", metric_value, "\n")
+        
+        if (metric_value < best_metric) {
+            best_metric <- metric_value
+            best_model_rf <- model_rf
+        }
+    }
+}
+
+cat("Best model:\n")
+print(best_model_rf)
+
+stopCluster(cl)
