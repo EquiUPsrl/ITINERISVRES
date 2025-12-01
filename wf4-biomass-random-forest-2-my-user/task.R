@@ -198,13 +198,7 @@ for (ntree in ntree_values) {
                              allowParallel = TRUE,
                              verboseIter = TRUE)
 
-        model_rf <- train(as.formula(paste(target_variable, "~ .")),
-                          data = train_data,
-                          method = "rf",
-                          trControl = ctrl,
-                          tuneGrid = tuneGrid_rf,
-                          preProcess=preProcSteps,
-                          ntree = ntree,
+        
     }
 }
 
