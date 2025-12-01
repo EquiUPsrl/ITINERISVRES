@@ -188,25 +188,23 @@ best_metric <- Inf  # Set an initial very high metric (for minimization)
 
 for (ntree in ntree_values) {
     for (m_value in mtry_values) {
-        cat("Running the Random Forest model with ntree =", ntree, 
-            ", mtry =", m_value, "\n")
+        cat("Running the Random Forest model with ntree =", ntree, ", mtry =", m_value, "\n")
 
         tuneGrid_rf <- expand.grid(mtry = m_value)
 
         ctrl <- trainControl(method = "cv",
-                             number = number,         # Number of folds for CV
-                             seeds = seeds,           # Seed for reproducibility
-                             allowParallel = TRUE,    # Allow parallel processing
-                             verboseIter = TRUE)      # Print iteration details
+                             number = number,
+                             seeds = seeds,
+                             allowParallel = TRUE,
+                             verboseIter = TRUE)
 
-        model_rf <- train(as.formula(paste(target_variable, "~ .")), 
-                          data = train_data, 
-                          method = "rf",       # Method: Random Forest
-                          trControl = ctrl, 
+        model_rf <- train(as.formula(paste(target_variable, "~ .")),
+                          data = train_data,
+                          method = "rf",
+                          trControl = ctrl,
                           tuneGrid = tuneGrid_rf,
                           preProcess=preProcSteps,
-                          ntree = ntree,       # Use the current ntree value
-
+                          ntree = ntree,
     }
 }
 
