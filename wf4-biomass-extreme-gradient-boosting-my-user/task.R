@@ -2,10 +2,6 @@ setwd('/app')
 library(optparse)
 library(jsonlite)
 
-if (!requireNamespace("base", quietly = TRUE)) {
-	install.packages("base", repos="http://cran.us.r-project.org")
-}
-library(base)
 if (!requireNamespace("caret", quietly = TRUE)) {
 	install.packages("caret", repos="http://cran.us.r-project.org")
 }
@@ -34,6 +30,10 @@ if (!requireNamespace("readr", quietly = TRUE)) {
 	install.packages("readr", repos="http://cran.us.r-project.org")
 }
 library(readr)
+if (!requireNamespace("remotes", quietly = TRUE)) {
+	install.packages("remotes", repos="http://cran.us.r-project.org")
+}
+library(remotes)
 if (!requireNamespace("tidyr", quietly = TRUE)) {
 	install.packages("tidyr", repos="http://cran.us.r-project.org")
 }
@@ -111,6 +111,11 @@ id <- gsub('"', '', opt$id)
 
 
 print("Running the cell")
+if (!requireNamespace("remotes", quietly = TRUE)) install.packages("remotes")
+remotes::install_github("dmlc/xgboost", ref="v1.6.2.1")
+library(xgboost)
+packageVersion("xgboost")
+
 library(ggplot2)
 library(xgboost)
 library(Metrics)
@@ -203,10 +208,6 @@ results_gbm <- list()
 best_model_gbm <- NULL
 best_metric <- Inf
 
-
-x_train <- base::as.matrix(train_data[, setdiff(names(train_data), target_variable)])
-y_train <- as.numeric(train_data[[target_variable]])
-
 for (n_value in nrounds) {
     for (depth_value in max_depth) {
         for (eta_value in eta) {
@@ -234,15 +235,14 @@ for (n_value in nrounds) {
                                 verboseIter = TRUE
                             )
                             
-                            
                             model_gbm <- train(
-                                x = x_train,
-                                y = y_train,
-                                method = "xgbTree",
-                                trControl = ctrl,
-                                tuneGrid = tuneGrid_gbm,
-                                preProcess = preProcSteps,
-                                verbose = FALSE
+                                as.formula(paste(target_variable, "~ .")),
+                                                   data = train_data,
+                                                   method = "xgbTree",
+                                                   trControl = ctrl,
+                                                   tuneGrid = tuneGrid_gbm,
+                                                   preProcess = preProcSteps,
+                                                   verbose = FALSE
                             )
                             
                             results_gbm[[paste0("nrounds_", n_value, "_depth_", depth_value)]] <- model_gbm
