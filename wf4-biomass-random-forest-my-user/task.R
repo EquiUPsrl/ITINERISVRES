@@ -179,6 +179,7 @@ training_data_percentage <- as.numeric(params$value[params$Parameter == "Trainin
 
 predictors <- setdiff(names(dati), target_variable)
 
+
 ntree_row <- params[params$Parameter == "ntree", ]
 mtry_row  <- params[params$Parameter == "mtry",  ]
 
@@ -222,7 +223,7 @@ if (tolower(as.character(params$value[params$Parameter == "metric_value_Rsquared
 
 cat("metric_value: ", metric, "\n")
 
-set.seed(123)  # Seme globale per riproducibilita
+set.seed(123)  # Seme globale per riproducibilità
 library(caret)  # Assicurati che il pacchetto caret sia installato
 train_index <- createDataPartition(dati[[target_variable]], p = training_data_percentage, list = FALSE)
 train_data <- dati[train_index, ]
@@ -253,7 +254,7 @@ for (ntree in ntree_values) {
     for (m_value in mtry_values) {
         cat("Running the Random Forest model with ntree =", ntree, 
             ", mtry =", m_value, "\n")
-        
+
         tuneGrid_rf <- expand.grid(mtry = m_value)
 
         ctrl <- trainControl(method = "cv",
@@ -273,7 +274,6 @@ for (ntree in ntree_values) {
         results[[paste0("ntree_", ntree, "_mtry_", m_value)]] <- model_rf
 
         metric_value <- min(model_rf$results[[metric]])  # Example: if optimizing MAE
-
         cat("calculated metric_value:", metric_value, "\n")
         
         if (metric_value < best_metric) {
@@ -368,9 +368,11 @@ parametri_testo <- paste(
 writeLines(parametri_testo, con = params_output_file)
 cat("Parameter description file saved in: ", params_output_file, "\n")
 
+
 model_path_rf <- file.path(model_dir, "best_model.rds")
 saveRDS(best_model_rf, model_path_rf)
 cat("Model saved in:", model_path_rf, "\n")
+
 
 results_rf <- best_model_rf$resample
 
