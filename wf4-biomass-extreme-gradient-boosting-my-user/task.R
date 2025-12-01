@@ -107,11 +107,6 @@ id <- gsub('"', '', opt$id)
 
 
 print("Running the cell")
-install.packages("xgboost", version = "1.6.0.1", repos = "https://cloud.r-project.org/")
-library(xgboost)
-packageVersion("xgboost")
-
-
 library(ggplot2)
 library(xgboost)
 library(Metrics)
@@ -204,57 +199,64 @@ results_gbm <- list()
 best_model_gbm <- NULL
 best_metric <- Inf
 
+target_index <- which(names(train_data) == target_variable)
+x_train <- as.matrix(train_data[, -target_index])
+y_train <- as.numeric(train_data[[target_index]])
+
 for (n_value in nrounds) {
-    for (depth_value in max_depth) {
-        for (eta_value in eta) {
-            for (gamma_value in gamma) {
-                for (colsample_value in colsample_bytree) {
-                    for (min_child_value in min_child_weight) {
-                        for (subsample_value in subsample) {
-                            cat("Running XGB with nrounds =", n_value, "max_depth =", depth_value, "\n")
-                            
-                            tuneGrid_gbm <- expand.grid(
-                                nrounds = n_value,
-                                max_depth = depth_value,
-                                eta = eta_value,
-                                gamma = gamma_value,
-                                colsample_bytree = colsample_value,
-                                min_child_weight = min_child_value,
-                                subsample = subsample_value
-                            )
-                            
-                            ctrl <- trainControl(
-                                method = "cv",
-                                number = number,
-                                seeds = seeds,
-                                allowParallel = TRUE,
-                                verboseIter = TRUE
-                            )
-                            
-                            model_gbm <- train(
-                                as.formula(paste(target_variable, "~ .")),
-                                                   data = train_data,
-                                                   method = "xgbTree",
-                                                   trControl = ctrl,
-                                                   tuneGrid = tuneGrid_gbm,
-                                                   preProcess = preProcSteps,
-                                                   verbose = FALSE
-                            )
-                            
-                            results_gbm[[paste0("nrounds_", n_value, "_depth_", depth_value)]] <- model_gbm
-                            metric_value <- min(model_gbm$results[[metric]])
-                            
-                            if (metric_value < best_metric) {
-                                best_metric <- metric_value
-                                best_model_gbm <- model_gbm
-                            }
-                        }
-                    }
-                }
+  for (depth_value in max_depth) {
+    for (eta_value in eta) {
+      for (gamma_value in gamma) {
+        for (colsample_value in colsample_bytree) {
+          for (min_child_value in min_child_weight) {
+            for (subsample_value in subsample) {
+              
+              cat("Running XGB with nrounds =", n_value, "max_depth =", depth_value, "\n")
+              
+              params <- list(
+                booster = "gbtree",
+                objective = "reg:squarederror", # cambia se classificazione
+                eta = eta_value,
+                max_depth = depth_value,
+                gamma = gamma_value,
+                colsample_bytree = colsample_value,
+                min_child_weight = min_child_value,
+                subsample = subsample_value
+              )
+              
+              dtrain <- xgb.DMatrix(data = x_train, label = y_train)
+              
+              cv <- xgb.cv(
+                params = params,
+                data = dtrain,
+                nrounds = n_value,
+                nfold = number,
+                metrics = "rmse",
+                verbose = FALSE,
+                early_stopping_rounds = 5
+              )
+              
+              key <- paste0("nrounds_", n_value, "_depth_", depth_value)
+              results_gbm[[key]] <- cv
+              
+              metric_value <- min(cv$evaluation_log$test_rmse_mean)
+              
+              if (metric_value < best_metric) {
+                best_metric <- metric_value
+                best_model_gbm <- xgb.train(
+                  params = params,
+                  data = dtrain,
+                  nrounds = cv$best_iteration
+                )
+              }
             }
+          }
         }
+      }
     }
+  }
 }
+
 
 cat("Best model:\n")
 print(best_model_gbm)
