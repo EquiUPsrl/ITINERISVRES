@@ -226,7 +226,20 @@ for (n_value in nrounds) {
                                 verboseIter = TRUE
                             )
                             
-                            model_gbm <- train(as.formula(paste(target_variable, "~ .")), data = train_data, method = "xgbTree", trControl = ctrl, tuneGrid = tuneGrid_gbm, preProcess = preProcSteps, verbose = FALSE)
+                            x_train <- as.matrix(train_data[, setdiff(names(train_data), target_variable)])
+                            y_train <- train_data[[target_variable]]
+                            
+                            if (!is.numeric(y_train)) y_train <- as.numeric(y_train)
+                            
+                            model_gbm <- train(
+                                x = x_train,
+                                y = y_train,
+                                method = "xgbTree",
+                                trControl = ctrl,
+                                tuneGrid = tuneGrid_gbm,
+                                preProcess = preProcSteps,
+                                verbose = FALSE
+                            )
                             
                             results_gbm[[paste0("nrounds_", n_value, "_depth_", depth_value)]] <- model_gbm
                             metric_value <- min(model_gbm$results[[metric]])
@@ -242,6 +255,7 @@ for (n_value in nrounds) {
         }
     }
 }
+
 
 cat("Best model:\n")
 print(best_model_gbm)
