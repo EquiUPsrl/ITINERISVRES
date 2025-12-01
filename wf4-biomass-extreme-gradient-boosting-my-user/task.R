@@ -199,6 +199,11 @@ results_gbm <- list()
 best_model_gbm <- NULL
 best_metric <- Inf
 
+train_data[] <- lapply(train_data, function(col) {
+  if (is.numeric(col)) as.numeric(col) else col
+})
+
+
 for (n_value in nrounds) {
     for (depth_value in max_depth) {
         for (eta_value in eta) {
@@ -226,20 +231,13 @@ for (n_value in nrounds) {
                                 verboseIter = TRUE
                             )
                             
-                            x_train <- as.matrix(train_data[, setdiff(names(train_data), target_variable)])
-                            y_train <- train_data[[target_variable]]
-                            
-                            if (!is.numeric(y_train)) y_train <- as.numeric(y_train)
-                            
-                            model_gbm <- train(
-                                x = x_train,
-                                y = y_train,
-                                method = "xgbTree",
-                                trControl = ctrl,
-                                tuneGrid = tuneGrid_gbm,
-                                preProcess = preProcSteps,
-                                verbose = FALSE
-                            )
+                            model_gbm <- train(as.formula(paste(target_variable, "~ .")), 
+                                               data = train_data, 
+                                               method = "xgbTree", 
+                                               trControl = ctrl, 
+                                               tuneGrid = tuneGrid_gbm, 
+                                               preProcess = preProcSteps, 
+                                               verbose = FALSE)
                             
                             results_gbm[[paste0("nrounds_", n_value, "_depth_", depth_value)]] <- model_gbm
                             metric_value <- min(model_gbm$results[[metric]])
@@ -255,7 +253,6 @@ for (n_value in nrounds) {
         }
     }
 }
-
 
 cat("Best model:\n")
 print(best_model_gbm)
