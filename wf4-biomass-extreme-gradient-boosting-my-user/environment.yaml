@@ -12,6 +12,7 @@ dependencies:
   - r-iml
   - r-xgboost
   - r-ggplot2
+  - r-base
   - r-e1071
   - r-Metrics
   - papermill
