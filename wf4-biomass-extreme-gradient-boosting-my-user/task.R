@@ -107,7 +107,7 @@ id <- gsub('"', '', opt$id)
 
 
 print("Running the cell")
-install.packages("xgboost", version = "1.6.0.1")  # se disponibile su CRAN
+install.packages("xgboost", repos = "https://cloud.r-project.org/")
 library(xgboost)
 packageVersion("xgboost")
 
