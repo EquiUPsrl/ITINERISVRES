@@ -30,10 +30,6 @@ if (!requireNamespace("readr", quietly = TRUE)) {
 	install.packages("readr", repos="http://cran.us.r-project.org")
 }
 library(readr)
-if (!requireNamespace("remotes", quietly = TRUE)) {
-	install.packages("remotes", repos="http://cran.us.r-project.org")
-}
-library(remotes)
 if (!requireNamespace("tidyr", quietly = TRUE)) {
 	install.packages("tidyr", repos="http://cran.us.r-project.org")
 }
@@ -111,10 +107,10 @@ id <- gsub('"', '', opt$id)
 
 
 print("Running the cell")
-if (!requireNamespace("remotes", quietly = TRUE)) install.packages("remotes")
-remotes::install_github("dmlc/xgboost", ref="v1.6.2.1")
+install.packages("xgboost", version = "1.6.0.1")  # se disponibile su CRAN
 library(xgboost)
 packageVersion("xgboost")
+
 
 library(ggplot2)
 library(xgboost)
