@@ -230,23 +230,25 @@ for (n_value in nrounds) {
                 params = params,
                 data = dtrain,
                 nrounds = n_value,
-                nfold = number,
+                nfold = number,  # numero di fold
                 metrics = "rmse",
                 verbose = FALSE,
                 early_stopping_rounds = 5
               )
               
+              best_iter <- cv$best_iteration
+              if (is.null(best_iter)) best_iter <- n_value
+              
               key <- paste0("nrounds_", n_value, "_depth_", depth_value)
               results_gbm[[key]] <- cv
               
               metric_value <- min(cv$evaluation_log$test_rmse_mean)
-              
               if (metric_value < best_metric) {
                 best_metric <- metric_value
                 best_model_gbm <- xgb.train(
                   params = params,
                   data = dtrain,
-                  nrounds = cv$best_iteration
+                  nrounds = best_iter
                 )
               }
             }
