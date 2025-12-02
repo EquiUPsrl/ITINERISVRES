@@ -512,7 +512,5 @@ cat("Table with input data and forecasts saved in: ", output_path, "\n")
 
 
 
-
-
 saveRDS(train_data, file = file.path(model_dir, "train_data.rds"))
 saveRDS(test_data,  file = file.path(model_dir, "test_data.rds"))
