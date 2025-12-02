@@ -13,6 +13,7 @@ dependencies:
   - r-xgboost
   - r-ggplot2
   - r-e1071
+  - r-dplyr
   - r-Metrics
   - papermill
   - ipykernel

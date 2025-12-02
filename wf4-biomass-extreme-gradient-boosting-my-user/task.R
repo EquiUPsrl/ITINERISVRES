@@ -10,6 +10,10 @@ if (!requireNamespace("doParallel", quietly = TRUE)) {
 	install.packages("doParallel", repos="http://cran.us.r-project.org")
 }
 library(doParallel)
+if (!requireNamespace("dplyr", quietly = TRUE)) {
+	install.packages("dplyr", repos="http://cran.us.r-project.org")
+}
+library(dplyr)
 if (!requireNamespace("e1071", quietly = TRUE)) {
 	install.packages("e1071", repos="http://cran.us.r-project.org")
 }
@@ -116,6 +120,7 @@ library(iml)
 library(e1071)
 library(readr)
 library(tidyr)
+library(dplyr)
 
 config_base_path <- "/tmp/data/WF4"
 output_path = file.path(config_base_path, "output")
