@@ -199,9 +199,23 @@ results_gbm <- list()
 best_model_gbm <- NULL
 best_metric <- Inf
 
-target_index <- which(names(train_data) == target_variable)
-x_train <- as.matrix(train_data[, -target_index])
-y_train <- as.numeric(train_data[[target_index]])
+pp <- preProcess(train_data[, predictors], method = preProcSteps)
+
+train_processed <- predict(pp, train_data[, predictors])
+test_processed  <- predict(pp, test_data[, predictors])
+
+cat("Columns after preProcess:", ncol(train_processed), "\n")
+
+x_train <- as.matrix(train_processed)
+y_train <- train_data[[target_variable]]
+
+x_test  <- as.matrix(test_processed)
+y_test  <- test_data[[target_variable]]
+
+cat("Training matrix dims:", dim(x_train), "\n")
+cat("Test matrix dims:", dim(x_test), "\n")
+
+dtrain <- xgb.DMatrix(data = x_train, label = y_train)
 
 for (n_value in nrounds) {
   for (depth_value in max_depth) {
@@ -211,46 +225,52 @@ for (n_value in nrounds) {
           for (min_child_value in min_child_weight) {
             for (subsample_value in subsample) {
               
-              cat("Running XGB with nrounds =", n_value, "max_depth =", depth_value, "\n")
-              
-              params <- list(
-                booster = "gbtree",
-                objective = "reg:squarederror", # cambia se classificazione
-                eta = eta_value,
-                max_depth = depth_value,
-                gamma = gamma_value,
-                colsample_bytree = colsample_value,
-                min_child_weight = min_child_value,
-                subsample = subsample_value
-              )
-              
-              dtrain <- xgb.DMatrix(data = x_train, label = y_train)
-              
-              cv <- xgb.cv(
-                params = params,
-                data = dtrain,
-                nrounds = n_value,
-                nfold = number,  # numero di fold
-                metrics = "rmse",
-                verbose = FALSE,
-                early_stopping_rounds = 5
-              )
-              
-              best_iter <- cv$best_iteration
-              if (is.null(best_iter)) best_iter <- n_value
-              
-              key <- paste0("nrounds_", n_value, "_depth_", depth_value)
-              results_gbm[[key]] <- cv
-              
-              metric_value <- min(cv$evaluation_log$test_rmse_mean)
-              if (metric_value < best_metric) {
-                best_metric <- metric_value
-                best_model_gbm <- xgb.train(
-                  params = params,
-                  data = dtrain,
-                  nrounds = best_iter
+                cat("Running XGB with nrounds =", n_value,
+                    "max_depth =", depth_value,
+                    "eta =", eta_value,
+                    "gamma =", gamma_value,
+                    "colsample =", colsample_value,
+                    "min_child_weight =", min_child_value,
+                    "subsample =", subsample_value, "\n")
+    
+                params <- list(
+                    objective = "reg:squarederror",
+                    max_depth = depth_value,
+                    eta = eta_value,
+                    gamma = gamma_value,
+                    colsample_bytree = colsample_value,
+                    min_child_weight = min_child_value,
+                    subsample = subsample_value
                 )
-              }
+    
+                cv <- xgb.cv(
+                    params = params,
+                    data = dtrain,
+                    nrounds = n_value,
+                    nfold = number,
+                    metrics = "rmse",
+                    verbose = FALSE,
+                    early_stopping_rounds = 5
+                )
+    
+                cat("CV best_iteration:", cv$best_iteration,
+                    "Min RMSE:", min(cv$evaluation_log$test_rmse_mean), "\n")
+    
+                best_iter <- cv$best_iteration
+                model <- xgb.train(
+                    params = params,
+                    data = dtrain,
+                    nrounds = best_iter
+                )
+    
+                preds <- predict(model, x_test)
+    
+                rmse_val <- Metrics::rmse(y_test, preds)
+    
+                if (rmse_val < best_metric) {
+                    best_metric <- rmse_val
+                    best_model_gbm <- model
+                }
             }
           }
         }
