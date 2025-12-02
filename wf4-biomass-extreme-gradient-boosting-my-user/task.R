@@ -223,81 +223,84 @@ print(predictors)
 cat("Train dimensioni:", dim(train_num), "\n")
 cat("Test dimensioni:", dim(test_num), "\n\n")
 
-for (n_value in nrounds) {
-  for (depth_value in max_depth) {
-    for (eta_value in eta) {
-      for (gamma_value in gamma) {
-        for (colsample_value in colsample_bytree) {
-          for (min_child_value in min_child_weight) {
-            for (subsample_value in subsample) {
+pre_proc <- preProcess(train_num, method = preProcSteps)
+train_processed <- predict(pre_proc, train_num)
+test_processed  <- predict(pre_proc, test_num)
 
-              cat("------------------------------------------------\n")
-              cat("Running XGB with parameters:\n")
-              cat("nrounds =", n_value, "max_depth =", depth_value,
-                  "eta =", eta_value, "gamma =", gamma_value,
-                  "colsample_bytree =", colsample_value,
-                  "min_child_weight =", min_child_value,
-                  "subsample =", subsample_value, "\n")
+cat("Dopo preprocessing:\n")
+cat("Train dim:", dim(train_processed), "\n")
+cat("Test dim :", dim(test_processed), "\n")
+cat("Colonne train:", paste(colnames(train_processed), collapse = ", "), "\n")
+cat("Colonne test :", paste(colnames(test_processed), collapse = ", "), "\n\n")
 
-              pre_proc <- preProcess(train_num, method = preProcSteps)
+if (!all(colnames(train_processed) == colnames(test_processed))) {
+  stop("Errore: colonne train e test non coincidono dopo preprocessing!")
+}
 
-              train_processed <- predict(pre_proc, train_num)
-              test_processed  <- predict(pre_proc, test_num)
+dtrain <- xgb.DMatrix(data = as.matrix(train_processed), label = y_train)
+dtest  <- xgb.DMatrix(data = as.matrix(test_processed))
 
-              cat("Train processed dim:", dim(train_processed), "\n")
-              cat("Test processed dim :", dim(test_processed), "\n")
+param_grid <- expand.grid(
+  nrounds = nrounds,
+  max_depth = max_depth,
+  eta = eta,
+  gamma = gamma,
+  colsample_bytree = colsample_bytree,
+  min_child_weight = min_child_weight,
+  subsample = subsample
+)
 
-              cat("Colonne train:", paste(colnames(train_processed), collapse = ", "), "\n")
-              cat("Colonne test :", paste(colnames(test_processed), collapse = ", "), "\n")
-
-              if (!all(colnames(train_processed) == colnames(test_processed))) {
-                stop("Errore: colonne train e test non coincidono dopo preprocessing!")
-              }
-
-              dtrain <- xgb.DMatrix(data = as.matrix(train_processed), label = y_train)
-              dtest  <- xgb.DMatrix(data = as.matrix(test_processed))
-
-              params <- list(
-                booster = "gbtree",
-                objective = "reg:squarederror",
-                eval_metric = "rmse",
-                eta = eta_value,
-                max_depth = depth_value,
-                gamma = gamma_value,
-                colsample_bytree = colsample_value,
-                min_child_weight = min_child_value,
-                subsample = subsample_value
-              )
-
-              model_gbm <- xgb.train(
-                params = params,
-                data = dtrain,
-                nrounds = n_value,
-                verbose = 0
-              )
-
-              pred_train <- predict(model_gbm, dtrain)
-              rmse_val <- sqrt(mean((y_train - pred_train)^2))
-              cat("RMSE su train:", rmse_val, "\n")
-
-              results_gbm[[paste0("nrounds_", n_value, "_depth_", depth_value)]] <- model_gbm
-
-              if (rmse_val < best_metric) {
-                best_metric <- rmse_val
-                best_model_gbm <- model_gbm
-              }
-
-            }
-          }
-        }
-      }
-    }
+for(i in 1:nrow(param_grid)) {
+  params <- param_grid[i, ]
+  
+  cat("------------------------------------------------\n")
+  cat("Running XGB with parameters:\n")
+  print(params)
+  
+  xgb_params <- list(
+    booster = "gbtree",
+    objective = "reg:squarederror",
+    eval_metric = "rmse",
+    eta = params$eta,
+    max_depth = params$max_depth,
+    gamma = params$gamma,
+    colsample_bytree = params$colsample_bytree,
+    min_child_weight = params$min_child_weight,
+    subsample = params$subsample
+  )
+  
+  cv <- xgb.cv(
+    params = xgb_params,
+    data = dtrain,
+    nrounds = params$nrounds,
+    nfold = number,
+    verbose = 0,
+    early_stopping_rounds = 10,
+    maximize = FALSE
+  )
+  
+  best_iter <- cv$best_iteration
+  rmse_cv <- cv$evaluation_log[best_iter, test_rmse_mean]
+  cat("Best iteration:", best_iter, "RMSE CV:", rmse_cv, "\n")
+  
+  model_gbm <- xgb.train(
+    params = xgb_params,
+    data = dtrain,
+    nrounds = best_iter,
+    verbose = 0
+  )
+  
+  results_gbm[[paste0("model_", i)]] <- model_gbm
+  
+  if (rmse_cv < best_metric) {
+    best_metric <- rmse_cv
+    best_model_gbm <- model_gbm
   }
 }
 
 cat("\nBest model:\n")
 print(best_model_gbm)
-cat("Best RMSE (train):", best_metric, "\n")
+cat("Best RMSE (CV):", best_metric, "\n")
 
 preds <- predict(best_model_gbm, dtest)
 cat("Predizioni calcolate correttamente su test.\n")
