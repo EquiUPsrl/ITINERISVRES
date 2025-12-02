@@ -269,17 +269,27 @@ for(i in 1:nrow(param_grid)) {
     subsample = params$subsample
   )
   
+
+
+  early_stop <- min(10, params$nrounds - 1) # early stopping < nrounds
+  if(early_stop < 1) early_stop <- 1
+    
   cv <- xgb.cv(
-    params = xgb_params,
-    data = dtrain,
-    nrounds = params$nrounds,
-    nfold = number,
-    verbose = 0,
-    early_stopping_rounds = 10,
-    maximize = FALSE
-  )
+      params = xgb_params,
+      data = dtrain,
+      nrounds = params$nrounds,
+      nfold = min(number, nrow(train_data)),
+      verbose = 0,
+      early_stopping_rounds = early_stop,
+      maximize = FALSE
+    )
+    
+    best_iter <- cv$best_iteration
+    if(length(best_iter) == 0) {
+      cat("Warning: best_iteration vuoto, uso nrounds =", params$nrounds, "\n")
+      best_iter <- params$nrounds
+    }
   
-  best_iter <- cv$best_iteration
   rmse_cv <- cv$evaluation_log[best_iter, test_rmse_mean]
   cat("Best iteration:", best_iter, "RMSE CV:", rmse_cv, "\n")
   
