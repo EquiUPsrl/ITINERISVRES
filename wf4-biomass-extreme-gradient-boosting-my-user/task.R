@@ -209,7 +209,6 @@ library(xgboost)
 library(caret)
 
 set.seed(123)  # seed globale
-number_folds <- number  # numero di fold per CV
 
 num_cols <- sapply(train_data, is.numeric)
 predictors <- names(train_data)[num_cols]
@@ -237,7 +236,8 @@ if(!all(colnames(train_processed) == colnames(test_processed))) {
 dtrain <- xgb.DMatrix(data = as.matrix(train_processed), label = y_train)
 dtest  <- xgb.DMatrix(data = as.matrix(test_processed))
 
-seeds <- vector("list", number_folds)
+number_folds <- number  # numero fold CV
+seeds <- vector("list", number_folds + 1)
 for(f in 1:number_folds) {
   seeds[[f]] <- sample.int(1e6, length(nrounds) * length(max_depth) *
                                        length(eta) * length(gamma) *
@@ -279,18 +279,18 @@ for (n_value in nrounds) {
                 subsample = subsample_value
               )
 
-              set.seed(seeds[[1]][1])  # puoi anche ciclare tra seeds[[fold]] se vuoi replicare tutti i fold
+              set.seed(seeds[[1]][1])
+              folds <- createFolds(y_train, k = number_folds, list = TRUE, returnTrain = TRUE)
 
               cv <- xgb.cv(
                 params = params,
                 data = dtrain,
                 nrounds = n_value,
                 nfold = number_folds,
+                folds = folds,
                 metrics = "rmse",
                 verbose = FALSE,
-                early_stopping_rounds = 10,
-                prediction = FALSE,
-                folds = createFolds(y_train, k = number_folds, list = TRUE, returnTrain = TRUE)
+                early_stopping_rounds = 10
               )
 
               best_iter <- cv$best_iteration
