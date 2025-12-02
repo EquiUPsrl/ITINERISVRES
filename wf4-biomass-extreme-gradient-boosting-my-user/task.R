@@ -10,6 +10,10 @@ if (!requireNamespace("doParallel", quietly = TRUE)) {
 	install.packages("doParallel", repos="http://cran.us.r-project.org")
 }
 library(doParallel)
+if (!requireNamespace("dplyr", quietly = TRUE)) {
+	install.packages("dplyr", repos="http://cran.us.r-project.org")
+}
+library(dplyr)
 if (!requireNamespace("e1071", quietly = TRUE)) {
 	install.packages("e1071", repos="http://cran.us.r-project.org")
 }
@@ -195,27 +199,35 @@ cat("ncores = ", ncores)
 cl <- makePSOCKcluster(ncores)
 registerDoParallel(cl)
 
-results_gbm <- list()
-best_model_gbm <- NULL
+
+
+
+
+
+train_data_num <- train_data %>% dplyr::select_if(is.numeric)
+test_data_num  <- test_data %>% dplyr::select_if(is.numeric)
+
+y_train <- train_data_num[[target_variable]]
+train_data_num[[target_variable]] <- NULL
+
+pre_proc <- preProcess(train_data_num, method = preProcSteps)
+
+train_processed <- predict(pre_proc, train_data_num)
+test_processed  <- predict(pre_proc, test_data_num)
+
+cat("Columns after preProcess (train):", ncol(train_processed), "\n")
+cat("Columns after preProcess (test):",  ncol(test_processed), "\n")
+
+dtrain_full <- xgb.DMatrix(
+    data = as.matrix(train_processed),
+    label = y_train
+)
+
+
 best_metric <- Inf
-
-pp <- preProcess(train_data[, predictors], method = preProcSteps)
-
-train_processed <- predict(pp, train_data[, predictors])
-test_processed  <- predict(pp, test_data[, predictors])
-
-cat("Columns after preProcess:", ncol(train_processed), "\n")
-
-x_train <- as.matrix(train_processed)
-y_train <- train_data[[target_variable]]
-
-x_test  <- as.matrix(test_processed)
-y_test  <- test_data[[target_variable]]
-
-cat("Training matrix dims:", dim(x_train), "\n")
-cat("Test matrix dims:", dim(x_test), "\n")
-
-dtrain <- xgb.DMatrix(data = x_train, label = y_train)
+best_model_gbm <- NULL
+best_params <- NULL
+best_iter <- NULL
 
 for (n_value in nrounds) {
   for (depth_value in max_depth) {
@@ -224,56 +236,56 @@ for (n_value in nrounds) {
         for (colsample_value in colsample_bytree) {
           for (min_child_value in min_child_weight) {
             for (subsample_value in subsample) {
-              
-                cat("Running XGB with nrounds =", n_value,
-                    "max_depth =", depth_value,
-                    "eta =", eta_value,
-                    "gamma =", gamma_value,
-                    "colsample =", colsample_value,
-                    "min_child_weight =", min_child_value,
-                    "subsample =", subsample_value, "\n")
-    
-                params <- list(
-                    objective = "reg:squarederror",
-                    max_depth = depth_value,
-                    eta = eta_value,
-                    gamma = gamma_value,
-                    colsample_bytree = colsample_value,
-                    min_child_weight = min_child_value,
-                    subsample = subsample_value
+
+              cat("\nRunning XGB:",
+                  "nrounds =", n_value,
+                  "max_depth =", depth_value,
+                  "eta =", eta_value,
+                  "gamma =", gamma_value,
+                  "colsample =", colsample_value,
+                  "min_child_weight =", min_child_value,
+                  "subsample =", subsample_value, "\n")
+
+              params <- list(
+                booster = "gbtree",
+                objective = "reg:squarederror",
+                eval_metric = "rmse",
+                eta = eta_value,
+                max_depth = depth_value,
+                gamma = gamma_value,
+                colsample_bytree = colsample_value,
+                min_child_weight = min_child_value,
+                subsample = subsample_value
+              )
+
+              cv <- xgb.cv(
+                params = params,
+                data = dtrain_full,
+                nrounds = n_value,
+                nfold = number,
+                verbose = FALSE,
+                early_stopping_rounds = 10,
+                prediction = FALSE
+              )
+
+              best_iter_cv <- cv$best_iteration
+              best_rmse_cv <- cv$evaluation_log$test_rmse_mean[best_iter_cv]
+
+              cat("CV best_iteration:", best_iter_cv,
+                  "Min RMSE:", best_rmse_cv, "\n")
+
+              if (!is.na(best_rmse_cv) && best_rmse_cv < best_metric) {
+                best_metric <- best_rmse_cv
+                best_iter <- best_iter_cv
+                best_params <- params
+
+                best_model_gbm <- xgb.train(
+                  params = params,
+                  data = dtrain_full,
+                  nrounds = best_iter
                 )
-    
-                cv <- xgb.cv(
-                    params = params,
-                    data = dtrain,
-                    nrounds = n_value,
-                    nfold = number,
-                    metrics = "rmse",
-                    verbose = FALSE,
-                    early_stopping_rounds = 5
-                )
-    
-                cat("CV best_iteration:", cv$best_iteration,
-                    "Min RMSE:", min(cv$evaluation_log$test_rmse_mean), "\n")
-    
-                best_iter <- cv$best_iteration
-                if (is.null(best_iter) || is.na(best_iter) || best_iter == 0) {
-                    best_iter <- n_value   # fallback: usa tutti i round
-                }
-                model <- xgb.train(
-                    params = params,
-                    data = dtrain,
-                    nrounds = best_iter
-                )
-    
-                preds <- predict(model, x_test)
-    
-                rmse_val <- Metrics::rmse(y_test, preds)
-    
-                if (rmse_val < best_metric) {
-                    best_metric <- rmse_val
-                    best_model_gbm <- model
-                }
+              }
+
             }
           }
         }
@@ -283,8 +295,24 @@ for (n_value in nrounds) {
 }
 
 
+dtest_final <- xgb.DMatrix(as.matrix(test_processed))
+
+pred <- predict(best_model_gbm, dtest_final)
+
+
 cat("Best model:\n")
 print(best_model_gbm)
+cat("\nBest params:\n")
+print(best_params)
+cat("\nBest iteration:", best_iter, "Best RMSE:", best_metric, "\n")
+
+
+
+
+
+
+
+
 
 stopCluster(cl)
 
