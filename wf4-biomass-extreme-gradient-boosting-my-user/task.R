@@ -205,9 +205,11 @@ registerDoParallel(cl)
 
 
 
-results_gbm <- list()
-best_model_gbm <- NULL
-best_metric <- Inf
+library(xgboost)
+library(caret)
+
+set.seed(123)  # seed globale
+number_folds <- number  # numero di fold per CV
 
 num_cols <- sapply(train_data, is.numeric)
 predictors <- names(train_data)[num_cols]
@@ -228,11 +230,26 @@ pre_proc <- preProcess(train_num, method = preProcSteps)
 train_processed <- predict(pre_proc, train_num)
 test_processed  <- predict(pre_proc, test_num)
 
-cat("Columns after preProcess (train):", ncol(train_processed), "\n")
-cat("Columns after preProcess (test):",  ncol(test_processed), "\n")
+if(!all(colnames(train_processed) == colnames(test_processed))) {
+  stop("Train e test hanno colonne diverse dopo preprocessing!")
+}
 
 dtrain <- xgb.DMatrix(data = as.matrix(train_processed), label = y_train)
 dtest  <- xgb.DMatrix(data = as.matrix(test_processed))
+
+seeds <- vector("list", number_folds)
+for(f in 1:number_folds) {
+  seeds[[f]] <- sample.int(1e6, length(nrounds) * length(max_depth) *
+                                       length(eta) * length(gamma) *
+                                       length(colsample_bytree) *
+                                       length(min_child_weight) *
+                                       length(subsample))
+}
+seeds[[number_folds + 1]] <- 12345
+
+results_gbm <- list()
+best_model_gbm <- NULL
+best_metric <- Inf
 
 for (n_value in nrounds) {
   for (depth_value in max_depth) {
@@ -262,15 +279,18 @@ for (n_value in nrounds) {
                 subsample = subsample_value
               )
 
+              set.seed(seeds[[1]][1])  # puoi anche ciclare tra seeds[[fold]] se vuoi replicare tutti i fold
+
               cv <- xgb.cv(
                 params = params,
                 data = dtrain,
                 nrounds = n_value,
-                nfold = number,
+                nfold = number_folds,
                 metrics = "rmse",
                 verbose = FALSE,
                 early_stopping_rounds = 10,
-                prediction = FALSE
+                prediction = FALSE,
+                folds = createFolds(y_train, k = number_folds, list = TRUE, returnTrain = TRUE)
               )
 
               best_iter <- cv$best_iteration
@@ -309,6 +329,7 @@ preds <- predict(best_model_gbm, dtest)
 cat("\nBest model:\n")
 print(best_model_gbm)
 cat("\nBest RMSE (CV):", best_metric, "\n")
+
 
 
 
