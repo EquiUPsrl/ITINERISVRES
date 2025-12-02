@@ -6,6 +6,10 @@ if (!requireNamespace("caret", quietly = TRUE)) {
 	install.packages("caret", repos="http://cran.us.r-project.org")
 }
 library(caret)
+if (!requireNamespace("doFuture", quietly = TRUE)) {
+	install.packages("doFuture", repos="http://cran.us.r-project.org")
+}
+library(doFuture)
 if (!requireNamespace("doParallel", quietly = TRUE)) {
 	install.packages("doParallel", repos="http://cran.us.r-project.org")
 }
@@ -18,6 +22,18 @@ if (!requireNamespace("e1071", quietly = TRUE)) {
 	install.packages("e1071", repos="http://cran.us.r-project.org")
 }
 library(e1071)
+if (!requireNamespace("fastICA", quietly = TRUE)) {
+	install.packages("fastICA", repos="http://cran.us.r-project.org")
+}
+library(fastICA)
+if (!requireNamespace("foreach", quietly = TRUE)) {
+	install.packages("foreach", repos="http://cran.us.r-project.org")
+}
+library(foreach)
+if (!requireNamespace("future", quietly = TRUE)) {
+	install.packages("future", repos="http://cran.us.r-project.org")
+}
+library(future)
 if (!requireNamespace("ggplot2", quietly = TRUE)) {
 	install.packages("ggplot2", repos="http://cran.us.r-project.org")
 }
@@ -26,22 +42,46 @@ if (!requireNamespace("iml", quietly = TRUE)) {
 	install.packages("iml", repos="http://cran.us.r-project.org")
 }
 library(iml)
+if (!requireNamespace("jsonlite", quietly = TRUE)) {
+	install.packages("jsonlite", repos="http://cran.us.r-project.org")
+}
+library(jsonlite)
+if (!requireNamespace("kernlab", quietly = TRUE)) {
+	install.packages("kernlab", repos="http://cran.us.r-project.org")
+}
+library(kernlab)
+if (!requireNamespace("MASS", quietly = TRUE)) {
+	install.packages("MASS", repos="http://cran.us.r-project.org")
+}
+library(MASS)
 if (!requireNamespace("Metrics", quietly = TRUE)) {
 	install.packages("Metrics", repos="http://cran.us.r-project.org")
 }
 library(Metrics)
+if (!requireNamespace("nnet", quietly = TRUE)) {
+	install.packages("nnet", repos="http://cran.us.r-project.org")
+}
+library(nnet)
+if (!requireNamespace("randomForest", quietly = TRUE)) {
+	install.packages("randomForest", repos="http://cran.us.r-project.org")
+}
+library(randomForest)
 if (!requireNamespace("readr", quietly = TRUE)) {
 	install.packages("readr", repos="http://cran.us.r-project.org")
 }
 library(readr)
-if (!requireNamespace("tidyr", quietly = TRUE)) {
-	install.packages("tidyr", repos="http://cran.us.r-project.org")
-}
-library(tidyr)
 if (!requireNamespace("xgboost", quietly = TRUE)) {
 	install.packages("xgboost", repos="http://cran.us.r-project.org")
 }
 library(xgboost)
+if (!requireNamespace("tidyr", quietly = TRUE)) {
+	install.packages("tidyr", repos="http://cran.us.r-project.org")
+}
+library(tidyr)
+if (!requireNamespace("scales", quietly = TRUE)) {
+	install.packages("scales", repos="http://cran.us.r-project.org")
+}
+library(scales)
 
 
 
@@ -120,7 +160,6 @@ library(iml)
 library(e1071)
 library(readr)
 library(tidyr)
-library(dplyr)
 
 config_base_path <- "/tmp/data/WF4"
 output_path = file.path(config_base_path, "output")
@@ -200,181 +239,64 @@ cat("ncores = ", ncores)
 cl <- makePSOCKcluster(ncores)
 registerDoParallel(cl)
 
-
-
-
-
-
-
-features_train <- train_data %>% select(-all_of(target_variable))
-y_train <- train_data[[target_variable]]
-
-features_test <- test_data %>% select(-all_of(target_variable))
-y_test <- test_data[[target_variable]]
-
-cat("Features (before preprocess):", paste(colnames(features_train), collapse = ", "), "\n")
-cat("Train rows/cols:", dim(features_train), " Test rows/cols:", dim(features_test), "\n")
-
-if (!is.null(preProcSteps) && length(preProcSteps) > 0) {
-  preProcObj <- preProcess(features_train, method = preProcSteps)
-  features_train_proc <- predict(preProcObj, features_train)
-  features_test_proc  <- predict(preProcObj, features_test)
-} else {
-  features_train_proc <- features_train
-  features_test_proc  <- features_test
-}
-
-ok_train <- complete.cases(features_train_proc)
-ok_test  <- complete.cases(features_test_proc)
-
-if (!all(ok_train)) {
-  cat("Warning: rimosse", sum(!ok_train), "righe dal train per NA/Inf dopo preprocess\n")
-  features_train_proc <- features_train_proc[ok_train, , drop = FALSE]
-  y_train <- y_train[ok_train]
-}
-if (!all(ok_test)) {
-  cat("Warning: rimosse", sum(!ok_test), "righe dal test per NA/Inf dopo preprocess\n")
-  features_test_proc <- features_test_proc[ok_test, , drop = FALSE]
-  y_test <- y_test[ok_test]
-}
-
-cat("Features after preprocess (train):", paste(colnames(features_train_proc), collapse = ", "), "\n")
-cat("Features after preprocess (test) :", paste(colnames(features_test_proc), collapse = ", "), "\n")
-cat("Train dims proc:", dim(features_train_proc), " Test dims proc:", dim(features_test_proc), "\n")
-
-if (!identical(colnames(features_train_proc), colnames(features_test_proc))) {
-  stop("ERROR: colonne di train e test diverse dopo preprocess. Controlla preProcSteps e le colonne numeriche.")
-}
-
-metric_map <- function(m) {
-  m_up <- toupper(as.character(m))
-  if (m_up == "MAE") return("mae")
-  if (m_up == "RMSE") return("rmse")
-  if (m_up == "RSQUARED" || m_up == "RSQUARED" || m_up == "RSQUARED") return("rmse") # use rmse for CV, compute R2 later
-  return("rmse")
-}
-eval_metric_xgb <- metric_map(metric)
-cat("Using eval_metric for xgboost CV:", eval_metric_xgb, "\n")
-
-dtrain <- xgb.DMatrix(data = as.matrix(features_train_proc), label = as.numeric(y_train))
-dtest  <- xgb.DMatrix(data = as.matrix(features_test_proc),  label = as.numeric(y_test))
-
 results_gbm <- list()
 best_model_gbm <- NULL
-best_metric_val <- Inf
+best_metric <- Inf
 
 for (n_value in nrounds) {
-  for (depth_value in max_depth) {
-    for (eta_value in eta) {
-      for (gamma_value in gamma) {
-        for (colsample_value in colsample_bytree) {
-          for (min_child_value in min_child_weight) {
-            for (subsample_value in subsample) {
-
-              cat("------------------------------------------------\n")
-              cat(sprintf("Params: nrounds=%s max_depth=%s eta=%s gamma=%s colsample=%s min_child_weight=%s subsample=%s\n",
-                          n_value, depth_value, eta_value, gamma_value, colsample_value, min_child_value, subsample_value))
-
-              params_xgb <- list(
-                booster = "gbtree",
-                objective = "reg:squarederror",
-                eta = eta_value,
-                max_depth = as.integer(depth_value),
-                gamma = gamma_value,
-                colsample_bytree = colsample_value,
-                min_child_weight = min_child_value,
-                subsample = subsample_value,
-                eval_metric = eval_metric_xgb
-              )
-
-              nfold_use <- min(number, nrow(features_train_proc))
-              if (nfold_use < 2) {
-                warning("nfold < 2, skipping CV and using full nrounds for training")
-                best_iter <- n_value
-                rmse_cv_val <- NA
-              } else {
-                early_stop <- 10
-                if (n_value <= early_stop) early_stop <- max(1, floor(n_value/2))
-
-                cv <- tryCatch({
-                  xgb.cv(
-                    params = params_xgb,
-                    data = dtrain,
-                    nrounds = n_value,
-                    nfold = nfold_use,
-                    verbose = FALSE,
-                    early_stopping_rounds = early_stop,
-                    showsd = TRUE
-                  )
-                }, error = function(e) {
-                  warning("xgb.cv failed: ", e$message)
-                  return(NULL)
-                })
-
-                if (is.null(cv)) {
-                  best_iter <- n_value
-                  rmse_cv_val <- NA
-                } else {
-                  best_iter <- cv$best_iteration
-                  if (is.null(best_iter) || length(best_iter) == 0) best_iter <- n_value
-                  em_col <- grep("^test_.*_mean$", colnames(cv$evaluation_log), value = TRUE)
-                  if (length(em_col) >= 1) {
-                    rmse_cv_val <- cv$evaluation_log[[em_col[1]]][best_iter]
-                  } else {
-                    rmse_cv_val <- NA
-                  }
+    for (depth_value in max_depth) {
+        for (eta_value in eta) {
+            for (gamma_value in gamma) {
+                for (colsample_value in colsample_bytree) {
+                    for (min_child_value in min_child_weight) {
+                        for (subsample_value in subsample) {
+                            cat("Running XGB with nrounds =", n_value, "max_depth =", depth_value, "\n")
+                            
+                            tuneGrid_gbm <- expand.grid(
+                                nrounds = n_value,
+                                max_depth = depth_value,
+                                eta = eta_value,
+                                gamma = gamma_value,
+                                colsample_bytree = colsample_value,
+                                min_child_weight = min_child_value,
+                                subsample = subsample_value
+                            )
+                            
+                            ctrl <- trainControl(
+                                method = "cv",
+                                number = number,
+                                seeds = seeds,
+                                allowParallel = TRUE,
+                                verboseIter = TRUE
+                            )
+                            
+                            model_gbm <- train(
+                                as.formula(paste(target_variable, "~ .")),
+                                data = train_data,
+                                method = "xgbTree",
+                                trControl = ctrl,
+                                tuneGrid = tuneGrid_gbm,
+                                preProcess = preProcSteps,
+                                verbose = FALSE
+                            )
+                            
+                            results_gbm[[paste0("nrounds_", n_value, "_depth_", depth_value)]] <- model_gbm
+                            metric_value <- min(model_gbm$results[[metric]])
+                            
+                            if (metric_value < best_metric) {
+                                best_metric <- metric_value
+                                best_model_gbm <- model_gbm
+                            }
+                        }
+                    }
                 }
-              }
+            }
+        }
+    }
+}
 
-              cat("Using best_iter =", best_iter, " CV-metric:", rmse_cv_val, "\n")
-
-              model_final <- xgb.train(
-                params = params_xgb,
-                data = dtrain,
-                nrounds = best_iter,
-                verbose = 0
-              )
-
-              key <- paste0("nrounds_", n_value, "_depth_", depth_value, "_eta_", eta_value,
-                            "_gamma_", gamma_value, "_col_", colsample_value)
-              results_gbm[[key]] <- list(params = params_xgb, best_iter = best_iter, cv_metric = rmse_cv_val, model = model_final)
-
-              metric_comp_val <- rmse_cv_val
-              if (is.na(metric_comp_val)) metric_comp_val <- Inf
-
-              if (metric_comp_val < best_metric_val) {
-                best_metric_val <- metric_comp_val
-                best_model_gbm <- model_final
-                best_info <- list(key = key, params = params_xgb, best_iter = best_iter, cv_metric = rmse_cv_val)
-              }
-
-            } # end subsample
-          } # end min_child
-        } # end colsample
-      } # end gamma
-    } # end eta
-  } # end depth
-} # end nrounds
-
-cat("------------------------------------------------\n")
-cat("Best (CV) metric value:", best_metric_val, "\n")
-cat("Best model info:\n")
-print(best_info)
-
-preds_test <- predict(best_model_gbm, dtest)
-
-mae_test  <- tryCatch({ Metrics::mae(y_test, preds_test) }, error = function(e) NA)
-rmse_test <- tryCatch({ Metrics::rmse(y_test, preds_test) }, error = function(e) NA)
-r2_test   <- tryCatch({
-  1 - sum((y_test - preds_test)^2) / sum((y_test - mean(y_test))^2)
-}, error = function(e) NA)
-
-cat(sprintf("Test MAE: %s  RMSE: %s  R2: %s\n", signif(mae_test,6), signif(rmse_test,6), signif(r2_test,6)))
-
-
-
-
-
+cat("Best model:\n")
+print(best_model_gbm)
 
 stopCluster(cl)
 
@@ -383,15 +305,12 @@ model_dir <- file.path(output_base_dir, "Extreme_Gradient_Boosting_Model")
 
 if (!dir.exists(model_dir)) {
   dir.create(model_dir, recursive = TRUE)
-}
+}  # <-- Close the if statement here
+
 
 
 predictions_gbm_test <- predict(best_model_gbm, newdata = test_data)
-
-results_gbm_test <- data.frame(
-  Actual = test_data[[target_variable]],
-  Predicted_gbm = predictions_gbm_test
-)
+results_gbm_test <- data.frame(Actual = test_data[[target_variable]], Predicted_gbm = predictions_gbm_test)
 
 plot_gbm_test <- ggplot(data = results_gbm_test, aes(x = Actual, y = Predicted_gbm)) +
   geom_point(color = 'blue') +
@@ -406,14 +325,8 @@ plot_path_gbm <- file.path(model_dir, "gbm_plot_test_set.png")
 ggsave(filename = plot_path_gbm, plot = plot_gbm_test, width = 8, height = 6)
 cat("Chart saved in: ", plot_path_gbm, "\n")
 
-
-
 train_gbm_preds <- predict(best_model_gbm, newdata = train_data)
-
-results_gbm_training_df <- data.frame(
-  Actual = train_data[[target_variable]],
-  Predicted_gbm = train_gbm_preds
-)
+results_gbm_training_df <- data.frame(Actual = train_data[[target_variable]], Predicted_gbm = train_gbm_preds)
 
 plot_gbm_training <- ggplot(data = results_gbm_training_df, aes(x = Actual, y = Predicted_gbm)) +
   geom_point(color = 'blue') +
@@ -428,10 +341,7 @@ plot_path_gbm_training <- file.path(model_dir, "gbm_plot_training_set.png")
 ggsave(filename = plot_path_gbm_training, plot = plot_gbm_training, width = 8, height = 6)
 cat("Chart saved in: ", plot_path_gbm_training, "\n")
 
-
-
 params_output_file <- file.path(model_dir, "model_parameters_description.txt")
-
 final_nrounds <- best_model_gbm$bestTune$nrounds
 final_max_depth <- best_model_gbm$bestTune$max_depth
 final_eta <- best_model_gbm$bestTune$eta
@@ -442,8 +352,10 @@ final_subsample <- best_model_gbm$bestTune$subsample
 
 variabile_target <- target_variable
 trasformazioni_applicate <- if (exists("preProcSteps") && length(preProcSteps) > 0) {
-  paste(preProcSteps, collapse = ", ")
-} else "None"
+    paste(preProcSteps, collapse = ", ")
+} else {
+    "None"
+}
 
 r_squared_training <- cor(results_gbm_training_df$Actual, results_gbm_training_df$Predicted_gbm)^2
 mae_training <- mean(abs(results_gbm_training_df$Actual - results_gbm_training_df$Predicted_gbm))
@@ -474,43 +386,55 @@ parametri_testo <- paste(
   "Root Mean Squared Error (RMSE):", rmse_test, "\n"
 )
 
+
 writeLines(parametri_testo, con = params_output_file)
 
 model_path_gbm <- file.path(model_dir, "best_model.rds")
 saveRDS(best_model_gbm, model_path_gbm)
 cat("Extreme Gradient Boosting Model saved in: ", model_path_gbm, "\n")
 
-results_gbm <- best_model_gbm$resample
+
+results_gbm <- best_model_gbm$resample  # This will give you a data frame with metrics for each fold
 print(results_gbm)
 
 
 
-library(readr)  # lascio SOLO ciò che serve
+library(e1071)  # Per il modello SVM
+library(readr)  # Per leggere i file
 
-best_model_gbm <- readRDS(model_path_gbm)
+model_path <- file.path(model_dir, "best_model.rds")
+best_model_gbm <- readRDS(model_path)
 
-prediction_data <- read_delim(prediction_file, delim = ";")
+data_path <- prediction_file
+prediction_data <- read_delim(data_path, delim = ";")
 
 head(prediction_data)
 
-
-feature_names <- setdiff(colnames(train_data), target_variable)
-
-prediction_data_fixed <- prediction_data[, feature_names, drop = FALSE]
-
-predictions <- predict(best_model_gbm, prediction_data_fixed)
+predictions <- predict(best_model_gbm, prediction_data)
 
 prediction_data$Predicted <- predictions
 
 output_path <- file.path(model_dir, "predictions_with_inputs.txt")
-write.table(prediction_data, file = output_path,
-            row.names = FALSE, col.names = TRUE, sep = ";")
+write.table(prediction_data, file = output_path, row.names = FALSE, col.names = TRUE, sep = ";")
 
 cat("Table with input data and forecasts saved in: ", output_path, "\n")
 
-
-
-
-
 saveRDS(train_data, file = file.path(model_dir, "train_data.rds"))
 saveRDS(test_data,  file = file.path(model_dir, "test_data.rds"))
+# capturing outputs
+print('Serialization of model_dir')
+file <- file(paste0('/tmp/model_dir_', id, '.json'))
+writeLines(toJSON(model_dir, auto_unbox=TRUE), file)
+close(file)
+print('Serialization of predictors')
+file <- file(paste0('/tmp/predictors_', id, '.json'))
+writeLines(toJSON(predictors, auto_unbox=TRUE), file)
+close(file)
+print('Serialization of target_variable')
+file <- file(paste0('/tmp/target_variable_', id, '.json'))
+writeLines(toJSON(target_variable, auto_unbox=TRUE), file)
+close(file)
+print('Serialization of target_variable_uom')
+file <- file(paste0('/tmp/target_variable_uom_', id, '.json'))
+writeLines(toJSON(target_variable_uom, auto_unbox=TRUE), file)
+close(file)
