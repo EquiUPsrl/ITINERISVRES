@@ -205,115 +205,118 @@ registerDoParallel(cl)
 
 
 
+cat("Starting XGB workflow...\n")
+cat("Selected Preprocessing:", preProcSteps, "\n")
+cat("Training set size:", nrow(train_data), "\n")
+cat("Test set size:", nrow(test_data), "\n")
+
+if (!is.null(preProcSteps) && length(preProcSteps) > 0) {
+  preProcObj <- preProcess(train_data %>% select(-all_of(target_variable)), method = preProcSteps)
+  
+  train_transformed <- predict(preProcObj, train_data %>% select(-all_of(target_variable)))
+  test_transformed  <- predict(preProcObj, test_data %>% select(-all_of(target_variable)))
+  
+  train_transformed[[target_variable]] <- train_data[[target_variable]]
+  test_transformed[[target_variable]]  <- test_data[[target_variable]]
+} else {
+  train_transformed <- train_data
+  test_transformed  <- test_data
+}
+
+cat("Columns after preprocessing (train):", colnames(train_transformed), "\n")
+cat("Columns after preprocessing (test):", colnames(test_transformed), "\n")
+cat("Train dims:", dim(train_transformed), "\n")
+cat("Test dims :", dim(test_transformed), "\n")
+
+dtrain <- xgb.DMatrix(data = as.matrix(train_transformed %>% select(-all_of(target_variable))),
+                      label = train_transformed[[target_variable]])
+
+dtest  <- xgb.DMatrix(data = as.matrix(test_transformed %>% select(-all_of(target_variable))),
+                      label = test_transformed[[target_variable]])
+
 results_gbm <- list()
 best_model_gbm <- NULL
 best_metric <- Inf
 
-num_cols <- sapply(train_data, is.numeric)
-predictors <- names(train_data)[num_cols]
-predictors <- setdiff(predictors, target_variable)
-
-train_num <- train_data[, predictors]
-test_num  <- test_data[, predictors]
-
-y_train <- train_data[[target_variable]]
-
-cat("Colonne numeriche selezionate:\n")
-print(predictors)
-cat("Train dimensioni:", dim(train_num), "\n")
-cat("Test dimensioni:", dim(test_num), "\n\n")
-
-pre_proc <- preProcess(train_num, method = preProcSteps)
-train_processed <- predict(pre_proc, train_num)
-test_processed  <- predict(pre_proc, test_num)
-
-cat("Dopo preprocessing:\n")
-cat("Train dim:", dim(train_processed), "\n")
-cat("Test dim :", dim(test_processed), "\n")
-cat("Colonne train:", paste(colnames(train_processed), collapse = ", "), "\n")
-cat("Colonne test :", paste(colnames(test_processed), collapse = ", "), "\n\n")
-
-if (!all(colnames(train_processed) == colnames(test_processed))) {
-  stop("Errore: colonne train e test non coincidono dopo preprocessing!")
-}
-
-dtrain <- xgb.DMatrix(data = as.matrix(train_processed), label = y_train)
-dtest  <- xgb.DMatrix(data = as.matrix(test_processed))
-
-param_grid <- expand.grid(
-  nrounds = nrounds,
-  max_depth = max_depth,
-  eta = eta,
-  gamma = gamma,
-  colsample_bytree = colsample_bytree,
-  min_child_weight = min_child_weight,
-  subsample = subsample
-)
-
-for(i in 1:nrow(param_grid)) {
-  params <- param_grid[i, ]
-  
-  cat("------------------------------------------------\n")
-  cat("Running XGB with parameters:\n")
-  print(params)
-  
-  xgb_params <- list(
-    booster = "gbtree",
-    objective = "reg:squarederror",
-    eval_metric = "rmse",
-    eta = params$eta,
-    max_depth = params$max_depth,
-    gamma = params$gamma,
-    colsample_bytree = params$colsample_bytree,
-    min_child_weight = params$min_child_weight,
-    subsample = params$subsample
-  )
-  
-
-
-  early_stop <- min(10, params$nrounds - 1) # early stopping < nrounds
-  if(early_stop < 1) early_stop <- 1
-    
-  cv <- xgb.cv(
-      params = xgb_params,
-      data = dtrain,
-      nrounds = params$nrounds,
-      nfold = min(number, nrow(train_data)),
-      verbose = 0,
-      early_stopping_rounds = early_stop,
-      maximize = FALSE
-    )
-    
-    best_iter <- cv$best_iteration
-    if(length(best_iter) == 0) {
-      cat("Warning: best_iteration vuoto, uso nrounds =", params$nrounds, "\n")
-      best_iter <- params$nrounds
+for (n_value in nrounds) {
+  for (depth_value in max_depth) {
+    for (eta_value in eta) {
+      for (gamma_value in gamma) {
+        for (colsample_value in colsample_bytree) {
+          for (min_child_value in min_child_weight) {
+            for (subsample_value in subsample) {
+              
+              cat("------------------------------------------------\n")
+              cat("Running XGB with parameters:\n")
+              cat(" nrounds:", n_value,
+                  " max_depth:", depth_value,
+                  " eta:", eta_value,
+                  " gamma:", gamma_value,
+                  " colsample_bytree:", colsample_value,
+                  " min_child_weight:", min_child_value,
+                  " subsample:", subsample_value, "\n")
+              
+              params <- list(
+                booster = "gbtree",
+                objective = "reg:squarederror",
+                eta = eta_value,
+                max_depth = depth_value,
+                gamma = gamma_value,
+                colsample_bytree = colsample_value,
+                min_child_weight = min_child_value,
+                subsample = subsample_value
+              )
+              
+              cv <- xgb.cv(
+                params = params,
+                data = dtrain,
+                nrounds = n_value,
+                nfold = number,
+                metrics = "rmse",
+                verbose = FALSE,
+                early_stopping_rounds = 10,
+                showsd = TRUE
+              )
+              
+              best_iter <- cv$best_iteration
+              best_rmse_cv <- cv$evaluation_log[best_iter,]$test_rmse_mean
+              
+              if (is.null(best_iter) || length(best_iter) == 0) {
+                warning("best_iteration vuoto, uso nrounds =", n_value)
+                best_iter <- n_value
+              }
+              
+              cat("Best iteration:", best_iter, "RMSE CV:", best_rmse_cv, "\n")
+              
+              model <- xgb.train(
+                params = params,
+                data = dtrain,
+                nrounds = best_iter,
+                verbose = 0
+              )
+              
+              results_gbm[[paste0("nrounds_", n_value, "_depth_", depth_value)]] <- list(
+                model = model,
+                rmse_cv = best_rmse_cv
+              )
+              
+              if (!is.na(best_rmse_cv) && best_rmse_cv < best_metric) {
+                best_metric <- best_rmse_cv
+                best_model_gbm <- model
+              }
+              
+            }
+          }
+        }
+      }
     }
-  
-  rmse_cv <- cv$evaluation_log[best_iter, test_rmse_mean]
-  cat("Best iteration:", best_iter, "RMSE CV:", rmse_cv, "\n")
-  
-  model_gbm <- xgb.train(
-    params = xgb_params,
-    data = dtrain,
-    nrounds = best_iter,
-    verbose = 0
-  )
-  
-  results_gbm[[paste0("model_", i)]] <- model_gbm
-  
-  if (rmse_cv < best_metric) {
-    best_metric <- rmse_cv
-    best_model_gbm <- model_gbm
   }
 }
 
-cat("\nBest model:\n")
+cat("------------------------------------------------\n")
+cat("Best model:\n")
 print(best_model_gbm)
 cat("Best RMSE (CV):", best_metric, "\n")
-
-preds <- predict(best_model_gbm, dtest)
-cat("Predizioni calcolate correttamente su test.\n")
 
 
 
