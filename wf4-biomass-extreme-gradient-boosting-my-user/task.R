@@ -10,10 +10,6 @@ if (!requireNamespace("doParallel", quietly = TRUE)) {
 	install.packages("doParallel", repos="http://cran.us.r-project.org")
 }
 library(doParallel)
-if (!requireNamespace("dplyr", quietly = TRUE)) {
-	install.packages("dplyr", repos="http://cran.us.r-project.org")
-}
-library(dplyr)
 if (!requireNamespace("e1071", quietly = TRUE)) {
 	install.packages("e1071", repos="http://cran.us.r-project.org")
 }
@@ -204,12 +200,18 @@ registerDoParallel(cl)
 
 
 
-train_data_num <- train_data %>% dplyr::select_if(is.numeric)
-test_data_num  <- test_data %>% dplyr::select_if(is.numeric)
+results_gbm <- list()
+best_model_gbm <- NULL
+best_metric <- Inf
 
-y_train <- train_data_num[[target_variable]]
-train_data_num[[target_variable]] <- NULL
+predictors <- setdiff(colnames(train_data), target_variable)
 
+train_data_num <- train_data %>% select(all_of(predictors)) %>% select_if(is.numeric)
+test_data_num  <- test_data %>% select(all_of(predictors)) %>% select_if(is.numeric)
+
+y_train <- train_data[[target_variable]]
+
+cat("Selected Preprocessing: ", paste(preProcSteps, collapse=", "), "\n")
 pre_proc <- preProcess(train_data_num, method = preProcSteps)
 
 train_processed <- predict(pre_proc, train_data_num)
@@ -218,16 +220,7 @@ test_processed  <- predict(pre_proc, test_data_num)
 cat("Columns after preProcess (train):", ncol(train_processed), "\n")
 cat("Columns after preProcess (test):",  ncol(test_processed), "\n")
 
-dtrain_full <- xgb.DMatrix(
-    data = as.matrix(train_processed),
-    label = y_train
-)
-
-
-best_metric <- Inf
-best_model_gbm <- NULL
-best_params <- NULL
-best_iter <- NULL
+dtrain <- xgb.DMatrix(data = as.matrix(train_processed), label = y_train)
 
 for (n_value in nrounds) {
   for (depth_value in max_depth) {
@@ -236,16 +229,15 @@ for (n_value in nrounds) {
         for (colsample_value in colsample_bytree) {
           for (min_child_value in min_child_weight) {
             for (subsample_value in subsample) {
-
-              cat("\nRunning XGB:",
-                  "nrounds =", n_value,
+              
+              cat("\nRunning XGB with nrounds =", n_value,
                   "max_depth =", depth_value,
                   "eta =", eta_value,
                   "gamma =", gamma_value,
                   "colsample =", colsample_value,
                   "min_child_weight =", min_child_value,
                   "subsample =", subsample_value, "\n")
-
+              
               params <- list(
                 booster = "gbtree",
                 objective = "reg:squarederror",
@@ -257,35 +249,41 @@ for (n_value in nrounds) {
                 min_child_weight = min_child_value,
                 subsample = subsample_value
               )
-
+              
               cv <- xgb.cv(
                 params = params,
-                data = dtrain_full,
+                data = dtrain,
                 nrounds = n_value,
                 nfold = number,
+                metrics = "rmse",
                 verbose = FALSE,
                 early_stopping_rounds = 10,
                 prediction = FALSE
               )
-
-              best_iter_cv <- cv$best_iteration
-              best_rmse_cv <- cv$evaluation_log$test_rmse_mean[best_iter_cv]
-
-              cat("CV best_iteration:", best_iter_cv,
-                  "Min RMSE:", best_rmse_cv, "\n")
-
-              if (!is.na(best_rmse_cv) && best_rmse_cv < best_metric) {
-                best_metric <- best_rmse_cv
-                best_iter <- best_iter_cv
-                best_params <- params
-
+              
+              best_iter <- cv$best_iteration
+              if (is.null(best_iter) || best_iter == 0 || is.na(best_iter)) best_iter <- n_value
+              
+              min_rmse <- min(cv$evaluation_log$test_rmse_mean, na.rm = TRUE)
+              
+              results_gbm[[paste0("nrounds_", n_value,
+                                  "_depth_", depth_value,
+                                  "_eta_", eta_value)]] <- list(
+                params = params,
+                best_iter = best_iter,
+                cv_rmse = min_rmse
+              )
+              
+              if (!is.na(min_rmse) && min_rmse < best_metric) {
+                best_metric <- min_rmse
                 best_model_gbm <- xgb.train(
                   params = params,
-                  data = dtrain_full,
-                  nrounds = best_iter
+                  data = dtrain,
+                  nrounds = best_iter,
+                  verbose = 0
                 )
               }
-
+              
             }
           }
         }
@@ -294,17 +292,13 @@ for (n_value in nrounds) {
   }
 }
 
+dtest <- xgb.DMatrix(as.matrix(test_processed))
+preds <- predict(best_model_gbm, dtest)
 
-dtest_final <- xgb.DMatrix(as.matrix(test_processed))
-
-pred <- predict(best_model_gbm, dtest_final)
-
-
-cat("Best model:\n")
+cat("\nBest model:\n")
 print(best_model_gbm)
-cat("\nBest params:\n")
-print(best_params)
-cat("\nBest iteration:", best_iter, "Best RMSE:", best_metric, "\n")
+cat("\nBest RMSE (CV):", best_metric, "\n")
+
 
 
 
