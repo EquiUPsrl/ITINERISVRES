@@ -205,10 +205,9 @@ registerDoParallel(cl)
 
 
 
-library(xgboost)
-library(caret)
-
-set.seed(123)  # seed globale
+results_gbm <- list()
+best_model_gbm <- NULL
+best_metric <- Inf
 
 num_cols <- sapply(train_data, is.numeric)
 predictors <- names(train_data)[num_cols]
@@ -219,37 +218,10 @@ test_num  <- test_data[, predictors]
 
 y_train <- train_data[[target_variable]]
 
-cat("Size of training set:", nrow(train_num), "\n")
-cat("Size of test set:", nrow(test_num), "\n")
-cat("Number of features:", ncol(train_num), "\n")
-
-cat("Selected Preprocessing: ", paste(preProcSteps, collapse=", "), "\n")
-pre_proc <- preProcess(train_num, method = preProcSteps)
-
-train_processed <- predict(pre_proc, train_num)
-test_processed  <- predict(pre_proc, test_num)
-
-if(!all(colnames(train_processed) == colnames(test_processed))) {
-  stop("Train e test hanno colonne diverse dopo preprocessing!")
-}
-
-dtrain <- xgb.DMatrix(data = as.matrix(train_processed), label = y_train)
-dtest  <- xgb.DMatrix(data = as.matrix(test_processed))
-
-number_folds <- number  # numero fold CV
-seeds <- vector("list", number_folds + 1)
-for(f in 1:number_folds) {
-  seeds[[f]] <- sample.int(1e6, length(nrounds) * length(max_depth) *
-                                       length(eta) * length(gamma) *
-                                       length(colsample_bytree) *
-                                       length(min_child_weight) *
-                                       length(subsample))
-}
-seeds[[number_folds + 1]] <- 12345
-
-results_gbm <- list()
-best_model_gbm <- NULL
-best_metric <- Inf
+cat("Colonne numeriche selezionate:\n")
+print(predictors)
+cat("Train dimensioni:", dim(train_num), "\n")
+cat("Test dimensioni:", dim(test_num), "\n\n")
 
 for (n_value in nrounds) {
   for (depth_value in max_depth) {
@@ -259,13 +231,31 @@ for (n_value in nrounds) {
           for (min_child_value in min_child_weight) {
             for (subsample_value in subsample) {
 
-              cat("\nRunning XGB with nrounds =", n_value,
-                  "max_depth =", depth_value,
-                  "eta =", eta_value,
-                  "gamma =", gamma_value,
-                  "colsample =", colsample_value,
+              cat("------------------------------------------------\n")
+              cat("Running XGB with parameters:\n")
+              cat("nrounds =", n_value, "max_depth =", depth_value,
+                  "eta =", eta_value, "gamma =", gamma_value,
+                  "colsample_bytree =", colsample_value,
                   "min_child_weight =", min_child_value,
                   "subsample =", subsample_value, "\n")
+
+              pre_proc <- preProcess(train_num, method = preProcSteps)
+
+              train_processed <- predict(pre_proc, train_num)
+              test_processed  <- predict(pre_proc, test_num)
+
+              cat("Train processed dim:", dim(train_processed), "\n")
+              cat("Test processed dim :", dim(test_processed), "\n")
+
+              cat("Colonne train:", paste(colnames(train_processed), collapse = ", "), "\n")
+              cat("Colonne test :", paste(colnames(test_processed), collapse = ", "), "\n")
+
+              if (!all(colnames(train_processed) == colnames(test_processed))) {
+                stop("Errore: colonne train e test non coincidono dopo preprocessing!")
+              }
+
+              dtrain <- xgb.DMatrix(data = as.matrix(train_processed), label = y_train)
+              dtest  <- xgb.DMatrix(data = as.matrix(test_processed))
 
               params <- list(
                 booster = "gbtree",
@@ -279,41 +269,22 @@ for (n_value in nrounds) {
                 subsample = subsample_value
               )
 
-              set.seed(seeds[[1]][1])
-              folds <- createFolds(y_train, k = number_folds, list = TRUE, returnTrain = TRUE)
-
-              cv <- xgb.cv(
+              model_gbm <- xgb.train(
                 params = params,
                 data = dtrain,
                 nrounds = n_value,
-                nfold = number_folds,
-                folds = folds,
-                metrics = "rmse",
-                verbose = FALSE,
-                early_stopping_rounds = 10
+                verbose = 0
               )
 
-              best_iter <- cv$best_iteration
-              if (is.null(best_iter) || best_iter == 0 || is.na(best_iter)) best_iter <- n_value
+              pred_train <- predict(model_gbm, dtrain)
+              rmse_val <- sqrt(mean((y_train - pred_train)^2))
+              cat("RMSE su train:", rmse_val, "\n")
 
-              min_rmse <- min(cv$evaluation_log$test_rmse_mean, na.rm = TRUE)
+              results_gbm[[paste0("nrounds_", n_value, "_depth_", depth_value)]] <- model_gbm
 
-              results_gbm[[paste0("nrounds_", n_value,
-                                  "_depth_", depth_value,
-                                  "_eta_", eta_value)]] <- list(
-                params = params,
-                best_iter = best_iter,
-                cv_rmse = min_rmse
-              )
-
-              if (!is.na(min_rmse) && min_rmse < best_metric) {
-                best_metric <- min_rmse
-                best_model_gbm <- xgb.train(
-                  params = params,
-                  data = dtrain,
-                  nrounds = best_iter,
-                  verbose = 0
-                )
+              if (rmse_val < best_metric) {
+                best_metric <- rmse_val
+                best_model_gbm <- model_gbm
               }
 
             }
@@ -324,11 +295,12 @@ for (n_value in nrounds) {
   }
 }
 
-preds <- predict(best_model_gbm, dtest)
-
 cat("\nBest model:\n")
 print(best_model_gbm)
-cat("\nBest RMSE (CV):", best_metric, "\n")
+cat("Best RMSE (train):", best_metric, "\n")
+
+preds <- predict(best_model_gbm, dtest)
+cat("Predizioni calcolate correttamente su test.\n")
 
 
 
