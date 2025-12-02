@@ -205,38 +205,32 @@ registerDoParallel(cl)
 
 
 
-cat("Starting XGB workflow...\n")
-cat("Selected Preprocessing:", preProcSteps, "\n")
-cat("Training set size:", nrow(train_data), "\n")
-cat("Test set size:", nrow(test_data), "\n")
-
-if (!is.null(preProcSteps) && length(preProcSteps) > 0) {
-  preProcObj <- preProcess(train_data %>% select(-all_of(target_variable)), method = preProcSteps)
-  
-  train_transformed <- predict(preProcObj, train_data %>% select(-all_of(target_variable)))
-  test_transformed  <- predict(preProcObj, test_data %>% select(-all_of(target_variable)))
-  
-  train_transformed[[target_variable]] <- train_data[[target_variable]]
-  test_transformed[[target_variable]]  <- test_data[[target_variable]]
-} else {
-  train_transformed <- train_data
-  test_transformed  <- test_data
-}
-
-cat("Columns after preprocessing (train):", colnames(train_transformed), "\n")
-cat("Columns after preprocessing (test):", colnames(test_transformed), "\n")
-cat("Train dims:", dim(train_transformed), "\n")
-cat("Test dims :", dim(test_transformed), "\n")
-
-dtrain <- xgb.DMatrix(data = as.matrix(train_transformed %>% select(-all_of(target_variable))),
-                      label = train_transformed[[target_variable]])
-
-dtest  <- xgb.DMatrix(data = as.matrix(test_transformed %>% select(-all_of(target_variable))),
-                      label = test_transformed[[target_variable]])
-
 results_gbm <- list()
 best_model_gbm <- NULL
 best_metric <- Inf
+
+cat("Starting XGB workflow...\n")
+cat("Selected Preprocessing: ", paste(preProcSteps, collapse = ", "), "\n")
+cat("Training set size:", nrow(train_data), "\n")
+cat("Test set size:", nrow(test_data), "\n")
+
+train_features <- train_data %>% select(-all_of(target_variable))
+train_target   <- train_data[[target_variable]]
+
+test_features  <- test_data %>% select(-all_of(target_variable))
+test_target    <- test_data[[target_variable]]
+
+preProc <- preProcess(train_features, method = preProcSteps)
+train_transformed <- predict(preProc, train_features)
+test_transformed  <- predict(preProc, test_features)
+
+cat("Columns after preprocessing (train):", paste(colnames(train_transformed), collapse = " "), "\n")
+cat("Columns after preprocessing (test):", paste(colnames(test_transformed), collapse = " "), "\n")
+cat("Train dims:", dim(train_transformed), "Test dims :", dim(test_transformed), "\n")
+cat("------------------------------------------------\n")
+
+dtrain <- xgb.DMatrix(data = as.matrix(train_transformed), label = train_target)
+dtest  <- xgb.DMatrix(data = as.matrix(test_transformed),  label = test_target)
 
 for (n_value in nrounds) {
   for (depth_value in max_depth) {
@@ -245,18 +239,21 @@ for (n_value in nrounds) {
         for (colsample_value in colsample_bytree) {
           for (min_child_value in min_child_weight) {
             for (subsample_value in subsample) {
-              
+
               cat("------------------------------------------------\n")
               cat("Running XGB with parameters:\n")
-              cat(" nrounds:", n_value,
-                  " max_depth:", depth_value,
-                  " eta:", eta_value,
-                  " gamma:", gamma_value,
-                  " colsample_bytree:", colsample_value,
-                  " min_child_weight:", min_child_value,
-                  " subsample:", subsample_value, "\n")
-              
-              params <- list(
+              param_grid <- data.frame(
+                nrounds = n_value,
+                max_depth = depth_value,
+                eta = eta_value,
+                gamma = gamma_value,
+                colsample_bytree = colsample_value,
+                min_child_weight = min_child_value,
+                subsample = subsample_value
+              )
+              print(param_grid)
+
+              params_xgb <- list(
                 booster = "gbtree",
                 objective = "reg:squarederror",
                 eta = eta_value,
@@ -266,45 +263,37 @@ for (n_value in nrounds) {
                 min_child_weight = min_child_value,
                 subsample = subsample_value
               )
-              
+
               cv <- xgb.cv(
-                params = params,
+                params = params_xgb,
                 data = dtrain,
                 nrounds = n_value,
                 nfold = number,
                 metrics = "rmse",
                 verbose = FALSE,
-                early_stopping_rounds = 10,
-                showsd = TRUE
+                early_stopping_rounds = 10
               )
-              
-              best_iter <- cv$best_iteration
-              best_rmse_cv <- cv$evaluation_log[best_iter,]$test_rmse_mean
-              
-              if (is.null(best_iter) || length(best_iter) == 0) {
-                warning("best_iteration vuoto, uso nrounds =", n_value)
-                best_iter <- n_value
-              }
-              
+
+              best_iter <- if(!is.null(cv$best_iteration)) cv$best_iteration else n_value
+              best_rmse_cv <- if(!is.null(cv$evaluation_log$test_rmse_mean[best_iter])) cv$evaluation_log$test_rmse_mean[best_iter] else NA
+              if (is.na(best_rmse_cv)) best_rmse_cv <- cv$evaluation_log$test_rmse_mean[nrow(cv$evaluation_log)]
               cat("Best iteration:", best_iter, "RMSE CV:", best_rmse_cv, "\n")
-              
-              model <- xgb.train(
-                params = params,
+
+              model_gbm <- xgb.train(
+                params = params_xgb,
                 data = dtrain,
                 nrounds = best_iter,
                 verbose = 0
               )
-              
-              results_gbm[[paste0("nrounds_", n_value, "_depth_", depth_value)]] <- list(
-                model = model,
-                rmse_cv = best_rmse_cv
-              )
-              
+
+              key <- paste0("nrounds_", n_value, "_depth_", depth_value, "_eta_", eta_value)
+              results_gbm[[key]] <- list(model = model_gbm, rmse_cv = best_rmse_cv, best_iter = best_iter)
+
               if (!is.na(best_rmse_cv) && best_rmse_cv < best_metric) {
                 best_metric <- best_rmse_cv
-                best_model_gbm <- model
+                best_model_gbm <- model_gbm
               }
-              
+
             }
           }
         }
