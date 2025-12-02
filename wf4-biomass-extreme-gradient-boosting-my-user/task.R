@@ -214,23 +214,25 @@ cat("Selected Preprocessing: ", paste(preProcSteps, collapse = ", "), "\n")
 cat("Training set size:", nrow(train_data), "\n")
 cat("Test set size:", nrow(test_data), "\n")
 
-train_features <- train_data %>% select(-all_of(target_variable))
-train_target   <- train_data[[target_variable]]
+if(length(preProcSteps) > 0){
+  preProc <- preProcess(train_data %>% select(-all_of(target_variable)), method = preProcSteps)
+  train_transformed <- predict(preProc, train_data %>% select(-all_of(target_variable)))
+  train_transformed[[target_variable]] <- train_data[[target_variable]]
+  cat("Columns after preprocessing (train):", paste(colnames(train_transformed), collapse = " "), "\n")
+} else {
+  train_transformed <- train_data
+}
 
-test_features  <- test_data %>% select(-all_of(target_variable))
-test_target    <- test_data[[target_variable]]
+if(length(preProcSteps) > 0){
+  test_transformed <- predict(preProc, test_data %>% select(-all_of(target_variable)))
+  test_transformed[[target_variable]] <- test_data[[target_variable]]
+  cat("Columns after preprocessing (test):", paste(colnames(test_transformed), collapse = " "), "\n")
+} else {
+  test_transformed <- test_data
+}
 
-preProc <- preProcess(train_features, method = preProcSteps)
-train_transformed <- predict(preProc, train_features)
-test_transformed  <- predict(preProc, test_features)
-
-cat("Columns after preprocessing (train):", paste(colnames(train_transformed), collapse = " "), "\n")
-cat("Columns after preprocessing (test):", paste(colnames(test_transformed), collapse = " "), "\n")
-cat("Train dims:", dim(train_transformed), "Test dims :", dim(test_transformed), "\n")
-cat("------------------------------------------------\n")
-
-dtrain <- xgb.DMatrix(data = as.matrix(train_transformed), label = train_target)
-dtest  <- xgb.DMatrix(data = as.matrix(test_transformed),  label = test_target)
+cat("Train dims:", dim(train_transformed), "\n")
+cat("Test dims :", dim(test_transformed), "\n")
 
 for (n_value in nrounds) {
   for (depth_value in max_depth) {
@@ -242,26 +244,27 @@ for (n_value in nrounds) {
 
               cat("------------------------------------------------\n")
               cat("Running XGB with parameters:\n")
-              param_grid <- data.frame(
-                nrounds = n_value,
-                max_depth = depth_value,
-                eta = eta_value,
-                gamma = gamma_value,
-                colsample_bytree = colsample_value,
-                min_child_weight = min_child_value,
-                subsample = subsample_value
-              )
-              print(param_grid)
+              cat(" nrounds:", n_value, 
+                  " max_depth:", depth_value,
+                  " eta:", eta_value,
+                  " gamma:", gamma_value,
+                  " colsample_bytree:", colsample_value,
+                  " min_child_weight:", min_child_value,
+                  " subsample:", subsample_value, "\n")
+
+              dtrain <- xgb.DMatrix(data = as.matrix(train_transformed %>% select(-all_of(target_variable))),
+                                    label = train_transformed[[target_variable]])
 
               params_xgb <- list(
                 booster = "gbtree",
-                objective = "reg:squarederror",
                 eta = eta_value,
                 max_depth = depth_value,
                 gamma = gamma_value,
                 colsample_bytree = colsample_value,
                 min_child_weight = min_child_value,
-                subsample = subsample_value
+                subsample = subsample_value,
+                objective = "reg:squarederror",
+                eval_metric = metric
               )
 
               cv <- xgb.cv(
@@ -269,29 +272,28 @@ for (n_value in nrounds) {
                 data = dtrain,
                 nrounds = n_value,
                 nfold = number,
-                metrics = "rmse",
                 verbose = FALSE,
-                early_stopping_rounds = 10
+                early_stopping_rounds = 10,
+                maximize = FALSE
               )
 
-              best_iter <- if(!is.null(cv$best_iteration)) cv$best_iteration else n_value
-              best_rmse_cv <- if(!is.null(cv$evaluation_log$test_rmse_mean[best_iter])) cv$evaluation_log$test_rmse_mean[best_iter] else NA
-              if (is.na(best_rmse_cv)) best_rmse_cv <- cv$evaluation_log$test_rmse_mean[nrow(cv$evaluation_log)]
+              best_iter <- cv$best_iteration
+              if(is.null(best_iter)) best_iter <- n_value
+              best_rmse_cv <- cv$evaluation_log$test_rmse_mean[best_iter]
               cat("Best iteration:", best_iter, "RMSE CV:", best_rmse_cv, "\n")
 
-              model_gbm <- xgb.train(
+              model_xgb <- xgb.train(
                 params = params_xgb,
                 data = dtrain,
                 nrounds = best_iter,
                 verbose = 0
               )
 
-              key <- paste0("nrounds_", n_value, "_depth_", depth_value, "_eta_", eta_value)
-              results_gbm[[key]] <- list(model = model_gbm, rmse_cv = best_rmse_cv, best_iter = best_iter)
+              results_gbm[[paste0("nrounds_", n_value, "_depth_", depth_value)]] <- model_xgb
 
-              if (!is.na(best_rmse_cv) && best_rmse_cv < best_metric) {
+              if(!is.na(best_rmse_cv) && best_rmse_cv < best_metric){
                 best_metric <- best_rmse_cv
-                best_model_gbm <- model_gbm
+                best_model_gbm <- model_xgb
               }
 
             }
@@ -306,6 +308,15 @@ cat("------------------------------------------------\n")
 cat("Best model:\n")
 print(best_model_gbm)
 cat("Best RMSE (CV):", best_metric, "\n")
+
+dtest <- xgb.DMatrix(data = as.matrix(test_transformed %>% select(-all_of(target_variable))),
+                     label = test_transformed[[target_variable]])
+
+predictions <- predict(best_model_gbm, dtest)
+
+mae_test <- Metrics::mae(test_transformed[[target_variable]], predictions)
+rmse_test <- Metrics::rmse(test_transformed[[target_variable]], predictions)
+cat("Test MAE:", mae_test, "Test RMSE:", rmse_test, "\n")
 
 
 
