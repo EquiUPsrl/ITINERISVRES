@@ -257,6 +257,9 @@ for (n_value in nrounds) {
                     "Min RMSE:", min(cv$evaluation_log$test_rmse_mean), "\n")
     
                 best_iter <- cv$best_iteration
+                if (is.null(best_iter) || is.na(best_iter) || best_iter == 0) {
+                    best_iter <- n_value   # fallback: usa tutti i round
+                }
                 model <- xgb.train(
                     params = params,
                     data = dtrain,
