@@ -376,13 +376,6 @@ cat(sprintf("Test MAE: %s  RMSE: %s  R2: %s\n", signif(mae_test,6), signif(rmse_
 
 
 
-
-
-
-
-
-
-
 stopCluster(cl)
 
 output_base_dir <- output_path
@@ -390,12 +383,15 @@ model_dir <- file.path(output_base_dir, "Extreme_Gradient_Boosting_Model")
 
 if (!dir.exists(model_dir)) {
   dir.create(model_dir, recursive = TRUE)
-}  # <-- Close the if statement here
-
+}
 
 
 predictions_gbm_test <- predict(best_model_gbm, newdata = test_data)
-results_gbm_test <- data.frame(Actual = test_data[[target_variable]], Predicted_gbm = predictions_gbm_test)
+
+results_gbm_test <- data.frame(
+  Actual = test_data[[target_variable]],
+  Predicted_gbm = predictions_gbm_test
+)
 
 plot_gbm_test <- ggplot(data = results_gbm_test, aes(x = Actual, y = Predicted_gbm)) +
   geom_point(color = 'blue') +
@@ -410,8 +406,14 @@ plot_path_gbm <- file.path(model_dir, "gbm_plot_test_set.png")
 ggsave(filename = plot_path_gbm, plot = plot_gbm_test, width = 8, height = 6)
 cat("Chart saved in: ", plot_path_gbm, "\n")
 
+
+
 train_gbm_preds <- predict(best_model_gbm, newdata = train_data)
-results_gbm_training_df <- data.frame(Actual = train_data[[target_variable]], Predicted_gbm = train_gbm_preds)
+
+results_gbm_training_df <- data.frame(
+  Actual = train_data[[target_variable]],
+  Predicted_gbm = train_gbm_preds
+)
 
 plot_gbm_training <- ggplot(data = results_gbm_training_df, aes(x = Actual, y = Predicted_gbm)) +
   geom_point(color = 'blue') +
@@ -426,7 +428,10 @@ plot_path_gbm_training <- file.path(model_dir, "gbm_plot_training_set.png")
 ggsave(filename = plot_path_gbm_training, plot = plot_gbm_training, width = 8, height = 6)
 cat("Chart saved in: ", plot_path_gbm_training, "\n")
 
+
+
 params_output_file <- file.path(model_dir, "model_parameters_description.txt")
+
 final_nrounds <- best_model_gbm$bestTune$nrounds
 final_max_depth <- best_model_gbm$bestTune$max_depth
 final_eta <- best_model_gbm$bestTune$eta
@@ -437,10 +442,8 @@ final_subsample <- best_model_gbm$bestTune$subsample
 
 variabile_target <- target_variable
 trasformazioni_applicate <- if (exists("preProcSteps") && length(preProcSteps) > 0) {
-    paste(preProcSteps, collapse = ", ")
-} else {
-    "None"
-}
+  paste(preProcSteps, collapse = ", ")
+} else "None"
 
 r_squared_training <- cor(results_gbm_training_df$Actual, results_gbm_training_df$Predicted_gbm)^2
 mae_training <- mean(abs(results_gbm_training_df$Actual - results_gbm_training_df$Predicted_gbm))
@@ -471,38 +474,45 @@ parametri_testo <- paste(
   "Root Mean Squared Error (RMSE):", rmse_test, "\n"
 )
 
-
 writeLines(parametri_testo, con = params_output_file)
 
 model_path_gbm <- file.path(model_dir, "best_model.rds")
 saveRDS(best_model_gbm, model_path_gbm)
 cat("Extreme Gradient Boosting Model saved in: ", model_path_gbm, "\n")
 
-
-results_gbm <- best_model_gbm$resample  # This will give you a data frame with metrics for each fold
+results_gbm <- best_model_gbm$resample
 print(results_gbm)
 
 
 
-library(e1071)  # Per il modello SVM
-library(readr)  # Per leggere i file
+library(readr)  # lascio SOLO ciò che serve
 
-model_path <- file.path(model_dir, "best_model.rds")
-best_model_gbm <- readRDS(model_path)
+best_model_gbm <- readRDS(model_path_gbm)
 
-data_path <- prediction_file
-prediction_data <- read_delim(data_path, delim = ";")
+prediction_data <- read_delim(prediction_file, delim = ";")
 
 head(prediction_data)
 
-predictions <- predict(best_model_gbm, prediction_data)
+
+feature_names <- setdiff(colnames(train_data), target_variable)
+
+prediction_data_fixed <- prediction_data[, feature_names, drop = FALSE]
+
+predictions <- predict(best_model_gbm, prediction_data_fixed)
 
 prediction_data$Predicted <- predictions
 
 output_path <- file.path(model_dir, "predictions_with_inputs.txt")
-write.table(prediction_data, file = output_path, row.names = FALSE, col.names = TRUE, sep = ";")
+write.table(prediction_data, file = output_path,
+            row.names = FALSE, col.names = TRUE, sep = ";")
 
 cat("Table with input data and forecasts saved in: ", output_path, "\n")
+
+
+
+
+
+
 
 saveRDS(train_data, file = file.path(model_dir, "train_data.rds"))
 saveRDS(test_data,  file = file.path(model_dir, "test_data.rds"))
