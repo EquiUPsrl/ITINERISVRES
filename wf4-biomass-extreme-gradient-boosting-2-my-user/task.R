@@ -246,11 +246,12 @@ test_matrix <- data.matrix(test_features)
 
 
 
-features_train <- train_data %>% select(-all_of(target_variable))
-y_train <- train_data[[target_variable]]
 
-features_test <- test_data %>% select(-all_of(target_variable))
-y_test <- test_data[[target_variable]]
+features_train <- train_data[, setdiff(names(train_data), target_variable), drop = FALSE]
+y_train        <- train_data[[target_variable]]
+
+features_test  <- test_data[, setdiff(names(test_data), target_variable), drop = FALSE]
+y_test         <- test_data[[target_variable]]
 
 cat("Features (before preprocess):", paste(colnames(features_train), collapse = ", "), "\n")
 cat("Train rows/cols:", dim(features_train), " Test rows/cols:", dim(features_test), "\n")
