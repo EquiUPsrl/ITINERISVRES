@@ -209,23 +209,30 @@ results_gbm <- list()
 best_model_gbm <- NULL
 best_metric <- Inf
 
-predictors <- setdiff(colnames(train_data), target_variable)
+num_cols <- sapply(train_data, is.numeric)
+predictors <- names(train_data)[num_cols]
+predictors <- setdiff(predictors, target_variable)
 
-train_data_num <- train_data %>% select(all_of(predictors)) %>% select_if(is.numeric)
-test_data_num  <- test_data %>% select(all_of(predictors)) %>% select_if(is.numeric)
+train_num <- train_data[, predictors]
+test_num  <- test_data[, predictors]
 
 y_train <- train_data[[target_variable]]
 
-cat("Selected Preprocessing: ", paste(preProcSteps, collapse=", "), "\n")
-pre_proc <- preProcess(train_data_num, method = preProcSteps)
+cat("Size of training set:", nrow(train_num), "\n")
+cat("Size of test set:", nrow(test_num), "\n")
+cat("Number of features:", ncol(train_num), "\n")
 
-train_processed <- predict(pre_proc, train_data_num)
-test_processed  <- predict(pre_proc, test_data_num)
+cat("Selected Preprocessing: ", paste(preProcSteps, collapse=", "), "\n")
+pre_proc <- preProcess(train_num, method = preProcSteps)
+
+train_processed <- predict(pre_proc, train_num)
+test_processed  <- predict(pre_proc, test_num)
 
 cat("Columns after preProcess (train):", ncol(train_processed), "\n")
 cat("Columns after preProcess (test):",  ncol(test_processed), "\n")
 
 dtrain <- xgb.DMatrix(data = as.matrix(train_processed), label = y_train)
+dtest  <- xgb.DMatrix(data = as.matrix(test_processed))
 
 for (n_value in nrounds) {
   for (depth_value in max_depth) {
@@ -234,7 +241,7 @@ for (n_value in nrounds) {
         for (colsample_value in colsample_bytree) {
           for (min_child_value in min_child_weight) {
             for (subsample_value in subsample) {
-              
+
               cat("\nRunning XGB with nrounds =", n_value,
                   "max_depth =", depth_value,
                   "eta =", eta_value,
@@ -242,7 +249,7 @@ for (n_value in nrounds) {
                   "colsample =", colsample_value,
                   "min_child_weight =", min_child_value,
                   "subsample =", subsample_value, "\n")
-              
+
               params <- list(
                 booster = "gbtree",
                 objective = "reg:squarederror",
@@ -254,7 +261,7 @@ for (n_value in nrounds) {
                 min_child_weight = min_child_value,
                 subsample = subsample_value
               )
-              
+
               cv <- xgb.cv(
                 params = params,
                 data = dtrain,
@@ -265,12 +272,12 @@ for (n_value in nrounds) {
                 early_stopping_rounds = 10,
                 prediction = FALSE
               )
-              
+
               best_iter <- cv$best_iteration
               if (is.null(best_iter) || best_iter == 0 || is.na(best_iter)) best_iter <- n_value
-              
+
               min_rmse <- min(cv$evaluation_log$test_rmse_mean, na.rm = TRUE)
-              
+
               results_gbm[[paste0("nrounds_", n_value,
                                   "_depth_", depth_value,
                                   "_eta_", eta_value)]] <- list(
@@ -278,7 +285,7 @@ for (n_value in nrounds) {
                 best_iter = best_iter,
                 cv_rmse = min_rmse
               )
-              
+
               if (!is.na(min_rmse) && min_rmse < best_metric) {
                 best_metric <- min_rmse
                 best_model_gbm <- xgb.train(
@@ -288,7 +295,7 @@ for (n_value in nrounds) {
                   verbose = 0
                 )
               }
-              
+
             }
           }
         }
@@ -297,7 +304,6 @@ for (n_value in nrounds) {
   }
 }
 
-dtest <- xgb.DMatrix(as.matrix(test_processed))
 preds <- predict(best_model_gbm, dtest)
 
 cat("\nBest model:\n")
