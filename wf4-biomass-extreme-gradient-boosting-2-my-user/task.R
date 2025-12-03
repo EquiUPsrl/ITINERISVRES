@@ -549,8 +549,16 @@ parametri_testo <- paste(
 
 writeLines(parametri_testo, con = params_output_file)
 
+
+safe_model <- best_model_gbm
+
+safe_model$.__enclos_env__ <- NULL
+
+safe_model$feature_names <- colnames(train_data[, predictors])
+
+                      
 model_path_gbm <- file.path(model_dir, "best_model.rds")
-saveRDS(best_model_gbm, model_path_gbm)
+saveRDS(safe_model, model_path_gbm)
 cat("Extreme Gradient Boosting Model saved in: ", model_path_gbm, "\n")
 
 results_gbm <- best_model_gbm$resample
@@ -558,6 +566,7 @@ print(results_gbm)
 
 
 
+best_model_gbm <- readRDS(model_path_gbm)
 
 prediction_data <- read_delim(prediction_file, delim = ";")
 
@@ -577,9 +586,8 @@ if (!is.null(preProcObj)) {
 cat("Columns after preprocessing for prediction:\n")
 print(colnames(features_prediction_proc))
 
-if (is.null(best_model_gbm$feature_names)) {
-  best_model_gbm$feature_names <- colnames(train_data[, predictors])
-}
+
+
 
 prediction_matrix <- as.matrix(features_prediction_proc[, best_model_gbm$feature_names, drop = FALSE])
 predictions <- predict(best_model_gbm, prediction_matrix)
