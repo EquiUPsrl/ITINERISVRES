@@ -74,6 +74,10 @@ if (!requireNamespace("xgboost", quietly = TRUE)) {
 	install.packages("xgboost", repos="http://cran.us.r-project.org")
 }
 library(xgboost)
+if (!requireNamespace("remotes", quietly = TRUE)) {
+	install.packages("remotes", repos="http://cran.us.r-project.org")
+}
+library(remotes)
 if (!requireNamespace("tidyr", quietly = TRUE)) {
 	install.packages("tidyr", repos="http://cran.us.r-project.org")
 }
@@ -157,16 +161,6 @@ library(e1071)
 library(readr)
 library(tidyr)
 library(dplyr)
-
-cat("R.version: \n")
-
-R.version.string
-
-cat("caret version: \n")
-packageVersion("caret")
-
-cat("xgboost version: \n")
-packageVersion("xgboost")
 
 
 config_base_path <- "/tmp/data/WF4"
@@ -564,7 +558,6 @@ print(results_gbm)
 
 
 
-best_model_gbm <- readRDS(model_path_gbm)
 
 prediction_data <- read_delim(prediction_file, delim = ";")
 

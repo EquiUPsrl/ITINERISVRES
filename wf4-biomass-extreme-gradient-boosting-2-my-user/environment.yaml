@@ -12,6 +12,7 @@ dependencies:
   - r-iml
   - r-kernlab
   - r-foreach
+  - r-remotes
   - r-e1071
   - r-Metrics
   - r-dplyr
