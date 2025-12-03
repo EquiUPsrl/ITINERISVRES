@@ -552,7 +552,13 @@ writeLines(parametri_testo, con = params_output_file)
             
 model_path_gbm <- file.path(model_dir, "best_model.rds")
 
-xgb.save(best_model_gbm, file.path(model_dir, "best_model.xgb"))
+safe_model <- list(
+  xgb_model = best_model_gbm,     # il booster XGBoost nativo
+  preProcess = preProcObj  # oggetto caret::preProcess
+)
+
+saveRDS(safe_model, model_path_gbm)
+
 cat("Extreme Gradient Boosting Model saved in: ", model_path_gbm, "\n")
 
 results_gbm <- best_model_gbm$resample
@@ -560,7 +566,6 @@ print(results_gbm)
 
 
 
-best_model_gbm <- xgb.load(file.path(model_dir, "best_model.xgb"))
 
 prediction_data <- read_delim(prediction_file, delim = ";")
 
