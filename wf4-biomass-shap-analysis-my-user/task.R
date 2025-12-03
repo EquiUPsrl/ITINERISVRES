@@ -139,7 +139,11 @@ print(var)
 var_len = length(var)
 print(paste("Variable predictors has length", var_len))
 
-predictors <- gsub("\"", "", opt$predictors)
+print("------------------------Running var_serialization for predictors-----------------------")
+print(opt$predictors)
+predictors = var_serialization(opt$predictors)
+print("---------------------------------------------------------------------------------")
+
 print("Retrieving target_variable")
 var = opt$target_variable
 print(var)
