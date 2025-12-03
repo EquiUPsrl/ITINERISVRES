@@ -154,7 +154,12 @@ print("Running the cell")
 if(!requireNamespace("remotes", quietly = TRUE)) install.packages("remotes")
 
 
-.libPaths(c("$HOME/R/library", .libPaths()))
+user_lib <- file.path(Sys.getenv("HOME"), "R", "library")
+dir.create(user_lib, recursive = TRUE, showWarnings = FALSE)
+
+cat(user_lib)
+
+.libPaths(c(user_lib, .libPaths()))
 
 system("git clone --recursive https://github.com/dmlc/xgboost.git")
 
