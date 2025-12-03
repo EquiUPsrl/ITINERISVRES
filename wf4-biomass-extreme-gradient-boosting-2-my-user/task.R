@@ -158,6 +158,16 @@ library(readr)
 library(tidyr)
 library(dplyr)
 
+cat("R.version: \n")
+
+R.version.string
+
+cat("caret version: \n")
+packageVersion("caret")
+
+cat("xgboost version: \n")
+packageVersion("xgboost")
+
 
 config_base_path <- "/tmp/data/WF4"
 output_path = file.path(config_base_path, "output")
