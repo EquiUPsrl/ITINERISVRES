@@ -139,11 +139,7 @@ print(var)
 var_len = length(var)
 print(paste("Variable predictors has length", var_len))
 
-print("------------------------Running var_serialization for predictors-----------------------")
-print(opt$predictors)
-predictors = var_serialization(opt$predictors)
-print("---------------------------------------------------------------------------------")
-
+predictors <- gsub("\"", "", opt$predictors)
 print("Retrieving target_variable")
 var = opt$target_variable
 print(var)
@@ -167,15 +163,19 @@ obj <- readRDS(file.path(model_dir, "best_model.rds"))
 if (is.list(obj) && "xgb_model" %in% names(obj)) {
     best_model <- obj$xgb_model
     preProcess <- obj$preProcess
+    cat("RDS contains wrapper with model and metadata", "\n")
 } else {
     best_model <- obj
     preProcess <- NULL
+    cat("RDS contains only model", "\n")
 }
 
 if (!is.null(preProcess)) {
     data_for_predictor <- predict(preProcess, train_data[, predictors])
+    cat("Model contains preProcess", "\n")
 } else {
     data_for_predictor <- train_data[, predictors, drop = FALSE]
+    cat("Model does not contains preProcess", "\n")
 }
 
 
@@ -193,6 +193,9 @@ for (ds in datasets) {
     if (!dir.exists(shap_dir)) {
       dir.create(shap_dir, recursive = TRUE)
     }
+
+    cat("Columns in data_for_predictor:", ncol(data_for_predictor), "\n")
+    cat("Columns expected by model:", best_model$nfeatures, "\n")
     
     predictor_model <- Predictor$new(best_model, data = data_for_predictor, y = train_data[[target_variable]])
     
