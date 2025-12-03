@@ -153,7 +153,13 @@ id <- gsub('"', '', opt$id)
 print("Running the cell")
 if(!requireNamespace("remotes", quietly = TRUE)) install.packages("remotes")
 
-remotes::install_version("xgboost", version = "1.7.11.1", repos = "http://cran.us.r-project.org")
+
+.libPaths(c("$HOME/R/library", .libPaths()))
+
+system("git clone --recursive https://github.com/dmlc/xgboost.git")
+
+system("R CMD INSTALL --configure-vars='CXXFLAGS=-DNO_ALTREP' xgboost/R-package --library=$HOME/R/library")
+
 
 library(ggplot2)
 library(xgboost)
@@ -164,10 +170,6 @@ library(iml)
 library(e1071)
 library(readr)
 library(tidyr)
-
-
-
-
 
 
 cat("R.version: \n")
