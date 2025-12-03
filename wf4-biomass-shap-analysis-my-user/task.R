@@ -159,11 +159,22 @@ library(caret)
 library(ggplot2)
 library(iml)
 
-
-
 train_data <- readRDS(file.path(model_dir, "train_data.rds"))
 test_data  <- readRDS(file.path(model_dir, "test_data.rds"))
-best_model  <- readRDS(file.path(model_dir, "best_model.rds"))
+
+rds_path <- file.path(model_dir, "best_model.rds")
+xgb_path <- file.path(model_dir, "best_model.xgb")
+
+if (file.exists(rds_path)) {
+    message("Loading best_model.rds...")
+    best_model <- readRDS(rds_path)
+}
+
+if (file.exists(xgb_path)) {
+    message("Loading best_model.xgb...")
+    best_model <- xgboost::xgb.load(xgb_path)
+}
+
 
 datasets <- c("train", "test")
 
