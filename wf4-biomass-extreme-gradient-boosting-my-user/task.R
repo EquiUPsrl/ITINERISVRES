@@ -151,6 +151,10 @@ id <- gsub('"', '', opt$id)
 
 
 print("Running the cell")
+if(!requireNamespace("remotes", quietly = TRUE)) install.packages("remotes")
+
+remotes::install_version("xgboost", version = "1.7.11.1", repos = "http://cran.us.r-project.org")
+
 library(ggplot2)
 library(xgboost)
 library(Metrics)
@@ -164,10 +168,7 @@ library(tidyr)
 
 
 
-if(!requireNamespace("remotes", quietly = TRUE)) install.packages("remotes")
 
-
-remotes::install_github("dmlc/xgboost", subdir = "R-package")
 
 cat("R.version: \n")
 R.version.string
