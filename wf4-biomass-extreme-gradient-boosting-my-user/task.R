@@ -261,6 +261,10 @@ results_gbm <- list()
 best_model_gbm <- NULL
 best_metric <- Inf
 
+train_data_clean <- as.data.frame(lapply(train_data, function(x) {
+  if (inherits(x, "ALTREP")) as.vector(x) else x
+}))
+
 for (n_value in nrounds) {
     for (depth_value in max_depth) {
         for (eta_value in eta) {
@@ -290,7 +294,7 @@ for (n_value in nrounds) {
                             
                             model_gbm <- train(
                                 as.formula(paste(target_variable, "~ .")),
-                                data = train_data,
+                                data = train_data_clean,
                                 method = "xgbTree",
                                 trControl = ctrl,
                                 tuneGrid = tuneGrid_gbm,
