@@ -573,15 +573,20 @@ print(colnames(prediction_data))
 if (!is.null(preProcObj)) {
   cat("Applying preProcess object from training to prediction data...\n")
   features_prediction_proc <- predict(preProcObj, prediction_data)
+  preprocessed_train <- predict(preProcObj, train_data[, predictors])
 } else {
   features_prediction_proc <- prediction_data
+  preprocessed_train <- colnames(train_data[, predictors])
 }
 
 cat("Columns after preprocessing for prediction:\n")
 print(colnames(features_prediction_proc))
 
 
-feature_names <- colnames(train_data[, predictors])
+feature_names <- colnames(preprocessed_train)
+
+cat("Columns after preprocessing for train:\n")
+print(feature_names)
 
 prediction_matrix <- as.matrix(features_prediction_proc[, feature_names, drop = FALSE])
 predictions <- predict(best_model_gbm, prediction_matrix)
