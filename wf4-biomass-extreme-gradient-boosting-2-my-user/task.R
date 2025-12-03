@@ -577,6 +577,10 @@ if (!is.null(preProcObj)) {
 cat("Columns after preprocessing for prediction:\n")
 print(colnames(features_prediction_proc))
 
+if (is.null(best_model_gbm$feature_names)) {
+  best_model_gbm$feature_names <- colnames(train_data[, predictors])
+}
+
 prediction_matrix <- as.matrix(features_prediction_proc[, best_model_gbm$feature_names, drop = FALSE])
 predictions <- predict(best_model_gbm, prediction_matrix)
 
