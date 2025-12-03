@@ -168,6 +168,7 @@ if (is.list(obj) && "xgb_model" %in% names(obj)) {
     best_model <- obj$xgb_model
     preProcess <- obj$preProcess
     cat("RDS contains wrapper with model and metadata", "\n")
+    str(best_model)
 } else {
     best_model <- obj
     preProcess <- NULL
