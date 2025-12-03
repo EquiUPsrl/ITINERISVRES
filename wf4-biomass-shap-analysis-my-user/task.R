@@ -162,18 +162,22 @@ library(iml)
 train_data <- readRDS(file.path(model_dir, "train_data.rds"))
 test_data  <- readRDS(file.path(model_dir, "test_data.rds"))
 
-rds_path <- file.path(model_dir, "best_model.rds")
-xgb_path <- file.path(model_dir, "best_model.xgb")
+obj <- readRDS(file.path(model_dir, "best_model.rds"))
 
-if (file.exists(rds_path)) {
-    message("Loading best_model.rds...")
-    best_model <- readRDS(rds_path)
+if (is.list(obj) && "xgb_model" %in% names(obj)) {
+    best_model <- obj$xgb_model
+    preProcess <- obj$preProcess
+} else {
+    best_model <- obj
+    preProcess <- NULL
 }
 
-if (file.exists(xgb_path)) {
-    message("Loading best_model.xgb...")
-    best_model <- xgboost::xgb.load(xgb_path)
+if (!is.null(preProcess)) {
+    data_for_predictor <- predict(preProcess, train_data[, predictors])
+} else {
+    data_for_predictor <- train_data[, predictors, drop = FALSE]
 }
+
 
 
 datasets <- c("train", "test")
@@ -190,7 +194,7 @@ for (ds in datasets) {
       dir.create(shap_dir, recursive = TRUE)
     }
     
-    predictor_model <- Predictor$new(best_model, data = train_data[, predictors], y = train_data[[target_variable]])
+    predictor_model <- Predictor$new(best_model, data = data_for_predictor, y = train_data[[target_variable]])
     
     shap_values_all <- lapply(1:nrow(dataset), function(i) {
       Shapley$new(predictor_model, x.interest = dataset[i, predictors, drop = FALSE])
