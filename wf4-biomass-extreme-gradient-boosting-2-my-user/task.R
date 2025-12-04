@@ -555,8 +555,8 @@ writeLines(parametri_testo, con = params_output_file)
 
             
 
-model_path_gbm = file.path(model_dir, "best_model.model")
-xgb.save(best_model_gbm, model_path_gbm)
+model_path_gbm = file.path(model_dir, "best_model.json")
+xgb.save(best_model_gbm, model_path_gbm, format = "json")
 cat("Extreme Gradient Boosting Model saved in: ", model_path_gbm, "\n")
 
 results_gbm <- best_model_gbm$resample
