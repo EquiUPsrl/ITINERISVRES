@@ -173,7 +173,7 @@ if (ext == "model") {
     raw <- readBin(model_file, "raw", 200)
     raw
     
-    best_model <- xgboost::xgb.load(model_file)
+    best_model <- xgb.load(model_file)
 
     if (!is.null(preProcess)) {
         message("Applying preProcess to training data")
