@@ -6,14 +6,34 @@ if (!requireNamespace("caret", quietly = TRUE)) {
 	install.packages("caret", repos="http://cran.us.r-project.org")
 }
 library(caret)
+if (!requireNamespace("doFuture", quietly = TRUE)) {
+	install.packages("doFuture", repos="http://cran.us.r-project.org")
+}
+library(doFuture)
 if (!requireNamespace("doParallel", quietly = TRUE)) {
 	install.packages("doParallel", repos="http://cran.us.r-project.org")
 }
 library(doParallel)
+if (!requireNamespace("dplyr", quietly = TRUE)) {
+	install.packages("dplyr", repos="http://cran.us.r-project.org")
+}
+library(dplyr)
 if (!requireNamespace("e1071", quietly = TRUE)) {
 	install.packages("e1071", repos="http://cran.us.r-project.org")
 }
 library(e1071)
+if (!requireNamespace("fastICA", quietly = TRUE)) {
+	install.packages("fastICA", repos="http://cran.us.r-project.org")
+}
+library(fastICA)
+if (!requireNamespace("foreach", quietly = TRUE)) {
+	install.packages("foreach", repos="http://cran.us.r-project.org")
+}
+library(foreach)
+if (!requireNamespace("future", quietly = TRUE)) {
+	install.packages("future", repos="http://cran.us.r-project.org")
+}
+library(future)
 if (!requireNamespace("ggplot2", quietly = TRUE)) {
 	install.packages("ggplot2", repos="http://cran.us.r-project.org")
 }
@@ -22,46 +42,50 @@ if (!requireNamespace("iml", quietly = TRUE)) {
 	install.packages("iml", repos="http://cran.us.r-project.org")
 }
 library(iml)
-if (!requireNamespace("Metrics", quietly = TRUE)) {
-	install.packages("Metrics", repos="http://cran.us.r-project.org")
+if (!requireNamespace("jsonlite", quietly = TRUE)) {
+	install.packages("jsonlite", repos="http://cran.us.r-project.org")
 }
-library(Metrics)
-if (!requireNamespace("readr", quietly = TRUE)) {
-	install.packages("readr", repos="http://cran.us.r-project.org")
+library(jsonlite)
+if (!requireNamespace("kernlab", quietly = TRUE)) {
+	install.packages("kernlab", repos="http://cran.us.r-project.org")
 }
-library(readr)
-if (!requireNamespace("tidyr", quietly = TRUE)) {
-	install.packages("tidyr", repos="http://cran.us.r-project.org")
-}
-library(tidyr)
-if (!requireNamespace("xgboost", quietly = TRUE)) {
-	install.packages("xgboost", repos="http://cran.us.r-project.org")
-}
-library(xgboost)
-if (!requireNamespace("nnet", quietly = TRUE)) {
-	install.packages("nnet", repos="http://cran.us.r-project.org")
-}
-library(nnet)
-if (!requireNamespace("fastICA", quietly = TRUE)) {
-	install.packages("fastICA", repos="http://cran.us.r-project.org")
-}
-library(fastICA)
-if (!requireNamespace("randomForest", quietly = TRUE)) {
-	install.packages("randomForest", repos="http://cran.us.r-project.org")
-}
-library(randomForest)
-if (!requireNamespace("dplyr", quietly = TRUE)) {
-	install.packages("dplyr", repos="http://cran.us.r-project.org")
-}
-library(dplyr)
+library(kernlab)
 if (!requireNamespace("MASS", quietly = TRUE)) {
 	install.packages("MASS", repos="http://cran.us.r-project.org")
 }
 library(MASS)
+if (!requireNamespace("Metrics", quietly = TRUE)) {
+	install.packages("Metrics", repos="http://cran.us.r-project.org")
+}
+library(Metrics)
+if (!requireNamespace("nnet", quietly = TRUE)) {
+	install.packages("nnet", repos="http://cran.us.r-project.org")
+}
+library(nnet)
+if (!requireNamespace("randomForest", quietly = TRUE)) {
+	install.packages("randomForest", repos="http://cran.us.r-project.org")
+}
+library(randomForest)
+if (!requireNamespace("readr", quietly = TRUE)) {
+	install.packages("readr", repos="http://cran.us.r-project.org")
+}
+library(readr)
+if (!requireNamespace("xgboost", quietly = TRUE)) {
+	install.packages("xgboost", repos="http://cran.us.r-project.org")
+}
+library(xgboost)
+if (!requireNamespace("tidyr", quietly = TRUE)) {
+	install.packages("tidyr", repos="http://cran.us.r-project.org")
+}
+library(tidyr)
 if (!requireNamespace("scales", quietly = TRUE)) {
 	install.packages("scales", repos="http://cran.us.r-project.org")
 }
 library(scales)
+if (!requireNamespace("tools", quietly = TRUE)) {
+	install.packages("tools", repos="http://cran.us.r-project.org")
+}
+library(tools)
 
 
 
@@ -321,22 +345,20 @@ write.table(prediction_data, file = output_path, row.names = FALSE, col.names = 
 
 cat("Table with input data and forecasts saved in: ", output_path, "\n")
 
-saveRDS(train_data, file = file.path(model_dir, "train_data.rds"))
-saveRDS(test_data,  file = file.path(model_dir, "test_data.rds"))
+
+model_info <- list(
+    model_file = model_path,
+    preProcess = NULL,
+    train_data = train_data,
+    test_data = test_data,
+    predictors = predictors,
+    target_variable = target_variable,
+    target_variable_uom = target_variable_uom
+)
+
+saveRDS(model_info, file = file.path(model_dir, "model_info.rds"))
 # capturing outputs
 print('Serialization of model_dir')
 file <- file(paste0('/tmp/model_dir_', id, '.json'))
 writeLines(toJSON(model_dir, auto_unbox=TRUE), file)
-close(file)
-print('Serialization of predictors')
-file <- file(paste0('/tmp/predictors_', id, '.json'))
-writeLines(toJSON(predictors, auto_unbox=TRUE), file)
-close(file)
-print('Serialization of target_variable')
-file <- file(paste0('/tmp/target_variable_', id, '.json'))
-writeLines(toJSON(target_variable, auto_unbox=TRUE), file)
-close(file)
-print('Serialization of target_variable_uom')
-file <- file(paste0('/tmp/target_variable_uom_', id, '.json'))
-writeLines(toJSON(target_variable_uom, auto_unbox=TRUE), file)
 close(file)
