@@ -564,11 +564,11 @@ print(results_gbm)
 
 
 
-cat("Loading model: ", model_path_gbm)
+cat("Loading model: ", model_path_gbm, "\n")
 best_model_gbm <- xgboost::xgb.load(model_path_gbm)
 
 
-cat("Loading prediction data: ", model_path_gbm)
+cat("Loading prediction data: ", model_path_gbm, "\n")
 prediction_data <- read_delim(prediction_file, delim = ";")
 
 head(prediction_data)
