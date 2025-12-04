@@ -149,9 +149,7 @@ model_info_path <- file.path(model_dir, "model_info.rds")
 model_info <- readRDS(model_info_path)
 
 model_file <- model_info$model_file
-train_data <- model_info$train_data
 test_data <- model_info$test_data
-predictors <- model_info$predictors
 target_variable <- model_info$target_variable
 uom <- model_info$target_variable_uom
 
