@@ -167,6 +167,12 @@ data_for_predictor <- train_data[, predictors, drop = FALSE]
 
 if (ext == "model") {
     message("Loading XGBoost binary model: ", model_file)
+
+    print(file.info(model_file)$size)
+
+    raw <- readBin("/tmp/data/.../best_model.model", "raw", 200)
+    raw
+    
     best_model <- xgboost::xgb.load(model_file)
 
     if (!is.null(preProcess)) {
