@@ -153,7 +153,7 @@ library(xgboost)
 model_info_path <- file.path(model_dir, "model_info.rds")
 model_info <- readRDS(model_info_path)
 
-model_file <- model_info$model_file
+model_file <- model_info$model_file #file.path(model_dir, "best_model.model")
 preProcess <- model_info$preProcess
 train_data <- model_info$train_data
 test_data <- model_info$test_data
@@ -164,20 +164,21 @@ target_variable <- model_info$target_variable
 ext <- tools::file_ext(model_file)
 
 data_for_predictor <- train_data[, predictors, drop = FALSE]
+test_data_proc <- test_data[, predictors, drop = FALSE]
 
-if (ext == "model") {
+if (ext == "json") {
     message("Loading XGBoost binary model: ", model_file)
 
     print(file.info(model_file)$size)
 
-    raw <- readBin(model_file, "raw", 200)
-    raw
     
     best_model <- xgb.load(model_file)
 
     if (!is.null(preProcess)) {
         message("Applying preProcess to training data")
         data_for_predictor <- predict(preProcess, train_data[, predictors])
+        test_data_proc <- predict(preProcess, test_data[, predictors])
+        predictors <- colnames(data_for_predictor)
     }
 } else if (ext == "rds") {
     message("Loading RDS model: ", model_file)
@@ -201,9 +202,11 @@ datasets <- c("train", "test")
 
 for (ds in datasets) {
 
-    dataset = train_data
+    cat("current dataset: ", ds)
+
+    dataset = data_for_predictor
     if (ds == "test") {
-        dataset = test_data
+        dataset = test_data_proc
     }
 
     shap_dir <- file.path(model_dir, paste("SHAP", ds, sep = "_"))
@@ -211,13 +214,33 @@ for (ds in datasets) {
       dir.create(shap_dir, recursive = TRUE)
     }
 
-    cat("Columns in data_for_predictor:", ncol(data_for_predictor), "\n")
-    cat("Columns expected by model:", best_model$nfeatures, "\n")
+    message("Columns in data_for_predictor: ", paste(colnames(data_for_predictor), collapse = ", "))
+    message("Columns in dataset row: ", paste(colnames(dataset), collapse = ", "))
+
+    cat(predictors, "\n")
+
+    if (inherits(best_model, "xgb.Booster")) {
+      predict_fun <- function(model, newdata) {
+        xgb_data <- as.matrix(newdata)
+        predict(model, xgb_data)
+      }
+    } else {
+      predict_fun <- function(model, newdata) {
+        predict(model, newdata)
+      }
+    }
+
     
-    predictor_model <- Predictor$new(best_model, data = data_for_predictor, y = train_data[[target_variable]])
+    predictor_model <- Predictor$new(best_model, data = data_for_predictor, y = train_data[[target_variable]], predict.fun = predict_xgb)
     
+
     shap_values_all <- lapply(1:nrow(dataset), function(i) {
-      Shapley$new(predictor_model, x.interest = dataset[i, predictors, drop = FALSE])
+        
+        x_interest <- dataset[i, predictors, drop = FALSE]
+
+        str(x_interest)
+        
+        Shapley$new(predictor_model, x.interest = x_interest)
     })
     
     
