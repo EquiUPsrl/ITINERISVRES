@@ -82,6 +82,10 @@ if (!requireNamespace("scales", quietly = TRUE)) {
 	install.packages("scales", repos="http://cran.us.r-project.org")
 }
 library(scales)
+if (!requireNamespace("tools", quietly = TRUE)) {
+	install.packages("tools", repos="http://cran.us.r-project.org")
+}
+library(tools)
 
 
 
@@ -550,15 +554,9 @@ parametri_testo <- paste(
 writeLines(parametri_testo, con = params_output_file)
 
             
-model_path_gbm <- file.path(model_dir, "best_model.rds")
 
-safe_model <- list(
-  xgb_model = best_model_gbm,     # il booster XGBoost nativo
-  preProcess = preProcObj  # oggetto caret::preProcess
-)
-
-saveRDS(safe_model, model_path_gbm)
-
+model_path_gbm = file.path(model_dir, "best_model.xgb")
+xgb.save(best_model_gbm, model_path_gbm)
 cat("Extreme Gradient Boosting Model saved in: ", model_path_gbm, "\n")
 
 results_gbm <- best_model_gbm$resample
@@ -610,16 +608,22 @@ cat("Table with input data and forecasts saved in: ", output_path, "\n")
 
 
 
-saveRDS(train_data, file = file.path(model_dir, "train_data.rds"))
-saveRDS(test_data,  file = file.path(model_dir, "test_data.rds"))
+
+model_info <- list(
+    model_file = model_path_gbm,
+    preProcess = preProcObj,
+    train_data = train_data,
+    test_data = test_data,
+    predictors = predictors,
+    target_variable = target_variable,
+    target_variable_uom = target_variable_uom
+)
+
+saveRDS(model_info, file = file.path(model_dir, "model_info.rds"))
 # capturing outputs
 print('Serialization of model_dir')
 file <- file(paste0('/tmp/model_dir_', id, '.json'))
 writeLines(toJSON(model_dir, auto_unbox=TRUE), file)
-close(file)
-print('Serialization of predictors')
-file <- file(paste0('/tmp/predictors_', id, '.json'))
-writeLines(toJSON(predictors, auto_unbox=TRUE), file)
 close(file)
 print('Serialization of target_variable')
 file <- file(paste0('/tmp/target_variable_', id, '.json'))
