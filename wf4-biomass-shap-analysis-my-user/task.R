@@ -153,26 +153,29 @@ library(xgboost)
 model_info_path <- file.path(model_dir, "model_info.rds")
 model_info <- readRDS(model_info_path)
 
-model_file <- model_info$model_file #file.path(model_dir, "best_model.model")
+model_file <- model_info$model_file
 preProcess <- model_info$preProcess
 train_data <- model_info$train_data
 test_data <- model_info$test_data
 predictors <- model_info$predictors
 target_variable <- model_info$target_variable
 
+cat("Model file: ", model_file, "\n")
 
 ext <- tools::file_ext(model_file)
+
+cat("Ext file: ", ext, "\n")
 
 data_for_predictor <- train_data[, predictors, drop = FALSE]
 test_data_proc <- test_data[, predictors, drop = FALSE]
 
-if (ext == "json") {
+if (ext == "xgb") {
     message("Loading XGBoost binary model: ", model_file)
 
     print(file.info(model_file)$size)
 
     
-    best_model <- xgb.load(model_file)
+    best_model <- xgboost::xgb.load(model_file)
 
     if (!is.null(preProcess)) {
         message("Applying preProcess to training data")
@@ -231,7 +234,7 @@ for (ds in datasets) {
     }
 
     
-    predictor_model <- Predictor$new(best_model, data = data_for_predictor, y = train_data[[target_variable]], predict.fun = predict_xgb)
+    predictor_model <- Predictor$new(best_model, data = data_for_predictor, y = train_data[[target_variable]], predict.fun = predict_fun)
     
 
     shap_values_all <- lapply(1:nrow(dataset), function(i) {
