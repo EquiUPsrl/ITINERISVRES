@@ -555,8 +555,8 @@ writeLines(parametri_testo, con = params_output_file)
 
             
 
-model_path_gbm = file.path(model_dir, "best_model.json")
-xgb.save(best_model_gbm, model_path_gbm, format = "json")
+model_path_gbm = file.path(model_dir, "best_model.xgb")
+xgboost::xgb.save(best_model_gbm, model_path_gbm)
 cat("Extreme Gradient Boosting Model saved in: ", model_path_gbm, "\n")
 
 results_gbm <- best_model_gbm$resample
@@ -564,7 +564,11 @@ print(results_gbm)
 
 
 
+cat("Loading model: ", model_path_gbm)
+best_model_gbm <- xgboost::xgb.load(model_path_gbm)
 
+
+cat("Loading prediction data: ", model_path_gbm)
 prediction_data <- read_delim(prediction_file, delim = ";")
 
 head(prediction_data)
