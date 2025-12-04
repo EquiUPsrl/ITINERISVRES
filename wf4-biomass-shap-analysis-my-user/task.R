@@ -165,7 +165,7 @@ ext <- tools::file_ext(model_file)
 
 data_for_predictor <- train_data[, predictors, drop = FALSE]
 
-if (ext == "xgb") {
+if (ext == "model") {
     message("Loading XGBoost binary model: ", model_file)
     best_model <- xgboost::xgb.load(model_file)
 
