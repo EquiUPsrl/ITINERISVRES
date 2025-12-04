@@ -82,6 +82,10 @@ if (!requireNamespace("scales", quietly = TRUE)) {
 	install.packages("scales", repos="http://cran.us.r-project.org")
 }
 library(scales)
+if (!requireNamespace("tools", quietly = TRUE)) {
+	install.packages("tools", repos="http://cran.us.r-project.org")
+}
+library(tools)
 
 
 
@@ -89,8 +93,6 @@ print('option_list')
 option_list = list(
 
 make_option(c("--model_dir"), action="store", default=NA, type="character", help="my description"),
-make_option(c("--predictors"), action="store", default=NA, type="character", help="my description"),
-make_option(c("--target_variable"), action="store", default=NA, type="character", help="my description"),
 make_option(c("--id"), action="store", default=NA, type="character", help="task id")
 )
 
@@ -133,24 +135,6 @@ var_len = length(var)
 print(paste("Variable model_dir has length", var_len))
 
 model_dir <- gsub("\"", "", opt$model_dir)
-print("Retrieving predictors")
-var = opt$predictors
-print(var)
-var_len = length(var)
-print(paste("Variable predictors has length", var_len))
-
-print("------------------------Running var_serialization for predictors-----------------------")
-print(opt$predictors)
-predictors = var_serialization(opt$predictors)
-print("---------------------------------------------------------------------------------")
-
-print("Retrieving target_variable")
-var = opt$target_variable
-print(var)
-var_len = length(var)
-print(paste("Variable target_variable has length", var_len))
-
-target_variable <- gsub("\"", "", opt$target_variable)
 id <- gsub('"', '', opt$id)
 
 
@@ -158,30 +142,52 @@ print("Running the cell")
 library(caret)
 library(ggplot2)
 library(iml)
+library(xgboost)
 
-train_data <- readRDS(file.path(model_dir, "train_data.rds"))
-test_data  <- readRDS(file.path(model_dir, "test_data.rds"))
 
-obj <- readRDS(file.path(model_dir, "best_model.rds"))
 
-if (is.list(obj) && "xgb_model" %in% names(obj)) {
-    best_model <- obj$xgb_model
-    preProcess <- obj$preProcess
-    cat("RDS contains wrapper with model and metadata", "\n")
-    str(best_model)
+
+
+
+
+model_info_path <- file.path(model_dir, "model_info.rds")
+model_info <- readRDS(model_info_path)
+
+model_file <- model_info$model_file
+preProcess <- model_info$preProcess
+train_data <- model_info$train_data
+test_data <- model_info$test_data
+predictors <- model_info$predictors
+target_variable <- model_info$target_variable
+
+
+ext <- tools::file_ext(model_file)
+
+data_for_predictor <- train_data[, predictors, drop = FALSE]
+
+if (ext == "xgb") {
+    message("Loading XGBoost binary model: ", model_file)
+    best_model <- xgboost::xgb.load(model_file)
+
+    if (!is.null(preProcess)) {
+        message("Applying preProcess to training data")
+        data_for_predictor <- predict(preProcess, train_data[, predictors])
+    }
+} else if (ext == "rds") {
+    message("Loading RDS model: ", model_file)
+    best_model <- readRDS(model_file)
 } else {
-    best_model <- obj
-    preProcess <- NULL
-    cat("RDS contains only model", "\n")
+    stop("Unsupported model file type: ", ext)
 }
 
-if (!is.null(preProcess)) {
-    data_for_predictor <- predict(preProcess, train_data[, predictors])
-    cat("Model contains preProcess", "\n")
-} else {
-    data_for_predictor <- train_data[, predictors, drop = FALSE]
-    cat("Model does not contains preProcess", "\n")
-}
+
+
+
+
+
+
+
+
 
 
 
