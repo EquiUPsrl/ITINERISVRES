@@ -170,7 +170,7 @@ if (ext == "model") {
 
     print(file.info(model_file)$size)
 
-    raw <- readBin("/tmp/data/.../best_model.model", "raw", 200)
+    raw <- readBin(model_file, "raw", 200)
     raw
     
     best_model <- xgboost::xgb.load(model_file)
