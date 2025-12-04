@@ -263,12 +263,7 @@ for (c_value in cost_values) {
     for (g_value in gamma_values) {
         cat("Running SVM model with cost =", c_value, ", gamma =", g_value, "\n")
         
-        model_svm <- train(formula_svm, 
-                           data = train_data, 
-                           method = "svmRadial",   # Method: SVM with radial kernel
-                           trControl = ctrl,
-                           tuneGrid = expand.grid(sigma = g_value, C = c_value),
-                           preProcess = preProcSteps,
+        model_svm <- train(formula_svm, data = train_data, method = "svmRadial", trControl = ctrl, tuneGrid = expand.grid(sigma = g_value, C = c_value), preProcess = preProcSteps, importance = TRUE)
         
         results[[paste0("cost_", c_value, "_gamma_", g_value)]] <- model_svm
         
