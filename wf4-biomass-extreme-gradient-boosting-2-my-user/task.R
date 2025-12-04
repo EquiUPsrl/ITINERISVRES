@@ -555,7 +555,7 @@ writeLines(parametri_testo, con = params_output_file)
 
             
 
-model_path_gbm = file.path(model_dir, "best_model.xgb")
+model_path_gbm = file.path(model_dir, "best_model.model")
 xgb.save(best_model_gbm, model_path_gbm)
 cat("Extreme Gradient Boosting Model saved in: ", model_path_gbm, "\n")
 
@@ -624,12 +624,4 @@ saveRDS(model_info, file = file.path(model_dir, "model_info.rds"))
 print('Serialization of model_dir')
 file <- file(paste0('/tmp/model_dir_', id, '.json'))
 writeLines(toJSON(model_dir, auto_unbox=TRUE), file)
-close(file)
-print('Serialization of target_variable')
-file <- file(paste0('/tmp/target_variable_', id, '.json'))
-writeLines(toJSON(target_variable, auto_unbox=TRUE), file)
-close(file)
-print('Serialization of target_variable_uom')
-file <- file(paste0('/tmp/target_variable_uom_', id, '.json'))
-writeLines(toJSON(target_variable_uom, auto_unbox=TRUE), file)
 close(file)
