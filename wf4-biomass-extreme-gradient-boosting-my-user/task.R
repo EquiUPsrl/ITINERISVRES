@@ -74,14 +74,18 @@ if (!requireNamespace("xgboost", quietly = TRUE)) {
 	install.packages("xgboost", repos="http://cran.us.r-project.org")
 }
 library(xgboost)
-if (!requireNamespace("remotes", quietly = TRUE)) {
-	install.packages("remotes", repos="http://cran.us.r-project.org")
-}
-library(remotes)
 if (!requireNamespace("tidyr", quietly = TRUE)) {
 	install.packages("tidyr", repos="http://cran.us.r-project.org")
 }
 library(tidyr)
+if (!requireNamespace("scales", quietly = TRUE)) {
+	install.packages("scales", repos="http://cran.us.r-project.org")
+}
+library(scales)
+if (!requireNamespace("tools", quietly = TRUE)) {
+	install.packages("tools", repos="http://cran.us.r-project.org")
+}
+library(tools)
 
 
 
@@ -151,21 +155,6 @@ id <- gsub('"', '', opt$id)
 
 
 print("Running the cell")
-if(!requireNamespace("remotes", quietly = TRUE)) install.packages("remotes")
-
-
-user_lib <- file.path(Sys.getenv("HOME"), "R", "library")
-dir.create(user_lib, recursive = TRUE, showWarnings = FALSE)
-
-cat(user_lib)
-
-.libPaths(c(user_lib, .libPaths()))
-
-system("git clone --recursive https://github.com/dmlc/xgboost.git")
-
-system("R CMD INSTALL --configure-vars='CXXFLAGS=-DNO_ALTREP' xgboost/R-package --library=$HOME/R/library")
-
-
 library(ggplot2)
 library(xgboost)
 library(Metrics)
@@ -175,18 +164,6 @@ library(iml)
 library(e1071)
 library(readr)
 library(tidyr)
-
-
-cat("R.version: \n")
-R.version.string
-cat("caret version: \n")
-packageVersion("caret")
-cat("xgboost version: \n")
-packageVersion("xgboost")
-
-
-
-
 
 config_base_path <- "/tmp/data/WF4"
 output_path = file.path(config_base_path, "output")
@@ -270,10 +247,6 @@ results_gbm <- list()
 best_model_gbm <- NULL
 best_metric <- Inf
 
-train_data_clean <- as.data.frame(lapply(train_data, function(x) {
-  if (inherits(x, "ALTREP")) as.vector(x) else x
-}))
-
 for (n_value in nrounds) {
     for (depth_value in max_depth) {
         for (eta_value in eta) {
@@ -303,7 +276,7 @@ for (n_value in nrounds) {
                             
                             model_gbm <- train(
                                 as.formula(paste(target_variable, "~ .")),
-                                data = train_data_clean,
+                                data = train_data,
                                 method = "xgbTree",
                                 trControl = ctrl,
                                 tuneGrid = tuneGrid_gbm,
@@ -450,5 +423,19 @@ write.table(prediction_data, file = output_path, row.names = FALSE, col.names = 
 
 cat("Table with input data and forecasts saved in: ", output_path, "\n")
 
-saveRDS(train_data, file = file.path(model_dir, "train_data.rds"))
-saveRDS(test_data,  file = file.path(model_dir, "test_data.rds"))
+model_info <- list(
+    model_file = model_path,
+    preProcess = NULL,
+    train_data = train_data,
+    test_data = test_data,
+    predictors = predictors,
+    target_variable = target_variable,
+    target_variable_uom = target_variable_uom
+)
+
+saveRDS(model_info, file = file.path(model_dir, "model_info.rds"))
+# capturing outputs
+print('Serialization of model_dir')
+file <- file(paste0('/tmp/model_dir_', id, '.json'))
+writeLines(toJSON(model_dir, auto_unbox=TRUE), file)
+close(file)
