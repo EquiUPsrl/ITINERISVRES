@@ -144,10 +144,7 @@ library(ggplot2)
 library(iml)
 library(xgboost)
 
-
-
-
-
+config_base_path <- "/tmp/data/WF4"
 
 
 model_info_path <- file.path(model_dir, "model_info.rds")
@@ -189,13 +186,6 @@ if (ext == "xgb") {
 } else {
     stop("Unsupported model file type: ", ext)
 }
-
-
-
-
-
-
-
 
 
 
@@ -326,3 +316,10 @@ for (ds in datasets) {
     ggsave(filename = png_file, 
            plot = shap_summary_plot, width = 8, height = 6)
 }
+
+output_dir = config_base_path
+# capturing outputs
+print('Serialization of output_dir')
+file <- file(paste0('/tmp/output_dir_', id, '.json'))
+writeLines(toJSON(output_dir, auto_unbox=TRUE), file)
+close(file)
