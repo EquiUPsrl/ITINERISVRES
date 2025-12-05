@@ -317,7 +317,7 @@ for (ds in datasets) {
            plot = shap_summary_plot, width = 8, height = 6)
 }
 
-output_dir = config_base_path
+output_dir <- config_base_path
 # capturing outputs
 print('Serialization of output_dir')
 file <- file(paste0('/tmp/output_dir_', id, '.json'))
