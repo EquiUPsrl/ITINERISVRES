@@ -143,6 +143,7 @@ library(caret)
 library(ggplot2)
 library(tidyr)
 
+config_base_path <- "/tmp/data/WF4"
 
 
 model_info_path <- file.path(model_dir, "model_info.rds")
@@ -185,3 +186,10 @@ plot_path_violin_test <- file.path(model_dir, "violin_plot_test_set.png")
 ggsave(filename = plot_path_violin_test, plot = violin_plot, width = 8, height = 6)
 
 cat("Violin plot saved in:", plot_path_violin_test, "\n")
+
+output_dir <- config_base_path
+# capturing outputs
+print('Serialization of output_dir')
+file <- file(paste0('/tmp/output_dir_', id, '.json'))
+writeLines(toJSON(output_dir, auto_unbox=TRUE), file)
+close(file)
