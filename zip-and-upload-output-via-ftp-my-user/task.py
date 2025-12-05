@@ -8,28 +8,35 @@ import json
 import os
 arg_parser = argparse.ArgumentParser()
 
+secret_ftp_pass = os.getenv('secret_ftp_pass')
 
 arg_parser.add_argument('--id', action='store', type=str, required=True, dest='id')
 
 
-arg_parser.add_argument('--model_dir', action='store', type=str, required=True, dest='model_dir')
+arg_parser.add_argument('--output_dir', action='store', type=str, required=True, dest='output_dir')
 
+arg_parser.add_argument('--param_ftp_remote_path', action='store', type=str, required=True, dest='param_ftp_remote_path')
+arg_parser.add_argument('--param_ftp_user', action='store', type=str, required=True, dest='param_ftp_user')
+arg_parser.add_argument('--param_host', action='store', type=str, required=True, dest='param_host')
 
 args = arg_parser.parse_args()
 print(args)
 
 id = args.id
 
-model_dir = args.model_dir.replace('"','')
+output_dir = args.output_dir.replace('"','')
 
+param_ftp_remote_path = args.param_ftp_remote_path.replace('"','')
+param_ftp_user = args.param_ftp_user.replace('"','')
+param_host = args.param_host.replace('"','')
 
 
 timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
 zip_output_path = f'WF4_Biomass_{timestamp}.zip'
-ftp_host = '178.238.235.97'
-ftp_user = 'equiup'
-ftp_pass = 'KAsH3g2s2s+qkcsu'
-ftp_remote_path = '/itineris'
+ftp_host = param_host
+ftp_user = param_ftp_user
+ftp_pass = secret_ftp_pass
+ftp_remote_path = param_ftp_remote_path
 
 def zip_folder(folder_path, output_path):
     with zipfile.ZipFile(output_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
@@ -40,7 +47,7 @@ def zip_folder(folder_path, output_path):
                 zipf.write(abs_path, rel_path)
     print(f"ZIP creato: {output_path}")
 
-zip_folder(model_dir, zip_output_path)
+zip_folder(output_dir, zip_output_path)
 
 def upload_via_ftp(local_file, host, user, password, remote_path):
     with FTP(host) as ftp:
