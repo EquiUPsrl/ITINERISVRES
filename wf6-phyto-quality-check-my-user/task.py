@@ -166,3 +166,9 @@ convert_csv(
 
 print("abiotic file verified -> ", abiotic_csv)
 
+file_abiotic_csv = open("/tmp/abiotic_csv_" + id + ".json", "w")
+file_abiotic_csv.write(json.dumps(abiotic_csv))
+file_abiotic_csv.close()
+file_biotic_csv = open("/tmp/biotic_csv_" + id + ".json", "w")
+file_biotic_csv.write(json.dumps(biotic_csv))
+file_biotic_csv.close()
