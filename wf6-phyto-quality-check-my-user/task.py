@@ -14,6 +14,8 @@ arg_parser = argparse.ArgumentParser()
 arg_parser.add_argument('--id', action='store', type=str, required=True, dest='id')
 
 
+arg_parser.add_argument('--abiotic_file', action='store', type=str, required=True, dest='abiotic_file')
+
 arg_parser.add_argument('--biotic_file', action='store', type=str, required=True, dest='biotic_file')
 
 
@@ -22,11 +24,9 @@ print(args)
 
 id = args.id
 
+abiotic_file = args.abiotic_file.replace('"','')
 biotic_file = args.biotic_file.replace('"','')
 
-
-
-print("biotic_file -> ", biotic_file)
 
 
 def detect_encoding(file_path, n_bytes=100_000):
@@ -142,18 +142,27 @@ def convert_csv(
 
 
 
-input_csv = biotic_file
-output_file = input_csv
+
+biotic_csv = biotic_file
 
 convert_csv(
-    input_csv=input_csv,
-    output_csv=output_file,
+    input_csv=biotic_csv,
+    output_csv=biotic_csv,
     normalize_unicode=True,
     clean_header_spaces=True
 )
 
-print("output_file -> ", output_file)
+print("biotic file verified -> ", biotic_csv)
 
-file_output_file = open("/tmp/output_file_" + id + ".json", "w")
-file_output_file.write(json.dumps(output_file))
-file_output_file.close()
+abiotic_csv = abiotic_file
+
+convert_csv(
+    input_csv=abiotic_csv,
+    output_csv=abiotic_csv,
+    normalize_unicode=True,
+    clean_header_spaces=True
+)
+
+
+print("abiotic file verified -> ", abiotic_csv)
+
