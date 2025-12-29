@@ -18,6 +18,8 @@ arg_parser.add_argument('--abiotic_file', action='store', type=str, required=Tru
 
 arg_parser.add_argument('--biotic_file', action='store', type=str, required=True, dest='biotic_file')
 
+arg_parser.add_argument('--config_file', action='store', type=str, required=True, dest='config_file')
+
 
 args = arg_parser.parse_args()
 print(args)
@@ -26,6 +28,7 @@ id = args.id
 
 abiotic_file = args.abiotic_file.replace('"','')
 biotic_file = args.biotic_file.replace('"','')
+config_file = args.config_file.replace('"','')
 
 
 
@@ -100,6 +103,11 @@ def convert_csv(
     - Clean headers and cell values
     - Output CSV with ';' separator and UTF-8 encoding
     """
+
+    if not input_csv:
+        print("WARNING: input_csv is empty or not set. Conversion skipped.")
+        return
+    
     input_csv = Path(input_csv)
     output_csv = Path(output_csv)
 
@@ -163,8 +171,18 @@ convert_csv(
     clean_header_spaces=True
 )
 
-
 print("abiotic file verified -> ", abiotic_csv)
+
+config_csv = config_file
+
+convert_csv(
+    input_csv=config_csv,
+    output_csv=config_csv,
+    normalize_unicode=True,
+    clean_header_spaces=True
+)
+
+print("config file verified -> ", config_csv)
 
 file_abiotic_csv = open("/tmp/abiotic_csv_" + id + ".json", "w")
 file_abiotic_csv.write(json.dumps(abiotic_csv))
