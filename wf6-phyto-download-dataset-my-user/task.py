@@ -56,6 +56,10 @@ biotic_file = download_file(param_biotic_file, input_dir)
 abiotic_file = download_file(param_abiotic_file, input_dir)
 config_file = download_file(param_config_file, input_dir)
 
+print("biotic_file", biotic_file)
+print("abiotic_file", abiotic_file)
+print("config_file", config_file)
+
 file_abiotic_file = open("/tmp/abiotic_file_" + id + ".json", "w")
 file_abiotic_file.write(json.dumps(abiotic_file))
 file_abiotic_file.close()
