@@ -32,9 +32,10 @@ os.makedirs(input_dir, exist_ok=True)
 print("input_dir -> ", input_dir)
 
 
-def download_file(url, dest_folder):
+def download_file(url, dest_folder, file_name=None):
     """Download a file from a URL into the specified folder."""
-    filename = url.split("/")[-1]
+
+    filename = file_name if file_name else url.split("/")[-1]
     filepath = os.path.join(dest_folder, filename)
 
     try:
@@ -46,6 +47,7 @@ def download_file(url, dest_folder):
 
         print(f"Download completed: {filepath}")
         return filepath
+
     except Exception as e:
         print(f"Error downloading {url}: {e}")
         return ""
@@ -54,7 +56,7 @@ def download_file(url, dest_folder):
 
 biotic_file = download_file(param_biotic_file, input_dir)
 abiotic_file = download_file(param_abiotic_file, input_dir)
-config_file = download_file(param_config_file, input_dir)
+config_file = download_file(param_config_file, input_dir, 'config.csv')
 
 file_abiotic_file = open("/tmp/abiotic_file_" + id + ".json", "w")
 file_abiotic_file.write(json.dumps(abiotic_file))
