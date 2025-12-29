@@ -225,7 +225,7 @@ def reorder_columns(
 output_dir = conf_output_path
 os.makedirs(output_dir, exist_ok=True)
 
-output_path = os.path.join(output_dir, "join_bio_abio.csv")
+merged_file = os.path.join(output_dir, "join_bio_abio.csv")
 
 df_bio = read_csv_clean(biotic_file)
 df_abio = read_csv_clean(abiotic_file)
@@ -292,11 +292,11 @@ df = reorder_columns(
     ]
 )
 
-df.to_csv(output_path, index=False)
+df.to_csv(merged_file, index=False)
 
-print("Joined dataset saved:", output_path)
+print("Joined dataset saved:", merged_file)
 print(df.head())
 
-file_output_path = open("/tmp/output_path_" + id + ".json", "w")
-file_output_path.write(json.dumps(output_path))
-file_output_path.close()
+file_merged_file = open("/tmp/merged_file_" + id + ".json", "w")
+file_merged_file.write(json.dumps(merged_file))
+file_merged_file.close()
