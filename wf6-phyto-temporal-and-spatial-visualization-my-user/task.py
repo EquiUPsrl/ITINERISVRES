@@ -10,7 +10,7 @@ arg_parser = argparse.ArgumentParser()
 arg_parser.add_argument('--id', action='store', type=str, required=True, dest='id')
 
 
-arg_parser.add_argument('--input_path', action='store', type=str, required=True, dest='input_path')
+arg_parser.add_argument('--merged_file', action='store', type=str, required=True, dest='merged_file')
 
 
 args = arg_parser.parse_args()
@@ -18,7 +18,7 @@ print(args)
 
 id = args.id
 
-input_path = args.input_path.replace('"','')
+merged_file = args.merged_file.replace('"','')
 
 
 conf_output_path = conf_output_path = '/tmp/data/WF6/' + 'output'
@@ -27,7 +27,7 @@ output_dir = conf_output_path
 os.makedirs(output_dir, exist_ok=True)
 print(f"Folder '{output_dir}' ready.")
 
-csv_path = input_path
+csv_path = merged_file
 df_raw = pd.read_csv(csv_path, low_memory=False)
 
 print("Original shape:", df_raw.shape)
@@ -51,10 +51,10 @@ event_df = (
 print("event_df shape:", event_df.shape)
 event_df.head()
 
-output_file = os.path.join(output_dir, "event_df.csv")
-event_df.to_csv(output_file, index=False)
-print(f"Saved file: {output_file}")
+final_input = os.path.join(output_dir, "final_input.csv")
+event_df.to_csv(final_input, index=False)
+print(f"Saved file: {final_input}")
 
-file_output_file = open("/tmp/output_file_" + id + ".json", "w")
-file_output_file.write(json.dumps(output_file))
-file_output_file.close()
+file_final_input = open("/tmp/final_input_" + id + ".json", "w")
+file_final_input.write(json.dumps(final_input))
+file_final_input.close()
