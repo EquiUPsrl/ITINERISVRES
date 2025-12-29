@@ -12,7 +12,7 @@ arg_parser = argparse.ArgumentParser()
 arg_parser.add_argument('--id', action='store', type=str, required=True, dest='id')
 
 
-arg_parser.add_argument('--input_path', action='store', type=str, required=True, dest='input_path')
+arg_parser.add_argument('--final_input', action='store', type=str, required=True, dest='final_input')
 
 
 args = arg_parser.parse_args()
@@ -20,7 +20,7 @@ print(args)
 
 id = args.id
 
-input_path = args.input_path.replace('"','')
+final_input = args.final_input.replace('"','')
 
 
 conf_output_path = conf_output_path = '/tmp/data/WF6/' + 'output'
@@ -35,7 +35,7 @@ output_dir = conf_output_path
 os.makedirs(output_dir, exist_ok=True)
 print(f"Folder '{output_dir}' ready.")
 
-csv_path = input_path
+csv_path = final_input
 event_df = pd.read_csv(csv_path, low_memory=False)
 
 abiotic_cols = [
