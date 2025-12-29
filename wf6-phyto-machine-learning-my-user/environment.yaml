@@ -10,5 +10,3 @@ dependencies:
   - shap
   - matplotlib
   - scikit-learn
-  - papermill
-  - ipykernel
