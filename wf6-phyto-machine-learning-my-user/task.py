@@ -3,12 +3,14 @@ import os
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import GridSearchCV
+import shap
 from sklearn.svm import SVR
 from sklearn.ensemble import RandomForestRegressor
 import numpy as np
 from sklearn.linear_model import LinearRegression
 from sklearn.linear_model import RidgeCV
 from sklearn.metrics import mean_absolute_error
+from sklearn.linear_model import Ridge
 from sklearn.metrics import mean_squared_error
 
 import argparse
@@ -116,8 +118,9 @@ def prepare_ml_df(df, abiotic_cols=None, log_transform=False, single_lake=None, 
 
     return ml_df, feature_cols, target_col
 
-"""
+
 def plot_and_save_shap(shap_dir, model_name, shap_values, X_for_plot, feature_names):
+    """Create and save SHAP summary plot and mean absolute SHAP barplot."""
     plt.figure()
     shap.summary_plot(shap_values, X_for_plot, feature_names=feature_names, show=False)
     plt.title(f"{model_name} - SHAP summary ({selected_lake})")
@@ -137,7 +140,7 @@ def plot_and_save_shap(shap_dir, model_name, shap_values, X_for_plot, feature_na
     plt.savefig(f"{shap_dir}/{model_name}_SHAP_barplot_{selected_lake}.svg")
     plt.close()
     print(f"{model_name}: saved summary + barplot + CSV")
-"""
+
 
 lakes = list(event_df['locality'].unique()) + ["All lakes"]
 
@@ -309,8 +312,6 @@ for selected_lake in lakes:
     
     shap_dir = os.path.join(lake_dir, "SHAP")
     os.makedirs(shap_dir, exist_ok=True)
-
-    """
     
     ridge_model = Ridge(alpha=10).fit(X_scaled, y_lake)
     explainer_ridge = shap.LinearExplainer(ridge_model, X_scaled)
@@ -326,7 +327,6 @@ for selected_lake in lakes:
     eval_idx = min(150, n_samples)
     explainer_svr = shap.KernelExplainer(svr_model.predict, bg)
     plot_and_save_shap(shap_dir, "SVR", explainer_svr.shap_values(X_scaled[:eval_idx]), X_lake.iloc[:eval_idx], X_lake.columns)
-    """
     
     print(f"\nSHAP analysis completed for lake: {selected_lake}")
 
