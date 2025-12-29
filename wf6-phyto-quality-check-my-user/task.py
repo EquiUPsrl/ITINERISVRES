@@ -26,6 +26,9 @@ biotic_file = args.biotic_file.replace('"','')
 
 
 
+print("biotic_file -> ", biotic_file)
+
+
 def detect_encoding(file_path, n_bytes=100_000):
     """
     Detect the file encoding using a sample of raw bytes.
@@ -118,16 +121,6 @@ def convert_csv(
         df.columns = clean_headers(df.columns)
 
 
-    '''
-    df = df.applymap(
-        lambda x: clean_text(
-            x,
-            normalize_unicode=normalize_unicode,
-            collapse_spaces=True
-        )
-    )
-    '''
-
     df = df.apply(
         lambda col: col.map(
             lambda x: clean_text(
@@ -148,11 +141,9 @@ def convert_csv(
     print(f"Output written to: {output_csv}")
 
 
-print("biotic_file -> ", biotic_file)
 
 input_csv = biotic_file
 output_file = input_csv
-
 
 convert_csv(
     input_csv=input_csv,
