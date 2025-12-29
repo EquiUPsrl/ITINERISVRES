@@ -44,7 +44,7 @@ def download_file(url, dest_folder):
         with open(filepath, "wb") as f:
             f.write(response.content)
 
-        print(f"Download completed: {filename}")
+        print(f"Download completed: {filepath}")
         return filepath
     except Exception as e:
         print(f"Error downloading {url}: {e}")
@@ -55,10 +55,6 @@ def download_file(url, dest_folder):
 biotic_file = download_file(param_biotic_file, input_dir)
 abiotic_file = download_file(param_abiotic_file, input_dir)
 config_file = download_file(param_config_file, input_dir)
-
-print("biotic_file", biotic_file)
-print("abiotic_file", abiotic_file)
-print("config_file", config_file)
 
 file_abiotic_file = open("/tmp/abiotic_file_" + id + ".json", "w")
 file_abiotic_file.write(json.dumps(abiotic_file))
