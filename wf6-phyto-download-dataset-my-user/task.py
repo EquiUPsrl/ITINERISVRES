@@ -24,10 +24,12 @@ param_abiotic_file = args.param_abiotic_file.replace('"','')
 param_biotic_file = args.param_biotic_file.replace('"','')
 param_config_file = args.param_config_file.replace('"','')
 
-conf_input_path = conf_input_path = '/tmp/data/WF6/' + 'data'
+conf_input_path = conf_input_path = '/tmp/data/WF6/data'
 
 input_dir = conf_input_path
 os.makedirs(input_dir, exist_ok=True)
+
+print("input_dir -> ", input_dir)
 
 
 def download_file(url, dest_folder):
