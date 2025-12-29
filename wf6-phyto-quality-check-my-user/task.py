@@ -14,7 +14,7 @@ arg_parser = argparse.ArgumentParser()
 arg_parser.add_argument('--id', action='store', type=str, required=True, dest='id')
 
 
-arg_parser.add_argument('--input_path', action='store', type=str, required=True, dest='input_path')
+arg_parser.add_argument('--biotic_file', action='store', type=str, required=True, dest='biotic_file')
 
 
 args = arg_parser.parse_args()
@@ -22,7 +22,7 @@ print(args)
 
 id = args.id
 
-input_path = args.input_path.replace('"','')
+biotic_file = args.biotic_file.replace('"','')
 
 
 
@@ -148,9 +148,9 @@ def convert_csv(
     print(f"Output written to: {output_csv}")
 
 
-print("input_path -> ", input_path)
+print("biotic_file -> ", biotic_file)
 
-input_csv = input_path
+input_csv = biotic_file
 output_file = input_csv
 
 
