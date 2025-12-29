@@ -25,8 +25,8 @@ abiotic_file = args.abiotic_file.replace('"','')
 biotic_file = args.biotic_file.replace('"','')
 
 
-conf_output_path = conf_output_path = '' + 'output'
-conf_input_path = conf_input_path = '' + 'data'
+conf_output_path = conf_output_path = '/tmp/data/WF6/' + 'output'
+conf_input_path = conf_input_path = '/tmp/data/WF6/' + 'data'
 
 def read_csv_clean(path, sep=";", encoding="latin1") -> pd.DataFrame:
     """
