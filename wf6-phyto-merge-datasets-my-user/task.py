@@ -11,9 +11,9 @@ arg_parser = argparse.ArgumentParser()
 arg_parser.add_argument('--id', action='store', type=str, required=True, dest='id')
 
 
-arg_parser.add_argument('--abiotic_file', action='store', type=str, required=True, dest='abiotic_file')
+arg_parser.add_argument('--abiotic_csv', action='store', type=str, required=True, dest='abiotic_csv')
 
-arg_parser.add_argument('--biotic_file', action='store', type=str, required=True, dest='biotic_file')
+arg_parser.add_argument('--biotic_csv', action='store', type=str, required=True, dest='biotic_csv')
 
 
 args = arg_parser.parse_args()
@@ -21,8 +21,8 @@ print(args)
 
 id = args.id
 
-abiotic_file = args.abiotic_file.replace('"','')
-biotic_file = args.biotic_file.replace('"','')
+abiotic_csv = args.abiotic_csv.replace('"','')
+biotic_csv = args.biotic_csv.replace('"','')
 
 
 conf_output_path = conf_output_path = '/tmp/data/WF6/' + 'output'
@@ -227,8 +227,8 @@ os.makedirs(output_dir, exist_ok=True)
 
 merged_file = os.path.join(output_dir, "join_bio_abio.csv")
 
-df_bio = read_csv_clean(biotic_file)
-df_abio = read_csv_clean(abiotic_file)
+df_bio = read_csv_clean(biotic_csv)
+df_abio = read_csv_clean(abiotic_csv)
 
 
 
