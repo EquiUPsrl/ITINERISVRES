@@ -148,6 +148,8 @@ def convert_csv(
     print(f"Output written to: {output_csv}")
 
 
+print("input_path -> ", input_path)
+
 input_csv = input_path
 output_file = input_csv
 
@@ -158,6 +160,8 @@ convert_csv(
     normalize_unicode=True,
     clean_header_spaces=True
 )
+
+print("output_file -> ", output_file)
 
 file_output_file = open("/tmp/output_file_" + id + ".json", "w")
 file_output_file.write(json.dumps(output_file))
