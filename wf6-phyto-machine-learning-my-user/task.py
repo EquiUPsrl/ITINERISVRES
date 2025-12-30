@@ -119,7 +119,7 @@ def prepare_ml_df(df, abiotic_cols=None, log_transform=False, single_lake=None, 
     return ml_df, feature_cols, target_col
 
 
-def plot_and_save_shap(shap_dir, model_name, shap_values, X_for_plot, feature_names):
+def plot_and_save_shap(shap_dir, model_name, shap_values, X_for_plot, feature_names, selected_name):
     """Create and save SHAP summary plot and mean absolute SHAP barplot."""
     
     print("Entering plot_and_save_shap:", model_name)
@@ -139,10 +139,10 @@ def plot_and_save_shap(shap_dir, model_name, shap_values, X_for_plot, feature_na
         feature_names=feature_names,
         show=False
     )
-    plt.title(f"{model_name} - SHAP summary ({selected_lake})")
+    plt.title(f"{model_name} - SHAP summary ({selected_name})")
     plt.tight_layout()
-    plt.savefig(f"{shap_dir}/{model_name}_SHAP_summary_{selected_lake}.png", dpi=300)
-    plt.savefig(f"{shap_dir}/{model_name}_SHAP_summary_{selected_lake}.svg")
+    plt.savefig(f"{shap_dir}/{model_name}_SHAP_summary_{selected_name}.png", dpi=300)
+    plt.savefig(f"{shap_dir}/{model_name}_SHAP_summary_{selected_name}.svg")
     plt.close()
 
     print("SHAP summary plot completed")
@@ -150,15 +150,12 @@ def plot_and_save_shap(shap_dir, model_name, shap_values, X_for_plot, feature_na
     print(f"DEBUG: shap_values.shape = {shap_values.shape}")
     print(f"DEBUG: len(feature_names) = {len(feature_names)}")
 
-    try:
-        mean_abs_shap = np.abs(shap_values).mean(axis=0)
-        print(f"DEBUG: mean_abs_shap = {mean_abs_shap}")
-    
-        print(f"DEBUG: importance defined successfully, length = {len(importance)}")
-        
 
-    except Exception as e:
-        print(f"ERROR: failed to create importance: {e}")
+    mean_abs_shap = np.abs(shap_values).mean(axis=0)
+    print(f"DEBUG: mean_abs_shap = {mean_abs_shap}")
+
+    print(f"DEBUG: importance defined successfully, length = {len(importance)}")
+    
 
     print("importance", importance)
 
@@ -166,10 +163,10 @@ def plot_and_save_shap(shap_dir, model_name, shap_values, X_for_plot, feature_na
         plt.figure(figsize=(6, 5))
         plt.barh(importance.index, importance.values)
         plt.xlabel("Mean |SHAP value|")
-        plt.title(f"{model_name} - SHAP feature importance ({selected_lake})")
+        plt.title(f"{model_name} - SHAP feature importance ({selected_name})")
         plt.tight_layout()
-        plt.savefig(f"{shap_dir}/{model_name}_SHAP_barplot_{selected_lake}.png", dpi=300)
-        plt.savefig(f"{shap_dir}/{model_name}_SHAP_barplot_{selected_lake}.svg")
+        plt.savefig(f"{shap_dir}/{model_name}_SHAP_barplot_{selected_name}.png", dpi=300)
+        plt.savefig(f"{shap_dir}/{model_name}_SHAP_barplot_{selected_name}.svg")
         plt.close()
 
     print(f"{model_name}: saved summary + barplot + CSV")
@@ -351,18 +348,18 @@ for selected_lake in lakes:
     
     ridge_model = Ridge(alpha=10).fit(X_scaled, y_lake)
     explainer_ridge = shap.LinearExplainer(ridge_model, X_scaled)
-    plot_and_save_shap(shap_dir, "Ridge", explainer_ridge.shap_values(X_scaled), X_lake, X_lake.columns)
+    plot_and_save_shap(shap_dir, "Ridge", explainer_ridge.shap_values(X_scaled), X_lake, X_lake.columns, selected_lake)
     
     rf_model = RandomForestRegressor(n_estimators=200, max_depth=10, max_features='sqrt', random_state=0).fit(X_lake, y_lake)
     explainer_rf = shap.TreeExplainer(rf_model)
-    plot_and_save_shap(shap_dir, "RandomForest", explainer_rf.shap_values(X_lake), X_lake, X_lake.columns)
+    plot_and_save_shap(shap_dir, "RandomForest", explainer_rf.shap_values(X_lake), X_lake, X_lake.columns, selected_lake)
     
     svr_model = SVR(C=1, epsilon=0.01, kernel="rbf").fit(X_scaled, y_lake)
     n_samples = X_scaled.shape[0]
     bg = X_scaled[np.random.choice(n_samples, min(50,n_samples), replace=False)]
     eval_idx = min(150, n_samples)
     explainer_svr = shap.KernelExplainer(svr_model.predict, bg)
-    plot_and_save_shap(shap_dir, "SVR", explainer_svr.shap_values(X_scaled[:eval_idx]), X_lake.iloc[:eval_idx], X_lake.columns)
+    plot_and_save_shap(shap_dir, "SVR", explainer_svr.shap_values(X_scaled[:eval_idx]), X_lake.iloc[:eval_idx], X_lake.columns, selected_lake)
     
     print(f"\nSHAP analysis completed for lake: {selected_lake}")
 
