@@ -6,12 +6,12 @@ dependencies:
   - python>=3.8
   - nbconvert
   - pandas
-  - scikit-bio
-  - numpy<=2.3
+  - skbio
+  - numpy
   - statsmodels
   - matplotlib
   - scipy
   - seaborn
-  - scikit-learn
+  - sklearn
   - papermill
   - ipykernel

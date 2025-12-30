@@ -22,7 +22,7 @@ arg_parser = argparse.ArgumentParser()
 arg_parser.add_argument('--id', action='store', type=str, required=True, dest='id')
 
 
-arg_parser.add_argument('--abiotic_file', action='store', type=str, required=True, dest='abiotic_file')
+arg_parser.add_argument('--abiotic_csv', action='store', type=str, required=True, dest='abiotic_csv')
 
 arg_parser.add_argument('--filtered_file', action='store', type=str, required=True, dest='filtered_file')
 
@@ -34,7 +34,7 @@ print(args)
 
 id = args.id
 
-abiotic_file = args.abiotic_file.replace('"','')
+abiotic_csv = args.abiotic_csv.replace('"','')
 filtered_file = args.filtered_file.replace('"','')
 sample_metrics_file = args.sample_metrics_file.replace('"','')
 
@@ -61,7 +61,7 @@ CSV_DIR    = os.path.join(output_dir, "csv")
 PLOTS_DIR  = os.path.join(output_dir, "plots")
 
 
-ABIOTIC_FILE = abiotic_file
+ABIOTIC_FILE = abiotic_csv
 SPECIES_FILE = filtered_file
 SAMPLE_METRICS_FILE = sample_metrics_file
 
