@@ -13,7 +13,7 @@ arg_parser = argparse.ArgumentParser()
 arg_parser.add_argument('--id', action='store', type=str, required=True, dest='id')
 
 
-arg_parser.add_argument('--input_file', action='store', type=str, required=True, dest='input_file')
+arg_parser.add_argument('--input_csv', action='store', type=str, required=True, dest='input_csv')
 
 
 args = arg_parser.parse_args()
@@ -21,7 +21,7 @@ print(args)
 
 id = args.id
 
-input_file = args.input_file.replace('"','')
+input_csv = args.input_csv.replace('"','')
 
 
 conf_output_path = conf_output_path = '/tmp/data/WF5/' + 'output'
@@ -91,7 +91,7 @@ if os.path.exists(config_file):
 
 
 
-df = pd.read_csv(input_file, sep=";", low_memory=False)
+df = pd.read_csv(input_csv, sep=";", low_memory=False)
 print("Raw dataset loaded:", len(df), "records")
 
 value_col = value_col if value_col in df.columns else "organismQuantity"
