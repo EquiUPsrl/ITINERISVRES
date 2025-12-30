@@ -7,11 +7,11 @@ dependencies:
   - nbconvert
   - pandas
   - skbio
-  - numpy
+  - numpy<=2.3
   - statsmodels
   - matplotlib
   - scipy
   - seaborn
-  - sklearn
+  - scikit-learn
   - papermill
   - ipykernel
