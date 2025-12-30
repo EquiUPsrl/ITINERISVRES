@@ -299,14 +299,18 @@ for selected_lake in lakes:
     plt.savefig(os.path.join(lake_dir, "model_R2_comparison.svg"))
     plt.show()
     
-    
-    df_lake = event_df[event_df["locality"]==selected_lake].sort_values("parsed_date")
+    if selected_lake=="All lakes":
+        df_lake = event_df.sort_values("parsed_date")
+    else:
+        df_lake = event_df[event_df["locality"]==selected_lake].sort_values("parsed_date")
+
     df_lake["density_log"] = np.log10(df_lake["density"]+1)
     df_lake["density_log_lag1"] = df_lake.groupby("locality")["density_log"].shift(1)
 
-    df_lake = df_lake.dropna(subset=features+["density_log"])
+    shap_features = [f for f in features if f in df_lake.columns]
+    df_lake = df_lake.dropna(subset=shap_features + ["density_log"])
     
-    X_lake = df_lake[features]
+    X_lake = df_lake[shap_features]
     y_lake = df_lake["density_log"]
     X_scaled = StandardScaler().fit_transform(X_lake)
     
@@ -330,3 +334,6 @@ for selected_lake in lakes:
     
     print(f"\nSHAP analysis completed for lake: {selected_lake}")
 
+file_output_dir = open("/tmp/output_dir_" + id + ".json", "w")
+file_output_dir.write(json.dumps(output_dir))
+file_output_dir.close()
