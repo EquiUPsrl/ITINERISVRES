@@ -75,3 +75,6 @@ plt.savefig(os.path.join(output_dir, "heatmap_abiotici.jpg"), format="jpg", dpi=
 print(f"Heatmap saved to {os.path.join(output_dir, 'heatmap_abiotici.svg')} and .jpg")
 plt.show()
 
+file_output_dir = open("/tmp/output_dir_" + id + ".json", "w")
+file_output_dir.write(json.dumps(output_dir))
+file_output_dir.close()
