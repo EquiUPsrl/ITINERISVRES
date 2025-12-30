@@ -151,16 +151,16 @@ def convert_csv(
 
 
 
-biotic_csv = input_file
+input_csv = input_file
 
 convert_csv(
-    input_csv=biotic_csv,
-    output_csv=biotic_csv,
+    input_csv=input_csv,
+    output_csv=input_csv,
     normalize_unicode=True,
     clean_header_spaces=True
 )
 
-print("biotic file verified -> ", biotic_csv)
+print("biotic file verified -> ", input_csv)
 
 abiotic_csv = abiotic_file
 
@@ -187,6 +187,6 @@ print("config file verified -> ", config_csv)
 file_abiotic_csv = open("/tmp/abiotic_csv_" + id + ".json", "w")
 file_abiotic_csv.write(json.dumps(abiotic_csv))
 file_abiotic_csv.close()
-file_biotic_csv = open("/tmp/biotic_csv_" + id + ".json", "w")
-file_biotic_csv.write(json.dumps(biotic_csv))
-file_biotic_csv.close()
+file_input_csv = open("/tmp/input_csv_" + id + ".json", "w")
+file_input_csv.write(json.dumps(input_csv))
+file_input_csv.close()
