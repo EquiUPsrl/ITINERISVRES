@@ -4,9 +4,9 @@ import pandas as pd
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import GridSearchCV
 import numpy as np
-import shap
 from sklearn.svm import SVR
 from sklearn.ensemble import RandomForestRegressor
+import shap
 from sklearn.linear_model import LinearRegression
 from sklearn.linear_model import RidgeCV
 from sklearn.metrics import mean_absolute_error
@@ -130,21 +130,24 @@ def plot_and_save_shap(shap_dir, model_name, shap_values, X_for_plot, feature_na
     if shap_values.ndim == 1:
         shap_values = shap_values.reshape(-1, 1)
 
-    plt.figure()
-    shap.summary_plot(
-        shap_values,
-        X_for_plot,
-        feature_names=feature_names,
-        show=False
-    )
-    plt.title(f"{model_name} - SHAP summary ({selected_lake})")
-    plt.tight_layout()
-    plt.savefig(f"{shap_dir}/{model_name}_SHAP_summary_{selected_lake}.png", dpi=300)
-    plt.savefig(f"{shap_dir}/{model_name}_SHAP_summary_{selected_lake}.svg")
-    plt.close()
-
     mean_abs_shap = np.abs(shap_values).mean(axis=0)
 
+
+    try:
+        plt.figure()
+        shap.summary_plot(
+            shap_values,
+            X_for_plot,
+            feature_names=feature_names,
+            show=False
+        )
+        plt.title(f"{model_name} - SHAP summary ({selected_lake})")
+        plt.tight_layout()
+        plt.savefig(f"{shap_dir}/{model_name}_SHAP_summary_{selected_lake}.png", dpi=300)
+        plt.savefig(f"{shap_dir}/{model_name}_SHAP_summary_{selected_lake}.svg")
+        plt.close()
+    except Exception as e:
+        print(f"WARNING: SHAP summary plot failed for {model_name}: {e}")
 
     plt.figure(figsize=(6, 5))
     plt.barh(importance.index, importance.values)
@@ -155,7 +158,8 @@ def plot_and_save_shap(shap_dir, model_name, shap_values, X_for_plot, feature_na
     plt.savefig(f"{shap_dir}/{model_name}_SHAP_barplot_{selected_lake}.svg")
     plt.close()
 
-    print(f"{model_name}: saved summary + barplot + CSV")
+    print(f"{model_name}: SHAP importance saved")
+
 
 lakes = list(event_df['locality'].unique()) + ["All lakes"]
 
