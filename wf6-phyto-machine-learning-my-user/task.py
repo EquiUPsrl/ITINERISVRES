@@ -3,10 +3,10 @@ import os
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import GridSearchCV
+import numpy as np
 import shap
 from sklearn.svm import SVR
 from sklearn.ensemble import RandomForestRegressor
-import numpy as np
 from sklearn.linear_model import LinearRegression
 from sklearn.linear_model import RidgeCV
 from sklearn.metrics import mean_absolute_error
@@ -118,9 +118,8 @@ def prepare_ml_df(df, abiotic_cols=None, log_transform=False, single_lake=None, 
 
     return ml_df, feature_cols, target_col
 
-
+"""
 def plot_and_save_shap(shap_dir, model_name, shap_values, X_for_plot, feature_names):
-    """Create and save SHAP summary plot and mean absolute SHAP barplot."""
     plt.figure()
     shap.summary_plot(shap_values, X_for_plot, feature_names=feature_names, show=False)
     plt.title(f"{model_name} - SHAP summary ({selected_lake})")
@@ -140,7 +139,51 @@ def plot_and_save_shap(shap_dir, model_name, shap_values, X_for_plot, feature_na
     plt.savefig(f"{shap_dir}/{model_name}_SHAP_barplot_{selected_lake}.svg")
     plt.close()
     print(f"{model_name}: saved summary + barplot + CSV")
+"""
 
+def plot_and_save_shap(shap_dir, model_name, shap_values, X_for_plot, feature_names):
+    """Create and save SHAP summary plot and mean absolute SHAP barplot."""
+
+    if isinstance(shap_values, list):
+        shap_values = shap_values[0]
+
+    shap_values = np.asarray(shap_values)
+
+    if shap_values.ndim == 1:
+        shap_values = shap_values.reshape(-1, 1)
+
+    plt.figure()
+    shap.summary_plot(
+        shap_values,
+        X_for_plot,
+        feature_names=feature_names,
+        show=False
+    )
+    plt.title(f"{model_name} - SHAP summary ({selected_lake})")
+    plt.tight_layout()
+    plt.savefig(f"{shap_dir}/{model_name}_SHAP_summary_{selected_lake}.png", dpi=300)
+    plt.savefig(f"{shap_dir}/{model_name}_SHAP_summary_{selected_lake}.svg")
+    plt.close()
+
+    mean_abs_shap = np.abs(shap_values).mean(axis=0)
+
+        pd.Series(mean_abs_shap, index=feature_names)
+        .sort_values(ascending=True)
+    )
+
+        f"{shap_dir}/{model_name}_SHAP_importance_{selected_lake}.csv"
+    )
+
+    plt.figure(figsize=(6, 5))
+    plt.barh(importance.index, importance.values)
+    plt.xlabel("Mean |SHAP value|")
+    plt.title(f"{model_name} - SHAP feature importance ({selected_lake})")
+    plt.tight_layout()
+    plt.savefig(f"{shap_dir}/{model_name}_SHAP_barplot_{selected_lake}.png", dpi=300)
+    plt.savefig(f"{shap_dir}/{model_name}_SHAP_barplot_{selected_lake}.svg")
+    plt.close()
+
+    print(f"{model_name}: saved summary + barplot + CSV")
 
 lakes = list(event_df['locality'].unique()) + ["All lakes"]
 
