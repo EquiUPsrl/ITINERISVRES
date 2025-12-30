@@ -118,28 +118,6 @@ def prepare_ml_df(df, abiotic_cols=None, log_transform=False, single_lake=None, 
 
     return ml_df, feature_cols, target_col
 
-"""
-def plot_and_save_shap(shap_dir, model_name, shap_values, X_for_plot, feature_names):
-    plt.figure()
-    shap.summary_plot(shap_values, X_for_plot, feature_names=feature_names, show=False)
-    plt.title(f"{model_name} - SHAP summary ({selected_lake})")
-    plt.tight_layout()
-    plt.savefig(f"{shap_dir}/{model_name}_SHAP_summary_{selected_lake}.png", dpi=300)
-    plt.savefig(f"{shap_dir}/{model_name}_SHAP_summary_{selected_lake}.svg")
-    plt.close()
-
-    mean_abs_shap = np.abs(shap_values).mean(axis=0)
-
-    plt.figure(figsize=(6,5))
-    plt.barh(importance.index, importance.values)
-    plt.xlabel("Mean |SHAP value|")
-    plt.title(f"{model_name} - SHAP feature importance ({selected_lake})")
-    plt.tight_layout()
-    plt.savefig(f"{shap_dir}/{model_name}_SHAP_barplot_{selected_lake}.png", dpi=300)
-    plt.savefig(f"{shap_dir}/{model_name}_SHAP_barplot_{selected_lake}.svg")
-    plt.close()
-    print(f"{model_name}: saved summary + barplot + CSV")
-"""
 
 def plot_and_save_shap(shap_dir, model_name, shap_values, X_for_plot, feature_names):
     """Create and save SHAP summary plot and mean absolute SHAP barplot."""
@@ -167,12 +145,6 @@ def plot_and_save_shap(shap_dir, model_name, shap_values, X_for_plot, feature_na
 
     mean_abs_shap = np.abs(shap_values).mean(axis=0)
 
-        pd.Series(mean_abs_shap, index=feature_names)
-        .sort_values(ascending=True)
-    )
-
-        f"{shap_dir}/{model_name}_SHAP_importance_{selected_lake}.csv"
-    )
 
     plt.figure(figsize=(6, 5))
     plt.barh(importance.index, importance.values)
