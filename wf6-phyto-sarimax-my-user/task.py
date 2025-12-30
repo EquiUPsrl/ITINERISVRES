@@ -166,3 +166,8 @@ for lake in lakes:
         output_base=output_dir
     )
 
+output_dir = conf_output_path
+
+file_output_dir = open("/tmp/output_dir_" + id + ".json", "w")
+file_output_dir.write(json.dumps(output_dir))
+file_output_dir.close()
