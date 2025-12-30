@@ -154,14 +154,16 @@ def plot_and_save_shap(shap_dir, model_name, shap_values, X_for_plot, feature_na
     mean_abs_shap = np.abs(shap_values).mean(axis=0)
     print(f"DEBUG: mean_abs_shap = {mean_abs_shap}")
 
-    print(f"DEBUG: importance defined successfully, length = {len(importance)}")
+    imp_series = pd.Series(mean_abs_shap, index=feature_names).sort_values(ascending=True)
+    print(f"DEBUG: importance defined successfully, length = {len(imp_series)}")
     
+    imp_series.to_csv(f"{shap_dir}/{model_name}_SHAP_importance_{selected_name}.csv")
 
-    print("importance", importance)
+    print("imp_series", imp_series)
 
-    if not importance.empty:
+    if not imp_series.empty:
         plt.figure(figsize=(6, 5))
-        plt.barh(importance.index, importance.values)
+        plt.barh(imp_series.index, imp_series.values)
         plt.xlabel("Mean |SHAP value|")
         plt.title(f"{model_name} - SHAP feature importance ({selected_name})")
         plt.tight_layout()
