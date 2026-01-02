@@ -22,8 +22,8 @@ id = args.id
 traits_file = args.traits_file.replace('"','')
 
 
-conf_output_path = conf_output_path = '' + 'output'
-conf_input_path = conf_input_path = '' + 'data'
+conf_output_path = conf_output_path = '/tmp/data/WF4/' + 'output'
+conf_input_path = conf_input_path = '/tmp/data/WF4/' + 'data'
 
 output_dir = os.path.join(conf_output_path, "data_aggregation")
 datain = traits_file     # input file
