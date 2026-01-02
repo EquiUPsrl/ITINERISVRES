@@ -11,15 +11,16 @@ arg_parser = argparse.ArgumentParser()
 arg_parser.add_argument('--id', action='store', type=str, required=True, dest='id')
 
 
-arg_parser.add_argument('--param_input_file', action='store', type=str, required=True, dest='param_input_file')
+arg_parser.add_argument('--dataportal_csv', action='store', type=str, required=True, dest='dataportal_csv')
+
 
 args = arg_parser.parse_args()
 print(args)
 
 id = args.id
 
+dataportal_csv = args.dataportal_csv.replace('"','')
 
-param_input_file = args.param_input_file.replace('"','')
 
 conf_input_path = conf_input_path = '/tmp/data/WF4/' + 'data'
 
@@ -44,7 +45,7 @@ def download_from_dataportal(url, output_file):
             print(f"Errore nel download: {response.status_code}")
 
 
-input_file = param_input_file
+input_file = dataportal_csv
 df = pd.read_csv(input_file, sep=';', encoding='utf-8', low_memory=False)
 
 download_dir = os.path.join(conf_input_path, 'download')
