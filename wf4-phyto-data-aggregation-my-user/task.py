@@ -22,8 +22,8 @@ id = args.id
 traits_file = args.traits_file.replace('"','')
 
 
-conf_output_path = conf_output_path = '/tmp/data/WF4/' + 'output'
-conf_input_path = conf_input_path = '/tmp/data/WF4/' + 'data'
+conf_output_path = conf_output_path = '' + 'output'
+conf_input_path = conf_input_path = '' + 'data'
 
 output_dir = os.path.join(conf_output_path, "data_aggregation")
 datain = traits_file     # input file
@@ -82,6 +82,7 @@ for col in mean_cols + sum_cols:
 mapping_file = os.path.join(conf_input_path, "data_aggregation_mapping.csv")
 
 if os.path.exists(mapping_file):
+    print("Data aggregation mapping file exists: " + mapping_file)
     mapping_df = pd.read_csv(mapping_file, sep=";")
 
     mapping_df["raw_value"] = mapping_df["raw_value"].astype(str).str.strip().str.casefold()
@@ -95,6 +96,8 @@ if os.path.exists(mapping_file):
         if col in df.columns:
             col_norm = df[col].astype(str).str.strip().str.casefold()
             df[col] = col_norm.map(col_map).fillna(df[col])
+else:
+    print("Data aggregation mapping file does not exists: " + mapping_file)
 
 
 abundance = df.groupby(group_keys, dropna=False).size().rename('abundance').reset_index()
