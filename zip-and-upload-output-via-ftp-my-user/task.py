@@ -32,7 +32,8 @@ param_host = args.param_host.replace('"','')
 
 
 timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-zip_output_path = f'WF4_Biomass_{timestamp}.zip'
+output_dir_clean = output_dir.strip("/").replace("/", "_")
+zip_output_path = f'{output_dir_clean}_{timestamp}.zip'
 ftp_host = param_host
 ftp_user = param_ftp_user
 ftp_pass = secret_ftp_pass
