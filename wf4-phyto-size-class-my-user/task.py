@@ -237,9 +237,15 @@ for cdir in _dirs:
         print(f"   ⚠️ {folder_name}: missing thr/rare files, skip.")
         continue
 
+    print("f_total", f_total)
+    print("f_rare", f_rare)
+
     try:
         df_tot = load_filtered(f_total[0])
         df_rar = load_filtered(f_rare[0])
+
+        print("df_tot", df_tot)
+        print("df_rar", df_rar)
 
         tab16_tot, tab6_tot = aggregate_classes(df_tot)
         tab16_rar, tab6_rar = aggregate_classes(df_rar)
