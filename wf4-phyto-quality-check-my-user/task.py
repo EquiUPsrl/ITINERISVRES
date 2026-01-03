@@ -141,7 +141,7 @@ def convert_csv(
     if clean_header_spaces:
         df.columns = clean_headers(df.columns)
 
-
+    """
     df = df.apply(
         lambda col: col.map(
             lambda x: clean_text(
@@ -151,7 +151,8 @@ def convert_csv(
             )
         )
     )
-
+    """
+    
     df.to_csv(
         output_csv,
         sep=";",
