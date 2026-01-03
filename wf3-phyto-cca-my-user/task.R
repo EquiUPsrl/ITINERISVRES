@@ -92,7 +92,6 @@ abio <- read.csv(abio_path, check.names = FALSE)
 cat("Dimensions bio:  ", dim(bio),  "\n")
 cat("Dimensions abio: ", dim(abio), "\n")
 
-
 rownames(bio) <- bio$ID
 bio$ID <- NULL
 rownames(abio) <- abio$ID
@@ -104,8 +103,7 @@ common_ids <- intersect(rownames(bio), rownames(abio))
 bio2  <- bio[common_ids, , drop = FALSE]
 abio2 <- abio[common_ids, , drop = FALSE]
 
-na_rows <- apply(bio2,  1, function(x) any(is.na(x))) |
-  apply(abio2, 1, function(x) any(is.na(x)))
+na_rows <- apply(bio2,  1, function(x) any(is.na(x))) | apply(abio2, 1, function(x) any(is.na(x)))
 
 bio3  <- bio2[!na_rows, , drop = FALSE]
 abio3 <- abio2[!na_rows, , drop = FALSE]
@@ -114,7 +112,6 @@ bio3  <- bio3[rowSums(bio3) > 0, , drop = FALSE]
 abio3 <- abio3[rownames(bio3), , drop = FALSE]
 
 cat("Samples after NA / all-zero removal:", nrow(bio3), "\n")
-
 
 
 
@@ -159,15 +156,9 @@ cat("\n=== CCA1: Test by axis (499 permutations) ===\n")
 print(anova(mod_cca1, by = "axis", permutations = 499))
 
 cca1_variance_path <- file.path(cca_dir, "cca1_axis_variance_axis1_4.csv")
-make_var_table(mod_cca1,
-               prefix   = "CCA",
-               n_axes   = 4,
-               file_out = cca1_variance_path)
+make_var_table(mod_cca1, prefix = "CCA", n_axes = 4, file_out = cca1_variance_path)
 
-env_sc1 <- scores(mod_cca1,
-                  display = "bp",
-                  choices = 1:2,
-                  scaling = 2)
+env_sc1 <- scores(mod_cca1, display = "bp", choices = 1:2, scaling = 2)
 
 env_df1 <- as.data.frame(env_sc1)
 colnames(env_df1) <- c("CCA1", "CCA2")
@@ -175,15 +166,10 @@ env_df1$Variable <- rownames(env_df1)
 env_df1 <- env_df1[, c("Variable", "CCA1", "CCA2")]
 
 cca1_env_loadings_path <- file.path(cca_dir, "cca1_env_loadings_axes1_2.csv")
-write.csv(env_df1,
-          cca1_env_loadings_path,
-          row.names = FALSE)
+write.csv(env_df1, cca1_env_loadings_path, row.names = FALSE)
 cat("Saved: ", cca1_env_loadings_path, "\n")
 
-sites_sc1 <- scores(mod_cca1,
-                    display = "sites",
-                    choices = 1:2,
-                    scaling = 2)
+sites_sc1 <- scores(mod_cca1, display = "sites", choices = 1:2, scaling = 2)
 
 site_df1 <- data.frame(
   SampleID = rownames(sites_sc1),
@@ -196,11 +182,8 @@ site_df1$CCA1_std <- as.numeric(scale(site_df1$CCA1_raw))
 site_df1$CCA2_std <- as.numeric(scale(site_df1$CCA2_raw))
 
 cca1_site_scores_path <- file.path(cca_dir, "cca1_site_scores_axes1_2.csv")
-write.csv(site_df1,
-          cca1_site_scores_path,
-          row.names = FALSE)
+write.csv(site_df1, cca1_site_scores_path, row.names = FALSE)
 cat("Saved: ", cca1_site_scores_path,"\n")
-
 
 
 
@@ -217,15 +200,9 @@ cat("\n=== CCA2: Test by axis (499 permutations) ===\n")
 print(anova(mod_cca2, by = "axis", permutations = 499))
 
 cca2_variance_path <- file.path(cca_dir, "cca2_axis_variance_axis1_4_test.csv")
-make_var_table(mod_cca2,
-               prefix   = "CCA",
-               n_axes   = 4,
-               file_out = cca2_variance_path)
+make_var_table(mod_cca2, prefix = "CCA", n_axes = 4, file_out = cca2_variance_path)
 
-sites_sc2 <- scores(mod_cca2,
-                    display = "sites",
-                    choices = 1:2,
-                    scaling = 2)
+sites_sc2 <- scores(mod_cca2, display = "sites", choices = 1:2, scaling = 2)
 
 site_df2 <- data.frame(
   SampleID = rownames(sites_sc2),
@@ -238,9 +215,7 @@ site_df2$CCA1_std <- as.numeric(scale(site_df2$CCA1_raw))
 site_df2$CCA2_std <- as.numeric(scale(site_df2$CCA2_raw))
 
 cca2_site_scores_path <- file.path(cca_dir, "cca2_site_scores_axes1_2.csv")
-write.csv(site_df2,
-          cca2_site_scores_path,
-          row.names = FALSE)
+write.csv(site_df2, cca2_site_scores_path, row.names = FALSE)
 cat("Saved: ", cca2_site_scores_path, "\n")
 # capturing outputs
 print('Serialization of cca1_env_loadings_path')
