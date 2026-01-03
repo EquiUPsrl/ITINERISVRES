@@ -65,18 +65,20 @@ print(paste("Variable bio_file_filtered has length", var_len))
 bio_file_filtered <- gsub("\"", "", opt$bio_file_filtered)
 id <- gsub('"', '', opt$id)
 
-{'name': 'conf_base_path', 'assignation': 'conf_base_path<-"/tmp/data/WF3/"'}
-{'name': 'conf_input_path', 'assignation': 'conf_input_path<-paste'}
-{'name': 'conf_output_path', 'assignation': 'conf_output_path<-paste'}
 
 print("Running the cell")
 library(vegan)
 
 
+config_base_path <- "/tmp/data/WF3/"
+
+config_input_path <- paste(config_base_path, "data", sep="")
+config_output_path <- paste(config_base_path, "output", sep="")
+
 bio_path  <- bio_file_filtered
 abio_path <- abio_file
 
-output_base_dir <- conf_output_path
+output_base_dir <- config_output_path
 cca_dir <- file.path(output_base_dir, "CCA")
 if (!dir.exists(cca_dir)) {
   dir.create(cca_dir, recursive = TRUE)
