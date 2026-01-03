@@ -103,13 +103,30 @@ common_ids <- intersect(rownames(bio), rownames(abio))
 bio2  <- bio[common_ids, , drop = FALSE]
 abio2 <- abio[common_ids, , drop = FALSE]
 
-na_rows <- apply(bio2,  1, function(x) any(is.na(x))) | apply(abio2, 1, function(x) any(is.na(x)))
 
-bio3  <- bio2[!na_rows, , drop = FALSE]
-abio3 <- abio2[!na_rows, , drop = FALSE]
 
-bio3  <- bio3[rowSums(bio3) > 0, , drop = FALSE]
-abio3 <- abio3[rownames(bio3), , drop = FALSE]
+
+
+keep <- complete.cases(bio2) & complete.cases(abio2)
+
+if (!any(keep)) {
+  stop("All samples removed: NA present in bio or abio tables.")
+}
+
+bio3  <- bio2[keep, , drop = FALSE]
+abio3 <- abio2[keep, , drop = FALSE]
+
+keep_nonzero <- rowSums(bio3, na.rm = TRUE) > 0
+
+if (!any(keep_nonzero)) {
+  stop("All samples removed: all-zero rows in bio table.")
+}
+
+bio3  <- bio3[keep_nonzero, , drop = FALSE]
+abio3 <- abio3[keep_nonzero, , drop = FALSE]
+
+
+
 
 cat("Samples after NA / all-zero removal:", nrow(bio3), "\n")
 
