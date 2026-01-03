@@ -73,6 +73,11 @@ print("Running the cell")
 library(vegan)
 
 
+conf_base_path <- "/tmp/data/WF3/"
+
+conf_input_path <- paste(conf_base_path, "data", sep="")
+conf_output_path <- paste(conf_base_path, "output", sep="")
+
 bio_path  <- bio_file_filtered
 abio_path <- abio_file
 
