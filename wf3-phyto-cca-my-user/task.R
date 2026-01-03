@@ -65,9 +65,9 @@ print(paste("Variable bio_file_filtered has length", var_len))
 bio_file_filtered <- gsub("\"", "", opt$bio_file_filtered)
 id <- gsub('"', '', opt$id)
 
-{'name': 'conf_base_path', 'assignation': 'conf_base_path="/tmp/data/WF3/"'}
-{'name': 'conf_input_path', 'assignation': 'conf_input_path=paste'}
-{'name': 'conf_output_path', 'assignation': 'conf_output_path=paste'}
+{'name': 'conf_base_path', 'assignation': 'conf_base_path<-"/tmp/data/WF3/"'}
+{'name': 'conf_input_path', 'assignation': 'conf_input_path<-paste'}
+{'name': 'conf_output_path', 'assignation': 'conf_output_path<-paste'}
 
 print("Running the cell")
 library(vegan)
