@@ -36,7 +36,7 @@ apply_frequency_filter = True        # Apply presence frequency filter
 min_frequency_ratio = 0.10           # Minimum presence (% of samples) to keep species
 
 
-df = pd.read_csv(bio_file, header=0, index_col=0, encoding="utf-8-sig")
+df = pd.read_csv(bio_file, header=0, index_col=0, encoding="utf-8")
 
 
 if apply_abundance_filter:
@@ -71,7 +71,7 @@ print(f"Species removed: {n_removed}")
 
 
 bio_file_filtered = os.path.join(output_dir, output_file_name)
-filtered.to_csv(bio_file_filtered, encoding="utf-8-sig")
+filtered.to_csv(bio_file_filtered, encoding="utf-8")
 
 print("Biotic pivot table filtered saved to: " + bio_file_filtered)
 
