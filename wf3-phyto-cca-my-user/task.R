@@ -86,9 +86,8 @@ if (!dir.exists(cca_dir)) {
 
 
 
-
-bio <- read.csv(bio_path, fileEncoding = "UTF-8-BOM", check.names = FALSE)
-abio <- read.csv(abio_path, fileEncoding = "UTF-8-BOM", check.names = FALSE)
+bio <- read.csv(bio_path, check.names = FALSE)
+abio <- read.csv(abio_path, check.names = FALSE)
 
 cat("Dimensions bio:  ", dim(bio),  "\n")
 cat("Dimensions abio: ", dim(abio), "\n")
