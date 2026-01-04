@@ -2,10 +2,6 @@ setwd('/app')
 library(optparse)
 library(jsonlite)
 
-if (!requireNamespace("readr", quietly = TRUE)) {
-	install.packages("readr", repos="http://cran.us.r-project.org")
-}
-library(readr)
 if (!requireNamespace("vegan", quietly = TRUE)) {
 	install.packages("vegan", repos="http://cran.us.r-project.org")
 }
@@ -91,41 +87,44 @@ if (!dir.exists(cca_dir)) {
 
 
 
-
-library(readr)
-
-bio  <- read_csv(bio_path,  show_col_types = FALSE)
-abio <- read_csv(abio_path, show_col_types = FALSE)
+bio <- read.csv(bio_path, fileEncoding = "UTF-8-BOM", check.names = FALSE)
+abio <- read.csv(abio_path, fileEncoding = "UTF-8-BOM", check.names = FALSE)
 
 cat("Dimensions bio:  ", dim(bio),  "\n")
 cat("Dimensions abio: ", dim(abio), "\n")
 
-rownames(bio)  <- bio[[grep("^ID$", names(bio))]]
-rownames(abio) <- abio[[grep("^ID$", names(abio))]]
-
-bio$ID  <- NULL
+rownames(bio) <- bio$ID
+bio$ID <- NULL
+rownames(abio) <- abio$ID
 abio$ID <- NULL
 
-bio[]  <- lapply(bio,  as.numeric)
-abio[] <- lapply(abio, as.numeric)
-
+bio[]  <- lapply(bio,  function(x) suppressWarnings(as.numeric(as.character(x))))
+abio[] <- lapply(abio, function(x) suppressWarnings(as.numeric(as.character(x))))
 common_ids <- intersect(rownames(bio), rownames(abio))
-
 bio2  <- bio[common_ids, , drop = FALSE]
 abio2 <- abio[common_ids, , drop = FALSE]
 
+
+
+
+
 keep <- complete.cases(bio2) & complete.cases(abio2)
+
+if (!any(keep)) {
+  stop("All samples removed: NA present in bio or abio tables.")
+}
 
 bio3  <- bio2[keep, , drop = FALSE]
 abio3 <- abio2[keep, , drop = FALSE]
 
-keep2 <- rowSums(bio3) > 0
+keep_nonzero <- rowSums(bio3, na.rm = TRUE) > 0
 
-bio3  <- bio3[keep2, , drop = FALSE]
-abio3 <- abio3[keep2, , drop = FALSE]
+if (!any(keep_nonzero)) {
+  stop("All samples removed: all-zero rows in bio table.")
+}
 
-stopifnot(nrow(bio3) > 0, identical(rownames(bio3), rownames(abio3)))
-
+bio3  <- bio3[keep_nonzero, , drop = FALSE]
+abio3 <- abio3[keep_nonzero, , drop = FALSE]
 
 
 
