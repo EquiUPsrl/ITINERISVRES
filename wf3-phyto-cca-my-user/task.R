@@ -97,8 +97,27 @@ bio$ID <- NULL
 rownames(abio) <- abio$ID
 abio$ID <- NULL
 
-bio[]  <- lapply(bio,  function(x) suppressWarnings(as.numeric(as.character(x))))
-abio[] <- lapply(abio, function(x) suppressWarnings(as.numeric(as.character(x))))
+
+
+
+
+cat("NA per colonna in bio:\n")
+print(colSums(is.na(bio)))
+
+cat("NA per colonna in abio:\n")
+print(colSums(is.na(abio)))
+
+num_cols_bio  <- sapply(bio, is.numeric) | sapply(bio, is.integer)
+num_cols_abio <- sapply(abio, is.numeric) | sapply(abio, is.integer)
+
+bio[num_cols_bio]  <- lapply(bio[num_cols_bio], as.numeric)
+abio[num_cols_abio] <- lapply(abio[num_cols_abio], as.numeric)
+
+
+
+
+
+
 common_ids <- intersect(rownames(bio), rownames(abio))
 bio2  <- bio[common_ids, , drop = FALSE]
 abio2 <- abio[common_ids, , drop = FALSE]
