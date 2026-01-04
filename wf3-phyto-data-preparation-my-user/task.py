@@ -33,8 +33,8 @@ os.makedirs(output_dir, exist_ok=True)
 biotic_file = input_biotic_csv
 abiotic_file = input_abiotic_csv
 
-df_abio = pd.read_csv(abiotic_file, sep=";",encoding="utf-8-sig")
-df_bio = pd.read_csv(biotic_file, sep=";",encoding="utf-8-sig")
+df_abio = pd.read_csv(abiotic_file, sep=";",encoding="utf-8")
+df_bio = pd.read_csv(biotic_file, sep=";",encoding="utf-8")
 
 
 df_abio['ID'] = df_abio['cruise'].astype(str) + "_" + df_abio['station'].astype(str) + "_" + df_abio['depth'].astype(str)
@@ -43,7 +43,7 @@ cols_to_keep = ['depth', 'Silicate', 'DIP', 'Temperature', 'DO', 'DIN']
 abio = df_abio[cols_to_keep]
 
 abio_file = os.path.join(output_dir, "abio.csv")
-abio.to_csv(abio_file, encoding="utf-8-sig")
+abio.to_csv(abio_file, encoding="utf-8")
 print("Abiotic data saved to: " + abio_file)
 
 df_bio["ID"] = (
@@ -61,11 +61,11 @@ bio = df_bio.pivot_table(
 )
 
 df_bio_file = os.path.join(output_dir, "df_bio.csv")
-df_bio.to_csv(df_bio_file, encoding="utf-8-sig")
+df_bio.to_csv(df_bio_file, encoding="utf-8")
 print("Biotic data saved to: " + df_bio_file)
 
 bio_file = os.path.join(output_dir, "bio.csv")
-bio.to_csv(bio_file, encoding="utf-8-sig")
+bio.to_csv(bio_file, encoding="utf-8")
 print("Biotic pivot table saved to: " + bio_file)
 
 file_abio_file = open("/tmp/abio_file_" + id + ".json", "w")
