@@ -5,6 +5,7 @@ dependencies:
   - pip
   - python>=3.8
   - nbconvert
+  - r-readr
   - r-vegan
   - papermill
   - ipykernel

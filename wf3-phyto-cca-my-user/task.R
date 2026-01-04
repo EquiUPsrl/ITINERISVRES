@@ -2,6 +2,10 @@ setwd('/app')
 library(optparse)
 library(jsonlite)
 
+if (!requireNamespace("readr", quietly = TRUE)) {
+	install.packages("readr", repos="http://cran.us.r-project.org")
+}
+library(readr)
 if (!requireNamespace("vegan", quietly = TRUE)) {
 	install.packages("vegan", repos="http://cran.us.r-project.org")
 }
@@ -86,63 +90,42 @@ if (!dir.exists(cca_dir)) {
 
 
 
-bio <- read.csv(bio_path, check.names = FALSE)
-abio <- read.csv(abio_path, check.names = FALSE)
+
+
+library(readr)
+
+bio  <- read_csv(bio_path,  show_col_types = FALSE)
+abio <- read_csv(abio_path, show_col_types = FALSE)
 
 cat("Dimensions bio:  ", dim(bio),  "\n")
 cat("Dimensions abio: ", dim(abio), "\n")
 
-rownames(bio) <- bio$ID
-bio$ID <- NULL
-rownames(abio) <- abio$ID
+rownames(bio)  <- bio[[grep("^ID$", names(bio))]]
+rownames(abio) <- abio[[grep("^ID$", names(abio))]]
+
+bio$ID  <- NULL
 abio$ID <- NULL
 
-
-
-
-
-cat("NA per colonna in bio:\n")
-print(colSums(is.na(bio)))
-
-cat("NA per colonna in abio:\n")
-print(colSums(is.na(abio)))
-
-num_cols_bio  <- sapply(bio, is.numeric) | sapply(bio, is.integer)
-num_cols_abio <- sapply(abio, is.numeric) | sapply(abio, is.integer)
-
-bio[num_cols_bio]  <- lapply(bio[num_cols_bio], as.numeric)
-abio[num_cols_abio] <- lapply(abio[num_cols_abio], as.numeric)
-
-
-
-
-
+bio[]  <- lapply(bio,  as.numeric)
+abio[] <- lapply(abio, as.numeric)
 
 common_ids <- intersect(rownames(bio), rownames(abio))
+
 bio2  <- bio[common_ids, , drop = FALSE]
 abio2 <- abio[common_ids, , drop = FALSE]
 
-
-
-
-
 keep <- complete.cases(bio2) & complete.cases(abio2)
-
-if (!any(keep)) {
-  stop("All samples removed: NA present in bio or abio tables.")
-}
 
 bio3  <- bio2[keep, , drop = FALSE]
 abio3 <- abio2[keep, , drop = FALSE]
 
-keep_nonzero <- rowSums(bio3, na.rm = TRUE) > 0
+keep2 <- rowSums(bio3) > 0
 
-if (!any(keep_nonzero)) {
-  stop("All samples removed: all-zero rows in bio table.")
-}
+bio3  <- bio3[keep2, , drop = FALSE]
+abio3 <- abio3[keep2, , drop = FALSE]
 
-bio3  <- bio3[keep_nonzero, , drop = FALSE]
-abio3 <- abio3[keep_nonzero, , drop = FALSE]
+stopifnot(nrow(bio3) > 0, identical(rownames(bio3), rownames(abio3)))
+
 
 
 
