@@ -108,7 +108,7 @@ def execute_niche_overlap_intra_class(optTol_filtered_file, axis_to_use):
     
         mat_df = pd.DataFrame(M, index=species, columns=species)
         mat_file = os.path.join(output_dir, f"overlap_axis{axis_to_use}_sizeclass_{cls}.csv")
-        mat_df.to_csv(mat_file, encoding="utf-8-sig", index=True)
+        mat_df.to_csv(mat_file, encoding="utf-8", index=True)
     
         long_df = (
             mat_df
@@ -200,3 +200,8 @@ show_overlap_heatmaps(os.path.join(output_dir, f"overlap_axis1_sizeclass_*.csv")
 
 show_overlap_heatmaps(os.path.join(output_dir, f"overlap_axis2_sizeclass_*.csv"), axis_label="Axis 2", axis_to_use=2)
 
+output_dir = conf_output_path
+
+file_output_dir = open("/tmp/output_dir_" + id + ".json", "w")
+file_output_dir.write(json.dumps(output_dir))
+file_output_dir.close()
