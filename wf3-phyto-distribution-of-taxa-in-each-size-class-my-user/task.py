@@ -47,7 +47,7 @@ def plot_distribution(niche_file, bio_sc_file, axis_to_use=1):
     print(f"Density file: {bio_sc_file}")
     
     
-    niche = pd.read_csv(niche_file, encoding="utf-8-sig")
+    niche = pd.read_csv(niche_file, encoding="utf-8")
     
     for col in ["scientificName", "sizeClass", "optimum", "tolerance"]:
         if col not in niche.columns:
@@ -69,7 +69,7 @@ def plot_distribution(niche_file, bio_sc_file, axis_to_use=1):
     print("Species with valid niche interval:", niche.shape[0])
     
     
-    bio_sc = pd.read_csv(bio_sc_file, encoding="utf-8-sig", sep=",")
+    bio_sc = pd.read_csv(bio_sc_file, encoding="utf-8", sep=",")
     
     if not {"scientificName", "density"}.issubset(bio_sc.columns):
         raise ValueError(
@@ -199,3 +199,8 @@ plot_distribution(niche_file_axis1, bio_sc_file, 1)
 
 plot_distribution(niche_file_axis2, bio_sc_file, 2)
 
+output_dir = conf_output_path
+
+file_output_dir = open("/tmp/output_dir_" + id + ".json", "w")
+file_output_dir.write(json.dumps(output_dir))
+file_output_dir.close()
