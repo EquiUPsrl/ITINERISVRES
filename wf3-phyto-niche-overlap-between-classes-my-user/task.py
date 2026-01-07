@@ -107,7 +107,7 @@ def execute_niche_overlap_between_classes(optTol_filtered_file, axis_to_use=1):
     class_summary.rename(columns={"sizeClass": "class"}).to_csv(
         intervals_outfile,
         index=False,
-        encoding="utf-8-sig"
+        encoding="utf-8"
     )
     
     print(f"Saved: {intervals_outfile}")
@@ -135,7 +135,7 @@ def execute_niche_overlap_between_classes(optTol_filtered_file, axis_to_use=1):
     
     mat_df = pd.DataFrame(M, index=classes, columns=classes)
     matrix_outfile = os.path.join(output_dir, f"overlap_axis{axis_to_use}_sizeclasses_matrix.csv")
-    mat_df.to_csv(matrix_outfile, encoding="utf-8-sig")
+    mat_df.to_csv(matrix_outfile, encoding="utf-8")
     
     long_df = (
         mat_df
@@ -145,7 +145,7 @@ def execute_niche_overlap_between_classes(optTol_filtered_file, axis_to_use=1):
     )
     
     long_outfile = os.path.join(output_dir, f"overlap_axis{axis_to_use}_sizeclasses_long.csv")
-    long_df.to_csv(long_outfile, index=False, encoding="utf-8-sig")
+    long_df.to_csv(long_outfile, index=False, encoding="utf-8")
     
     print("Saved:")
     print(f"- {matrix_outfile}")
@@ -304,3 +304,8 @@ plot_sizeclass_intervals(interval_file_axis1, 1)
 
 plot_sizeclass_intervals(interval_file_axis2, 2)
 
+output_dir = conf_output_path
+
+file_output_dir = open("/tmp/output_dir_" + id + ".json", "w")
+file_output_dir.write(json.dumps(output_dir))
+file_output_dir.close()
