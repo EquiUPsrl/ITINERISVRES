@@ -51,7 +51,7 @@ bio = pd.read_csv(
     bio_file,
     sep=",",
     na_values=["", "NA", "NaN", "na", "-"],
-    encoding="utf-8-sig"
+    encoding="utf-8"
 )
 
 if "ID" in bio.columns:
@@ -90,7 +90,7 @@ print("Samples used for RA3-like:", bio.shape[0])
 
 
 
-sc = pd.read_csv(sizeclass_file, sep=",", encoding="utf-8-sig")
+sc = pd.read_csv(sizeclass_file, sep=",", encoding="utf-8")
 
 if "scientificName" not in sc.columns or "sizeClass" not in sc.columns:
     raise ValueError(
@@ -406,6 +406,8 @@ print(f"Figure saved as: {fig_name}")
 
 plt.show()
 
-file_bio_file = open("/tmp/bio_file_" + id + ".json", "w")
-file_bio_file.write(json.dumps(bio_file))
-file_bio_file.close()
+output_dir = conf_output_path
+
+file_output_dir = open("/tmp/output_dir_" + id + ".json", "w")
+file_output_dir.write(json.dumps(output_dir))
+file_output_dir.close()
