@@ -23,7 +23,7 @@ id = args.id
 biotic_file = args.biotic_file.replace('"','')
 
 
-conf_output_path = conf_output_path = '' + 'output'
+conf_output_path = conf_output_path = '/tmp/data/WF2/' + 'output'
 
 plt.rcParams.update({
     "font.family": "DejaVu Sans",       # full font with superscript
