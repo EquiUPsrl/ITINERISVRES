@@ -15,6 +15,8 @@ arg_parser.add_argument('--id', action='store', type=str, required=True, dest='i
 
 arg_parser.add_argument('--abiotic_file', action='store', type=str, required=True, dest='abiotic_file')
 
+arg_parser.add_argument('--fd_panel_path', action='store', type=str, required=True, dest='fd_panel_path')
+
 arg_parser.add_argument('--locations_config', action='store', type=str, required=True, dest='locations_config')
 
 
@@ -24,6 +26,7 @@ print(args)
 id = args.id
 
 abiotic_file = args.abiotic_file.replace('"','')
+fd_panel_path = args.fd_panel_path.replace('"','')
 locations_config = args.locations_config.replace('"','')
 
 
@@ -66,6 +69,9 @@ env_annual = (
 
 print("\nAnnual environment – first rows:")
 print(env_annual.head())
+
+
+fd_panel = pd.read_csv(fd_panel_path, sep = ";")
 
 fd_env = fd_panel.merge(env_annual, on=["lake", "year"], how="left")
 
