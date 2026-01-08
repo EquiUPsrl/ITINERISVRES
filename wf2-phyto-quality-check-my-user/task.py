@@ -14,13 +14,13 @@ arg_parser = argparse.ArgumentParser()
 arg_parser.add_argument('--id', action='store', type=str, required=True, dest='id')
 
 
-arg_parser.add_argument('--input_abiotic', action='store', type=str, required=True, dest='input_abiotic')
+arg_parser.add_argument('--input_abiotic_file', action='store', type=str, required=True, dest='input_abiotic_file')
 
-arg_parser.add_argument('--input_biotic', action='store', type=str, required=True, dest='input_biotic')
+arg_parser.add_argument('--input_biotic_file', action='store', type=str, required=True, dest='input_biotic_file')
 
-arg_parser.add_argument('--input_traits', action='store', type=str, required=True, dest='input_traits')
+arg_parser.add_argument('--input_traits_file', action='store', type=str, required=True, dest='input_traits_file')
 
-arg_parser.add_argument('--locations_config', action='store', type=str, required=True, dest='locations_config')
+arg_parser.add_argument('--locations_config_file', action='store', type=str, required=True, dest='locations_config_file')
 
 
 args = arg_parser.parse_args()
@@ -28,10 +28,10 @@ print(args)
 
 id = args.id
 
-input_abiotic = args.input_abiotic.replace('"','')
-input_biotic = args.input_biotic.replace('"','')
-input_traits = args.input_traits.replace('"','')
-locations_config = args.locations_config.replace('"','')
+input_abiotic_file = args.input_abiotic_file.replace('"','')
+input_biotic_file = args.input_biotic_file.replace('"','')
+input_traits_file = args.input_traits_file.replace('"','')
+locations_config_file = args.locations_config_file.replace('"','')
 
 
 
@@ -160,15 +160,16 @@ def convert_csv(
     print(f"Output written to: {output_csv}")
 
 
-input_biotic_csv = input_biotic
-input_abiotic_csv = input_abiotic
-input_traits_csv = input_traits
-locations_config_csv = locations_config
+input_biotic = input_biotic_file
+input_abiotic = input_abiotic_file
+input_traits = input_traits_file
+locations_config = locations_config_file
 
 files = [
-    input_biotic_csv,
-    input_abiotic_csv,
-    input_traits_csv
+    input_biotic,
+    input_abiotic,
+    input_traits,
+    locations_config
 ]
 
 for file_csv in files:
@@ -182,15 +183,15 @@ for file_csv in files:
 
     print("File verified -> ", file_csv)
 
-file_input_abiotic_csv = open("/tmp/input_abiotic_csv_" + id + ".json", "w")
-file_input_abiotic_csv.write(json.dumps(input_abiotic_csv))
-file_input_abiotic_csv.close()
-file_input_biotic_csv = open("/tmp/input_biotic_csv_" + id + ".json", "w")
-file_input_biotic_csv.write(json.dumps(input_biotic_csv))
-file_input_biotic_csv.close()
-file_input_traits_csv = open("/tmp/input_traits_csv_" + id + ".json", "w")
-file_input_traits_csv.write(json.dumps(input_traits_csv))
-file_input_traits_csv.close()
-file_locations_config_csv = open("/tmp/locations_config_csv_" + id + ".json", "w")
-file_locations_config_csv.write(json.dumps(locations_config_csv))
-file_locations_config_csv.close()
+file_input_abiotic = open("/tmp/input_abiotic_" + id + ".json", "w")
+file_input_abiotic.write(json.dumps(input_abiotic))
+file_input_abiotic.close()
+file_input_biotic = open("/tmp/input_biotic_" + id + ".json", "w")
+file_input_biotic.write(json.dumps(input_biotic))
+file_input_biotic.close()
+file_input_traits = open("/tmp/input_traits_" + id + ".json", "w")
+file_input_traits.write(json.dumps(input_traits))
+file_input_traits.close()
+file_locations_config = open("/tmp/locations_config_" + id + ".json", "w")
+file_locations_config.write(json.dumps(locations_config))
+file_locations_config.close()
