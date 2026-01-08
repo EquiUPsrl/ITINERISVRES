@@ -145,3 +145,8 @@ plt.savefig(os.path.join(out_dir, "Fig1B_TotalDensity_Taxa_by_site.png"), dpi=30
 plt.savefig(os.path.join(out_dir, "Fig1B_TotalDensity_Taxa_by_site.svg"), format="svg")
 plt.show()
 
+output_dir = conf_output_path
+
+file_output_dir = open("/tmp/output_dir_" + id + ".json", "w")
+file_output_dir.write(json.dumps(output_dir))
+file_output_dir.close()
