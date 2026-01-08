@@ -29,8 +29,8 @@ locations_config = args.locations_config.replace('"','')
 
 conf_output_path = conf_output_path = '/tmp/data/WF2/' + 'output'
 
-base_output_dir = conf_output_path
-func_output_dir = os.path.join(base_output_dir, "Functional approach")
+output_dir = conf_output_path
+func_output_dir = os.path.join(output_dir, "Functional approach")
 env_output_dir = os.path.join(func_output_dir, "abiotic_correlations")
 
 os.makedirs(func_output_dir, exist_ok=True)
@@ -65,7 +65,7 @@ env_annual = (
 )
 
 print("\nAnnual environment – first rows:")
-display(env_annual.head())
+print(env_annual.head())
 
 fd_env = fd_panel.merge(env_annual, on=["lake", "year"], how="left")
 
@@ -74,7 +74,7 @@ fd_env.to_csv(fd_env_file, sep = ";", index=False)
 
 print("\nSaved FD_ENV_all_lakes.csv to:")
 print(fd_env_file)
-display(fd_env.head())
+print(fd_env.head())
 
 
 fd_env = pd.read_csv(fd_env_file, sep = ";")
@@ -113,7 +113,7 @@ corr_df.to_csv(corr_file, sep = ";", index=False)
 
 print("\nSaved correlations to:")
 print(corr_file)
-display(corr_df.head(20))
+print(corr_df.head(20))
 
 
 corr = pd.read_csv(corr_file, sep = ";")
@@ -213,3 +213,6 @@ for lake_name in lakes:
     
     print("Figure saved in:", out_fig)
 
+file_output_dir = open("/tmp/output_dir_" + id + ".json", "w")
+file_output_dir.write(json.dumps(output_dir))
+file_output_dir.close()
