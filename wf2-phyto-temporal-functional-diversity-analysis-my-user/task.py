@@ -32,10 +32,10 @@ locations_config = args.locations_config.replace('"','')
 
 conf_output_path = conf_output_path = '/tmp/data/WF2/' + 'output'
 
-base_output_dir = conf_output_path
-os.makedirs(base_output_dir, exist_ok=True)
+output_dir = conf_output_path
+os.makedirs(output_dir, exist_ok=True)
 
-out_dir = os.path.join(base_output_dir, "Functional approach")
+out_dir = os.path.join(output_dir, "Functional approach")
 os.makedirs(out_dir, exist_ok=True)
 
 
@@ -367,5 +367,8 @@ stats_df = pd.DataFrame(stats_rows)
 stats_df.to_csv(os.path.join(out_dir, "FD_trend_statistics_all_lakes.csv"), sep = ";", index=False)
 
 print("\nSaved trend stats to: FD_trend_statistics_all_lakes.csv")
-display(stats_df)
+print(stats_df)
 
+file_output_dir = open("/tmp/output_dir_" + id + ".json", "w")
+file_output_dir.write(json.dumps(output_dir))
+file_output_dir.close()
