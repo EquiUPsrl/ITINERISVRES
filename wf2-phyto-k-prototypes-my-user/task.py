@@ -435,10 +435,11 @@ for lake_name in lakes:
                 sankey_html = os.path.join(out_dir, f"sankey_{tax_col}_cluster_{lake_name}.html")
                 fig.write_html(sankey_html)
                 print(f"Sankey {tax_col}-cluster saved in HTML: {sankey_html}")
-    
+
 
 
         
+        imp_env_vars = [
             "waterTemperature",
             "transparency",
             "totalPhosphorous",
@@ -449,7 +450,7 @@ for lake_name in lakes:
             "dissolvedOxygen"
         ]
     
-        vars_env = [v for v in important_env_vars if v in df_result.columns]
+        vars_env = [v for v in imp_env_vars if v in df_result.columns]
     
         vars_env += ["Density"]
     
