@@ -17,8 +17,6 @@ arg_parser.add_argument('--id', action='store', type=str, required=True, dest='i
 
 arg_parser.add_argument('--abiotic_file', action='store', type=str, required=True, dest='abiotic_file')
 
-arg_parser.add_argument('--base_output_dir', action='store', type=str, required=True, dest='base_output_dir')
-
 arg_parser.add_argument('--biotic_file', action='store', type=str, required=True, dest='biotic_file')
 
 
@@ -28,7 +26,6 @@ print(args)
 id = args.id
 
 abiotic_file = args.abiotic_file.replace('"','')
-base_output_dir = args.base_output_dir.replace('"','')
 biotic_file = args.biotic_file.replace('"','')
 
 
