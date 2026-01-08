@@ -26,8 +26,8 @@ biotic_file = args.biotic_file.replace('"','')
 
 conf_output_path = conf_output_path = '/tmp/data/WF2/' + 'output'
 
-out_dir = conf_output_path
-os.makedirs(out_dir, exist_ok=True)
+output_dir = conf_output_path
+os.makedirs(output_dir, exist_ok=True)
 
 phyto = pd.read_csv(
     biotic_file,
@@ -69,7 +69,7 @@ print("\nSummary by lake (after filter location_config.csv):")
 print(summary)
 
 summary.to_csv(
-    os.path.join(out_dir, "Phyto_summary_biovolume_density_taxa_by_site.csv"),
+    os.path.join(output_dir, "Phyto_summary_biovolume_density_taxa_by_site.csv"),
     sep = ";",
     index=False
 )
@@ -112,8 +112,8 @@ ax2.tick_params(axis="y", labelcolor="black")
 ax2.set_ylim(0, taxa_ylim)
 
 plt.tight_layout(rect=[0, 0, 1, 0.90])
-plt.savefig(os.path.join(out_dir, "Fig1A_TotalBiovolume_Taxa_by_site.png"), dpi=300)
-plt.savefig(os.path.join(out_dir, "Fig1A_TotalBiovolume_Taxa_by_site.svg"), format="svg")
+plt.savefig(os.path.join(output_dir, "Fig1A_TotalBiovolume_Taxa_by_site.png"), dpi=300)
+plt.savefig(os.path.join(output_dir, "Fig1A_TotalBiovolume_Taxa_by_site.svg"), format="svg")
 plt.show()
 
 fig, ax1 = plt.subplots(figsize=(12, 6))
@@ -141,11 +141,9 @@ ax2.tick_params(axis="y", labelcolor="black")
 ax2.set_ylim(0, taxa_ylim)
 
 plt.tight_layout(rect=[0, 0, 1, 0.90])
-plt.savefig(os.path.join(out_dir, "Fig1B_TotalDensity_Taxa_by_site.png"), dpi=300)
-plt.savefig(os.path.join(out_dir, "Fig1B_TotalDensity_Taxa_by_site.svg"), format="svg")
+plt.savefig(os.path.join(output_dir, "Fig1B_TotalDensity_Taxa_by_site.png"), dpi=300)
+plt.savefig(os.path.join(output_dir, "Fig1B_TotalDensity_Taxa_by_site.svg"), format="svg")
 plt.show()
-
-output_dir = conf_output_path
 
 file_output_dir = open("/tmp/output_dir_" + id + ".json", "w")
 file_output_dir.write(json.dumps(output_dir))
