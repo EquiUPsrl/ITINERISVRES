@@ -25,7 +25,7 @@ id = args.id
 biotic_file = args.biotic_file.replace('"','')
 
 
-conf_output_path = conf_output_path = '' + 'output'
+conf_output_path = conf_output_path = '/tmp/data/WF2/' + 'output'
 
 output_dir = conf_output_path
 os.makedirs(output_dir, exist_ok=True)
