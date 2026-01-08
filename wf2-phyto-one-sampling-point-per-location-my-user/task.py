@@ -17,6 +17,8 @@ arg_parser.add_argument('--input_abiotic', action='store', type=str, required=Tr
 
 arg_parser.add_argument('--input_biotic', action='store', type=str, required=True, dest='input_biotic')
 
+arg_parser.add_argument('--locations_config', action='store', type=str, required=True, dest='locations_config')
+
 
 args = arg_parser.parse_args()
 print(args)
@@ -25,10 +27,10 @@ id = args.id
 
 input_abiotic = args.input_abiotic.replace('"','')
 input_biotic = args.input_biotic.replace('"','')
+locations_config = args.locations_config.replace('"','')
 
 
-conf_output_path = conf_output_path = '' + 'output'
-conf_input_path = conf_input_path = '' + 'data'
+conf_output_path = conf_output_path = '/tmp/data/WF2/' + 'output'
 
 out_dir = conf_output_path
 os.makedirs(out_dir, exist_ok=True)
@@ -71,12 +73,7 @@ def filter_by_location(data_df: pd.DataFrame, config_df: pd.DataFrame) -> pd.Dat
 
 
 
-config_file = os.path.join(conf_input_path, 'locations_config.csv')
-
-if os.path.exists(config_file):
-    location_config = pd.read_csv(config_file, sep=';')
-else:
-    location_config = None
+locations_config_df = pd.read_csv(locations_config, sep=';')
 
 
 phyto_bio = pd.read_csv(
@@ -89,10 +86,10 @@ phyto_bio = pd.read_csv(
 phyto_bio.columns = [re.sub(r'[^\x00-\x7F]+','', x) for x in phyto_bio.columns]
 
 
-phyto_bio_filt = filter_by_location(phyto_bio, location_config)
+phyto_bio_filt = filter_by_location(phyto_bio, locations_config_df)
 
 print("Biotic Total Records:", phyto_bio.shape[0])
-print("Record after filter (location_config.csv):", phyto_bio_filt.shape[0])
+print("Record after filter (locations_config.csv):", phyto_bio_filt.shape[0])
 print("\nLocationID for lake after filter:")
 print(phyto_bio_filt.groupby("locality")["locationID"].unique())
 
@@ -112,10 +109,10 @@ phyto_abio = pd.read_csv(
 phyto_abio.columns = [re.sub(r'[^\x00-\x7F]+','', x) for x in phyto_abio.columns]
 
 
-phyto_abio_filt = filter_by_location(phyto_abio, location_config)
+phyto_abio_filt = filter_by_location(phyto_abio, locations_config_df)
 
 print("Abiotic Total Records:", phyto_abio.shape[0])
-print("Record after filter (location_config.csv):", phyto_abio_filt.shape[0])
+print("Record after filter (locations_config.csv):", phyto_abio_filt.shape[0])
 print("\nLocationID for lake after filter:")
 print(phyto_abio_filt.groupby("locality")["locationID"].unique())
 
