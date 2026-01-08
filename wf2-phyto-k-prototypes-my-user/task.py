@@ -1,6 +1,6 @@
+import os
 import pandas as pd
 import re
-import os
 import numpy as np
 from kmodes.kprototypes import KPrototypes
 import plotly.graph_objects as go
@@ -37,6 +37,11 @@ input_traits = args.input_traits.replace('"','')
 
 
 conf_output_path = conf_output_path = '/tmp/data/WF2/' + 'output'
+
+output_dir = conf_output_path
+kproto_output_dir = os.path.join(output_dir, "K-Prototypes")
+os.makedirs(kproto_output_dir, exist_ok=True)
+
 
 bio_path = biotic_file 
 traits_path = input_traits
@@ -140,7 +145,7 @@ for lake_name in lakes:
     lake_data = phyto[phyto["locality"] == lake_name].copy()
     lake_location_id = lake_data.iloc[0]["locationID"]
 
-    out_dir = os.path.join(conf_output_path, lake_name + "_target_analysis")
+    out_dir = os.path.join(kproto_output_dir, lake_name)
     os.makedirs(out_dir, exist_ok=True)
     
     lake_data["Species_clean"] = lake_data["acceptedNameUsage"].apply(clean_species)
@@ -572,8 +577,6 @@ for lake_name in lakes:
                         print(f"Levene - {var}: p-value = {pval:.5f}")
         else:
             print(f"No useful environmental variables available for boxplots ({lake_name}).")
-
-output_dir = conf_output_path
 
 file_output_dir = open("/tmp/output_dir_" + id + ".json", "w")
 file_output_dir.write(json.dumps(output_dir))
