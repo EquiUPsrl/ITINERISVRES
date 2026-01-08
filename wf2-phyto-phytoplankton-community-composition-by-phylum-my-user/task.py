@@ -327,3 +327,6 @@ print(summary_season.head())
 
 summary_season.to_csv(os.path.join(output_dir, "Taxonomic_richness_by_lake_season.csv"), sep = ";", index=False)
 
+file_output_dir = open("/tmp/output_dir_" + id + ".json", "w")
+file_output_dir.write(json.dumps(output_dir))
+file_output_dir.close()
