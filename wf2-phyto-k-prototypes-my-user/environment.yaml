@@ -6,7 +6,7 @@ dependencies:
   - python>=3.8
   - nbconvert
   - pandas
-  - scikit_posthocs
+  - scikit-posthocs
   - kmodes
   - numpy
   - matplotlib
