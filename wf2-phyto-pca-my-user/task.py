@@ -32,7 +32,7 @@ biotic_file = args.biotic_file.replace('"','')
 conf_output_path = conf_output_path = '/tmp/data/WF2/' + 'output'
 
 output_dir = conf_output_path
-pca_output_dir = os.path.join(base_output_dir, "PCA")
+pca_output_dir = os.path.join(output_dir, "PCA")
 os.makedirs(pca_output_dir, exist_ok=True)
 
 env_data = pd.read_csv(abiotic_file, sep=";")
