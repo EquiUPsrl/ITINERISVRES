@@ -6,9 +6,9 @@ dependencies:
   - python>=3.8
   - nbconvert
   - pandas
-  - numpy
+  - numpy<=2.3
   - matplotlib
   - seaborn
-  - sklearn
+  - scikit-learn
   - papermill
   - ipykernel
