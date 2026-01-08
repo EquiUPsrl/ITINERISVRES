@@ -369,6 +369,9 @@ stats_df.to_csv(os.path.join(out_dir, "FD_trend_statistics_all_lakes.csv"), sep 
 print("\nSaved trend stats to: FD_trend_statistics_all_lakes.csv")
 print(stats_df)
 
+file_fd_panel_path = open("/tmp/fd_panel_path_" + id + ".json", "w")
+file_fd_panel_path.write(json.dumps(fd_panel_path))
+file_fd_panel_path.close()
 file_output_dir = open("/tmp/output_dir_" + id + ".json", "w")
 file_output_dir.write(json.dumps(output_dir))
 file_output_dir.close()
