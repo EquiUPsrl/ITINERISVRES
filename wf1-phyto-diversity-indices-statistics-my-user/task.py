@@ -404,3 +404,6 @@ plt.show()
 
 print("Paper-style BOXPLOT panel with statistics saved to:", out_fig)
 
+file_output_dir = open("/tmp/output_dir_" + id + ".json", "w")
+file_output_dir.write(json.dumps(output_dir))
+file_output_dir.close()
