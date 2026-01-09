@@ -15,7 +15,7 @@ arg_parser.add_argument('--id', action='store', type=str, required=True, dest='i
 
 arg_parser.add_argument('--density_file', action='store', type=str, required=True, dest='density_file')
 
-arg_parser.add_argument('--input_formulas', action='store', type=str, required=True, dest='input_formulas')
+arg_parser.add_argument('--formulas_csv', action='store', type=str, required=True, dest='formulas_csv')
 
 
 args = arg_parser.parse_args()
@@ -24,7 +24,7 @@ print(args)
 id = args.id
 
 density_file = args.density_file.replace('"','')
-input_formulas = args.input_formulas.replace('"','')
+formulas_csv = args.formulas_csv.replace('"','')
 
 
 conf_output_path = conf_output_path = '/tmp/data/WF1/' + 'output'
@@ -33,7 +33,7 @@ output_dir = conf_output_path
 os.makedirs(output_dir, exist_ok=True)
 
 density_file   = density_file
-formulas_file = input_formulas
+formulas_file = formulas_csv
 traits_file   = os.path.join(output_dir, "final_input.csv")
 
 
