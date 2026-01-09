@@ -508,9 +508,6 @@ anova_table.to_csv(anova_path, sep=";", decimal=".")
 print("\nANOVA: slope ~ season + treatment")
 print(anova_table)
 
-try:
-except ImportError:
-    sns = None
 
 if sns is not None:
     sns.set_theme(style="whitegrid")  # clean academic style
