@@ -29,22 +29,25 @@ final_input = os.path.join(conf_output_path, 'merged.csv')  # output file path a
 os.makedirs(os.path.dirname(final_input), exist_ok=True)
 
 csv_files = [f for f in os.listdir(input_folder) if f.endswith('.csv')]
-print(f"Trovati {len(csv_files)} file CSV:", csv_files)
+print(f"Found {len(csv_files)} CSV files:", csv_files)
 
 df_list = []
 
-for file in csv_files:
-    file_path = os.path.join(input_folder, file)
-    try:
-        df = pd.read_csv(file_path, sep=';', encoding='utf-8', low_memory=False)
-    except UnicodeDecodeError:
-        df = pd.read_csv(file_path, sep=';', encoding='latin1', low_memory=False)  # fallback if UTF-8 fails
-    df_list.append(df)
-
-merged_df = pd.concat(df_list, ignore_index=True, sort=False)
-merged_df.to_csv(final_input, index=False, sep=';', encoding='utf-8')
-
-print(f"Merged file saved in: {final_input}")
+if df_list:
+    for file in csv_files:
+        file_path = os.path.join(input_folder, file)
+        try:
+            df = pd.read_csv(file_path, sep=';', encoding='utf-8', low_memory=False)
+        except UnicodeDecodeError:
+            df = pd.read_csv(file_path, sep=';', encoding='latin1', low_memory=False)  # fallback if UTF-8 fails
+        df_list.append(df)
+    
+    merged_df = pd.concat(df_list, ignore_index=True, sort=False)
+    merged_df.to_csv(final_input, index=False, sep=';', encoding='utf-8')
+    
+    print(f"Merged file saved in: {final_input}")
+else:
+    print("No files to merge")
 
 file_final_input = open("/tmp/final_input_" + id + ".json", "w")
 file_final_input.write(json.dumps(final_input))
