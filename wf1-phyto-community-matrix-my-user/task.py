@@ -1,8 +1,6 @@
 from scipy.spatial.distance import pdist
 from scipy.cluster.hierarchy import linkage
 from scipy.cluster.hierarchy import dendrogram
-from scipy.spatial.distance import squareform
-from sklearn.manifold import MDS
 import os
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -130,6 +128,8 @@ plt.savefig(file_graph, dpi=300, bbox_inches="tight")
 plt.show()
 print("Community dendrogram saved to:", file_graph)
 
+"""
+
 dissimilarity_matrix = squareform(dist_vec)
 
 mds = MDS(
@@ -162,6 +162,8 @@ file_graph_nmds = os.path.join(output_dir, f"CommunityAnalysis_nmds_{display}.pn
 plt.savefig(file_graph_nmds, dpi=300, bbox_inches="tight")
 plt.show()
 print("NMDS plot saved to:", file_graph_nmds)
+
+"""
 
 file_matrix_path = open("/tmp/matrix_path_" + id + ".json", "w")
 file_matrix_path.write(json.dumps(matrix_path))

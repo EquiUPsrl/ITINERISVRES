@@ -7,7 +7,6 @@ dependencies:
   - nbconvert
   - matplotlib
   - pandas
-  - scikit-learn
   - scipy
   - papermill
   - ipykernel
