@@ -16,7 +16,7 @@ arg_parser = argparse.ArgumentParser()
 arg_parser.add_argument('--id', action='store', type=str, required=True, dest='id')
 
 
-arg_parser.add_argument('--filtered_file', action='store', type=str, required=True, dest='filtered_file')
+arg_parser.add_argument('--matrix_path', action='store', type=str, required=True, dest='matrix_path')
 
 
 args = arg_parser.parse_args()
@@ -24,56 +24,15 @@ print(args)
 
 id = args.id
 
-filtered_file = args.filtered_file.replace('"','')
+matrix_path = args.matrix_path.replace('"','')
 
 
 conf_output_path = conf_output_path = '/tmp/data/WF1/' + 'output'
-conf_input_path = conf_input_path = '/tmp/data/WF1/' + 'data'
 
 output_dir = conf_output_path
 os.makedirs(output_dir, exist_ok=True)
 
-datain = filtered_file
-
-taxlev = "scientificname_accepted"
-param = "density"
-method = "braycurtis"
-display = "site"
-
-
-action_name = "community_matrix"
-config_file = os.path.join(conf_input_path, "config.csv")
-
-if os.path.exists(config_file):
-    cfg = pd.read_csv(config_file, sep=";")
-    act = cfg[cfg["action"] == action_name]
-
-    p = act.set_index("parameter")["value"]
-    
-    taxlev = p.get("taxlev", taxlev)
-    param = p.get("param", param)
-    display = p.get("display", display)
-    method = p.get("method", method)
-    
-    if "cluster" in p:
-        cluster = [x for x in p["cluster"].split(",")]
-
-df = pd.read_csv(datain, sep=";", engine="python", decimal=".")
-
-dataset = df.copy()
-
-df.columns = df.columns.str.replace("\ufeff", "", regex=False).str.strip().str.lower()
-
-taxlev = taxlev.lower()
-param = param.lower()
-
-df["site_id"] = df["treatment"].astype(str) + "." + df["season"].astype(str)
-
-mat = (
-    df.groupby(["site_id", df[taxlev]])[param]
-    .sum()
-    .unstack(fill_value=0)
-)
+mat = pd.read_csv(matrix_path, sep=";", decimal=".", index_col=0)
 
 labels = mat.index.astype(str)
 
@@ -215,56 +174,7 @@ print("Pairwise PERMANOVA saved to:", pairwise_out)
 
 
 
-
-
-
-
-
-
-
-
-dataset.columns = (
-    dataset.columns
-    .str.replace("\ufeff", "", regex=False)
-    .str.strip()
-    .str.lower()
-)
-
-cluster_lower = [c.lower() for c in cluster]
-taxlev_lower = taxlev.lower()
-param_lower = param.lower()
-
-missing = [c for c in cluster_lower + [taxlev_lower, param_lower] if c not in dataset.columns]
-if missing:
-    raise KeyError(f"Missing columns: {missing}")
-
-
-if len(cluster_lower) > 1:
-    site_id = dataset[cluster_lower].astype(str).agg(".".join, axis=1)
-elif len(cluster_lower) == 1 and cluster_lower[0] != "whole":
-    site_id = dataset[cluster_lower[0]].astype(str)
-else:
-    site_id = pd.Series("all", index=dataset.index)
-
-
-if param_lower not in dataset.columns:
-    print(f"WARNING: '{param_lower}' not found, set to 1.")
-    dataset[param_lower] = 1.0
-
-dataset[param_lower] = dataset[param_lower].fillna(0)
-dataset[param_lower] = np.round(dataset[param_lower]).astype(int)
-dataset.loc[dataset[param_lower] < 0, param_lower] = 0
-
-matz = (
-    dataset
-    .groupby([site_id, dataset[taxlev_lower]])[param_lower]
-    .sum()
-    .unstack(fill_value=0)
-)
-
-matrix_path = os.path.join(output_dir, f"CommunityMatrix_{param_lower}_rarefaction.csv")
-matz.to_csv(matrix_path, sep=";", decimal=".", index=True)
-print("Community matrix saved in:", matrix_path)
+matz = pd.read_csv(matrix_path, sep=";", decimal=".", index_col=0)
 
 mat_values = matz.values
 site_labels = matz.index.astype(str)
