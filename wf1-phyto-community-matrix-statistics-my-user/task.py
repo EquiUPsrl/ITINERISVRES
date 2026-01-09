@@ -18,8 +18,6 @@ arg_parser.add_argument('--id', action='store', type=str, required=True, dest='i
 
 arg_parser.add_argument('--matrix_path', action='store', type=str, required=True, dest='matrix_path')
 
-arg_parser.add_argument('--method', action='store', type=str, required=True, dest='method')
-
 
 args = arg_parser.parse_args()
 print(args)
@@ -27,13 +25,27 @@ print(args)
 id = args.id
 
 matrix_path = args.matrix_path.replace('"','')
-method = args.method.replace('"','')
 
 
 conf_output_path = conf_output_path = '/tmp/data/WF1/' + 'output'
+conf_input_path = conf_input_path = '/tmp/data/WF1/' + 'data'
 
 output_dir = conf_output_path
 os.makedirs(output_dir, exist_ok=True)
+
+method = "braycurtis"
+
+
+action_name = "community_matrix"
+config_file = os.path.join(conf_input_path, "config.csv")
+
+if os.path.exists(config_file):
+    cfg = pd.read_csv(config_file, sep=";")
+    act = cfg[cfg["action"] == action_name]
+
+    p = act.set_index("parameter")["value"]
+    
+    method = p.get("method", method)
 
 mat = pd.read_csv(matrix_path, sep=";", decimal=".", index_col=0)
 
