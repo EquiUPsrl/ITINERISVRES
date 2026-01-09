@@ -18,6 +18,8 @@ arg_parser.add_argument('--id', action='store', type=str, required=True, dest='i
 
 arg_parser.add_argument('--matrix_path', action='store', type=str, required=True, dest='matrix_path')
 
+arg_parser.add_argument('--method', action='store', type=str, required=True, dest='method')
+
 
 args = arg_parser.parse_args()
 print(args)
@@ -25,6 +27,7 @@ print(args)
 id = args.id
 
 matrix_path = args.matrix_path.replace('"','')
+method = args.method.replace('"','')
 
 
 conf_output_path = conf_output_path = '/tmp/data/WF1/' + 'output'
