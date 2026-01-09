@@ -5,5 +5,9 @@ dependencies:
   - pip
   - python>=3.8
   - nbconvert
+  - numpy
+  - pandas
+  - matplotlib
+  - statsmodels
   - papermill
   - ipykernel
