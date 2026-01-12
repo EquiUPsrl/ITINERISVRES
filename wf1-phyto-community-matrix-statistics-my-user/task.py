@@ -317,7 +317,40 @@ plt.ylabel("Expected richness (E[Species])")
 plt.title("Pooled rarefaction per Treatment")
 plt.legend()
 plt.tight_layout()
+plot_path = os.path.join(output_dir, "rarefaction_treatment_pooled.png")
+plt.savefig(plot_path, dpi=300, bbox_inches="tight")
 plt.show()
+
+print("Rarefaction plot (pooled) saved to:", plot_path)
+
+
+
+treatments = [lab.split(".")[0] for lab in site_labels]
+
+treat_groups = {t: [] for t in np.unique(treatments)}
+
+for lab, curve in all_curves.items():
+    t = lab.split(".")[0]
+    treat_groups[t].append(curve)
+
+treat_mean = {t: np.mean(curves, axis=0) for t, curves in treat_groups.items()}
+
+plt.figure(figsize=(8,6))
+for t, curve in treat_mean.items():
+    plt.plot(n_vals, curve, label=f"{t} (mean)")
+
+plt.xlabel("Number of individuals sampled (n)")
+plt.ylabel("Expected richness")
+plt.title("Mean rarefaction curves per Treatment")
+plt.legend()
+plt.tight_layout()
+
+plot_path = os.path.join(output_dir, "rarefaction_treatment_mean.png")
+plt.savefig(plot_path, dpi=300)
+
+plt.show()
+
+print("Rarefaction plot (mean) saved to:", plot_path)
 
 file_output_dir = open("/tmp/output_dir_" + id + ".json", "w")
 file_output_dir.write(json.dumps(output_dir))
