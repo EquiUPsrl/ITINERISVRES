@@ -22,12 +22,12 @@ id = args.id
 zip_files = json.loads(args.zip_files)
 
 
-conf_base_path = conf_base_path = '/tmp/data/WF5/'
+conf_temp_path = conf_temp_path = '/tmp/data/WF5/work/' + 'tmp'
 
 array_strings = zip_files
 
-output_dir = os.path.join(conf_base_path, "output")
-os.makedirs(output_dir, exist_ok=True)
+dataset_path = os.path.join(conf_temp_path, "Dataset")
+os.makedirs(dataset_path, exist_ok=True)
 
 def download_file(url, dest_path):
     """Download a file from a URL."""
@@ -62,7 +62,7 @@ def extract_images_from_zip(zip_path, dest_folder):
 for item in array_strings:
     try:
         product, url = item.split("||")
-        product_folder = output_dir #os.path.join(output_dir, product)
+        product_folder = dataset_path #os.path.join(output_dir, product)
         os.makedirs(product_folder, exist_ok=True)
 
         zip_path = os.path.join(product_folder, f"{product}.zip")
@@ -71,6 +71,6 @@ for item in array_strings:
     except Exception as e:
         print(f"Failed to process {item}: {e}")
 
-file_output_dir = open("/tmp/output_dir_" + id + ".json", "w")
-file_output_dir.write(json.dumps(output_dir))
-file_output_dir.close()
+file_dataset_path = open("/tmp/dataset_path_" + id + ".json", "w")
+file_dataset_path.write(json.dumps(dataset_path))
+file_dataset_path.close()
