@@ -42,7 +42,8 @@ start_year = args.start_year.replace('"','')
 
 param_oceancolor_app_key = args.param_oceancolor_app_key.replace('"','')
 
-conf_temp_path = conf_temp_path = '/tmp/data/WF5/work/' + 'tmp'
+conf_input_path = conf_input_path = '/tmp/data/WF5/' + 'input'
+conf_temp_path = conf_temp_path = '/tmp/data/WF5/' + 'tmp'
 
 app_key = param_oceancolor_app_key # generated from ocean color
 
@@ -378,7 +379,7 @@ def retrieveURL(request, localpath='.', uncompress=False, verbose=0, force_downl
     return httpdl(server, netpath, localpath=localpath, uncompress=uncompress, verbose=verbose, force_download=force_download)
 
 
-dataset_path = os.path.join(conf_temp_path, "Dataset")
+dataset_path = os.path.join(conf_input_path, "dataset")
 
 for product_type in products_types:
 
@@ -419,7 +420,7 @@ for product_type in products_types:
             else:
                 print(f"File {os.path.join(temp_path, l)} not found.")
     
-    with open(os.path.join(conf_temp_path, product_type + "_errors.txt") , "w", encoding="utf-8") as f:
+    with open(os.path.join(conf_input_path, product_type + "_errors.txt") , "w", encoding="utf-8") as f:
         for err in errors:
             f.write(err + "\n")
 
