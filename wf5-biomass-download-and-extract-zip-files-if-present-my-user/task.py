@@ -22,11 +22,11 @@ id = args.id
 zip_files = json.loads(args.zip_files)
 
 
-conf_temp_path = conf_temp_path = '/tmp/data/WF5/work/' + 'tmp'
+conf_input_path = conf_input_path = '/tmp/data/WF5/' + 'input'
 
 array_strings = zip_files
 
-dataset_path = os.path.join(conf_temp_path, "Dataset")
+dataset_path = os.path.join(conf_input_path, "dataset")
 os.makedirs(dataset_path, exist_ok=True)
 
 def download_file(url, dest_path):
