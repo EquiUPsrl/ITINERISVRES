@@ -38,12 +38,13 @@ ocean_productivity = json.loads(args.ocean_productivity)
 start_year = args.start_year.replace('"','')
 
 
-conf_temp_path = conf_temp_path = '/tmp/data/WF5/work/' + 'tmp'
+conf_temp_path = conf_temp_path = '/tmp/data/WF5/' + 'tmp'
+conf_input_path = conf_input_path = '/tmp/data/WF5/' + 'input'
 
 warnings.filterwarnings("ignore")
 
 tmp_dir = conf_temp_path
-dataset_path = os.path.join(conf_temp_path, "Dataset")
+dataset_path = os.path.join(conf_input_path, "dataset")
 os.makedirs(tmp_dir, exist_ok=True)
 os.makedirs(dataset_path, exist_ok=True)
 
