@@ -184,3 +184,6 @@ def download_npp():
 
 download_npp()
 
+file_dataset_path = open("/tmp/dataset_path_" + id + ".json", "w")
+file_dataset_path.write(json.dumps(dataset_path))
+file_dataset_path.close()
