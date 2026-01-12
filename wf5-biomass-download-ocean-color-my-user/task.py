@@ -7,7 +7,6 @@ import pandas as pd
 from datetime import timedelta
 import subprocess
 import os
-import shutil
 import rasterio
 import requests
 from requests.adapters import HTTPAdapter
@@ -384,18 +383,12 @@ dataset_path = os.path.join(conf_temp_path, "Dataset")
 for product_type in products_types:
 
     temp_path = os.path.join(conf_temp_path, "nc", product_type)
-    output_path = os.path.join(dataset_path, product_type)
+    output_path = dataset_path #os.path.join(dataset_path, product_type)
 
     
     valore_variabile = get_variable_by_product(product_type)
     
     generated_links = generate_links(input_start, input_end, interval, resolution, product_type, valore_variabile)
-    
-    print("Delete folder " + temp_path)
-    shutil.rmtree(temp_path, ignore_errors = True) 
-    
-    print("Delete folder " + output_path)
-    shutil.rmtree(output_path, ignore_errors = True) 
     
     os.makedirs(temp_path, exist_ok=True)
     os.makedirs(output_path, exist_ok=True)
