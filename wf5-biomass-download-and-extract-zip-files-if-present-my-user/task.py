@@ -22,10 +22,11 @@ id = args.id
 zip_files = json.loads(args.zip_files)
 
 
+conf_base_path = conf_base_path = '/tmp/data/WF5/'
 
 array_strings = zip_files
 
-output_dir = "OUTPUT_DIR"
+output_dir = os.path.join(conf_base_path, "output")
 os.makedirs(output_dir, exist_ok=True)
 
 def download_file(url, dest_path):
@@ -70,3 +71,6 @@ for item in array_strings:
     except Exception as e:
         print(f"Failed to process {item}: {e}")
 
+file_output_dir = open("/tmp/output_dir_" + id + ".json", "w")
+file_output_dir.write(json.dumps(output_dir))
+file_output_dir.close()
