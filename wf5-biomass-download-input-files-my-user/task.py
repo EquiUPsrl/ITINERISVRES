@@ -34,9 +34,9 @@ param_raster_dataset = args.param_raster_dataset.replace('"','')
 param_raster_depth = args.param_raster_depth.replace('"','')
 param_shape_coast = args.param_shape_coast.replace('"','')
 
-conf_base_path = conf_base_path = '/tmp/data/WF5/'
+conf_input_path = conf_input_path = '/tmp/data/WF5/work/' + 'input'
 
-input_dir = os.path.join(conf_base_path, "data")
+input_dir = conf_input_path
 os.makedirs(input_dir, exist_ok=True)
 
 
