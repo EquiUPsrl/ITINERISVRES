@@ -9,7 +9,7 @@ arg_parser = argparse.ArgumentParser()
 arg_parser.add_argument('--id', action='store', type=str, required=True, dest='id')
 
 
-arg_parser.add_argument('--raster_dataset_file', action='store', type=str, required=True, dest='raster_dataset_file')
+arg_parser.add_argument('--raster_dataset_csv', action='store', type=str, required=True, dest='raster_dataset_csv')
 
 
 args = arg_parser.parse_args()
@@ -17,11 +17,11 @@ print(args)
 
 id = args.id
 
-raster_dataset_file = args.raster_dataset_file.replace('"','')
+raster_dataset_csv = args.raster_dataset_csv.replace('"','')
 
 
 
-df = pd.read_csv(raster_dataset_file, sep=";")
+df = pd.read_csv(raster_dataset_csv, sep=";")
 
 zip_files = []
 oceancolor = []
