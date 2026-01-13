@@ -27,7 +27,7 @@ density_file = args.density_file.replace('"','')
 info_csv = args.info_csv.replace('"','')
 
 
-conf_output_path = conf_output_path = '/tmp/data/WF6/' + 'output'
+conf_output_path = conf_output_path = '/tmp/data/WF6_0/' + 'output'
 
 pd.options.mode.chained_assignment = None  # avoid warning chained assignment
 
