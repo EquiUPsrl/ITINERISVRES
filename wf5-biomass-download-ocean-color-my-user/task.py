@@ -1,3 +1,5 @@
+import sys
+import rasterio
 from rasterio.transform import from_origin
 from pathlib import Path
 from urllib.parse import urlparse
@@ -7,12 +9,10 @@ import pandas as pd
 from datetime import timedelta
 import subprocess
 import os
-import rasterio
 import requests
 from requests.adapters import HTTPAdapter
 import logging
 import re
-import sys
 
 import argparse
 import json
@@ -53,6 +53,15 @@ interval = "MO"          # "8D", "MO", "1D"
 resolution = "9km"
 
 products_types = oceancolor
+
+
+
+print("PYTHON EXECUTABLE:", sys.executable)
+print("LD_LIBRARY_PATH:", os.environ.get("LD_LIBRARY_PATH"))
+print("PATH:", os.environ.get("PATH"))
+print("sqlite3 resolved to:", ctypes.util.find_library("sqlite3"))
+
+print("Rasterio GDAL version:", rasterio.__gdal_version__)
 
 
 
