@@ -24,7 +24,7 @@ id = args.id
 input_file = args.input_file.replace('"','')
 
 
-conf_output_path = conf_output_path = '/tmp/data/WF6/' + 'output'
+conf_output_path = conf_output_path = '/tmp/data/WF6_0/' + 'output'
 
 pd.options.mode.chained_assignment = None  # disable chained assignment warning
 
