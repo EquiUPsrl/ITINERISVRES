@@ -13,7 +13,7 @@ arg_parser = argparse.ArgumentParser()
 arg_parser.add_argument('--id', action='store', type=str, required=True, dest='id')
 
 
-arg_parser.add_argument('--input_file', action='store', type=str, required=True, dest='input_file')
+arg_parser.add_argument('--input_csv', action='store', type=str, required=True, dest='input_csv')
 
 
 args = arg_parser.parse_args()
@@ -21,7 +21,7 @@ print(args)
 
 id = args.id
 
-input_file = args.input_file.replace('"','')
+input_csv = args.input_csv.replace('"','')
 
 
 conf_output_path = conf_output_path = '/tmp/data/WF6_0/' + 'output'
@@ -29,7 +29,7 @@ conf_output_path = conf_output_path = '/tmp/data/WF6_0/' + 'output'
 pd.options.mode.chained_assignment = None  # disable chained assignment warning
 
 output_dir  = conf_output_path
-datain      = input_file
+datain      = input_csv
 density_file   = os.path.join(output_dir, 'traits_density.csv')
 
 os.makedirs(output_dir, exist_ok=True)
