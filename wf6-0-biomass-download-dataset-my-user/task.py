@@ -22,7 +22,7 @@ id = args.id
 param_info_file = args.param_info_file.replace('"','')
 param_input_file = args.param_input_file.replace('"','')
 
-conf_base_path = conf_base_path = '/tmp/data/WF6/'
+conf_base_path = conf_base_path = '/tmp/data/WF6_0/'
 
 input_dir = os.path.join(conf_base_path, "data")
 os.makedirs(input_dir, exist_ok=True)
