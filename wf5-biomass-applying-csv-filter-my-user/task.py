@@ -31,8 +31,8 @@ def apply_csv_filter(csv_path, filtro_dict):
     df = pd.read_csv(csv_path, delimiter=';')
     
     for col, regole in filtro_dict.items():
-        if 'valore' in regole:
-            df = df[df[col] == regole['valore']]
+        if 'value' in regole:
+            df = df[df[col] == regole['value']]
         else:
             df[col] = pd.to_numeric(df[col].astype(str).str.replace(',', '.'), errors='coerce')
             df = df.dropna(subset=[col])
@@ -63,7 +63,7 @@ def csv_to_json_filter(csv_path):
             value_field = row['value'].strip()
             
             if value_field:
-                result[key] = {'valore': value_field}
+                result[key] = {'value': value_field}
             else:
                 entry = {}
                 if row['min'].strip():
