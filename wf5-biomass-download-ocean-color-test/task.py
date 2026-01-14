@@ -23,7 +23,10 @@ arg_parser = argparse.ArgumentParser()
 arg_parser.add_argument('--id', action='store', type=str, required=True, dest='id')
 
 
+arg_parser.add_argument('--param_end_year', action='store', type=str, required=True, dest='param_end_year')
+arg_parser.add_argument('--param_oceancolor', action='store', type=str, required=True, dest='param_oceancolor')
 arg_parser.add_argument('--param_oceancolor_app_key', action='store', type=str, required=True, dest='param_oceancolor_app_key')
+arg_parser.add_argument('--param_start_year', action='store', type=str, required=True, dest='param_start_year')
 
 args = arg_parser.parse_args()
 print(args)
@@ -31,7 +34,19 @@ print(args)
 id = args.id
 
 
+param_end_year = args.param_end_year.replace('"','')
+print(args.param_oceancolor)
+print(type(args.param_oceancolor))
+try:
+    param_oceancolor = json.loads(args.param_oceancolor)
+except Exception as e:
+    if e.__class__.__name__ == 'JSONDecodeError':
+        import ast
+        param_oceancolor = ast.literal_eval(args.param_oceancolor.replace('[','["').replace(',','","').replace('" ','"').replace(']','"]').replace("'",""))
+    else:
+        raise e
 param_oceancolor_app_key = args.param_oceancolor_app_key.replace('"','')
+param_start_year = args.param_start_year.replace('"','')
 
 conf_input_path = conf_input_path = '/tmp/data/WF5/' + 'input'
 conf_temp_path = conf_temp_path = '/tmp/data/WF5/' + 'tmp'
