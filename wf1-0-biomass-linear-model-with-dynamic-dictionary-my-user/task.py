@@ -43,7 +43,7 @@ def safe_log(x):
     except:
         return np.nan
 
-def linearRegression(dati_df, params_file, transformations_dict, trasf=False):
+def linearRegression(dati_df, params_file, output_dir, transformations_dict, trasf=False):
     prefix = "_trasf" if trasf else ""
 
     SEED = 42
@@ -106,7 +106,6 @@ def linearRegression(dati_df, params_file, transformations_dict, trasf=False):
     for line in output_lines:
         print(line)
     
-    output_dir = conf_output_path
     output_base_dir = output_dir
     new_dir_lm = os.path.join(output_base_dir, "LinearModel")
     os.makedirs(new_dir_lm, exist_ok=True)
@@ -155,6 +154,8 @@ def linearRegression(dati_df, params_file, transformations_dict, trasf=False):
     print(f"Shapiro-Wilk test results have been saved in: {shapiro_output_file}")
 
 
+output_dir = conf_output_path
+
 log_columns = []
 with open(parameters_file_csv, encoding='utf-8') as f:
     for line in f:
@@ -177,7 +178,7 @@ for col in log_columns:
 
 df = df.dropna()
 
-linearRegression(df, parameters_file_csv, transformations_dict, trasf=True)
+linearRegression(df, parameters_file_csv, output_dir, transformations_dict, trasf=True)
 
 file_output_dir = open("/tmp/output_dir_" + id + ".json", "w")
 file_output_dir.write(json.dumps(output_dir))
