@@ -155,12 +155,12 @@ def convert_csv(
 
 
 
-data_csv = data_file
+data_file_csv = data_file
 parameters_file_csv = parameters_file
 
 
 files = [
-    data_csv,
+    data_file_csv,
     parameters_file_csv
 ]
 
@@ -175,9 +175,9 @@ for file_csv in files:
 
     print("File verified -> ", file_csv)
 
-file_data_csv = open("/tmp/data_csv_" + id + ".json", "w")
-file_data_csv.write(json.dumps(data_csv))
-file_data_csv.close()
+file_data_file_csv = open("/tmp/data_file_csv_" + id + ".json", "w")
+file_data_file_csv.write(json.dumps(data_file_csv))
+file_data_file_csv.close()
 file_parameters_file_csv = open("/tmp/parameters_file_csv_" + id + ".json", "w")
 file_parameters_file_csv.write(json.dumps(parameters_file_csv))
 file_parameters_file_csv.close()
