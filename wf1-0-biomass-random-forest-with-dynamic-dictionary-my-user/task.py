@@ -79,7 +79,7 @@ print("\nDynamic Transformation Dictionary:")
 print(transformations_dict)
 
 
-def randomForest(dati_df, params_file, transformations_dict, trasf=False):
+def randomForest(dati_df, params_file, output_dir, transformations_dict, trasf=False):
     prefix = "_trasf" if trasf else ""
 
     SEED = 42
@@ -195,7 +195,7 @@ def randomForest(dati_df, params_file, transformations_dict, trasf=False):
     results_csv_path = os.path.join(new_dir, "grid_search_results" + prefix + ".csv")
     results_df.to_csv(results_csv_path, index=False)
 
-randomForest(df, parameters_file_csv, transformations_dict, trasf=True)
+randomForest(df, parameters_file_csv, output_dir, transformations_dict, trasf=True)
 
 file_output_dir = open("/tmp/output_dir_" + id + ".json", "w")
 file_output_dir.write(json.dumps(output_dir))
