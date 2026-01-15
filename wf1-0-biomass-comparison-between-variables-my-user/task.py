@@ -1,6 +1,6 @@
+import os
 import pandas as pd
 from sklearn.metrics import mean_absolute_error
-import os
 import numpy as np
 from sklearn.metrics import mean_squared_error
 
@@ -29,7 +29,7 @@ parameters_file_csv = args.parameters_file_csv.replace('"','')
 
 conf_output_path = conf_output_path = '/tmp/data/WF1_0/' + 'output'
 
-def variable_comparison(data_file, params_file, trasf=False) :
+def variable_comparison(data_file, params_file, output_dir, trasf=False) :
 
     prefix = ""
     if trasf:
@@ -57,9 +57,6 @@ def variable_comparison(data_file, params_file, trasf=False) :
         })
         print(f"{pred}: MAE = {mae:.4f}, RMSE = {rmse:.4f}")
     
-    output_dir = os.path.join(conf_output_path)
-    os.makedirs(output_dir, exist_ok=True)
-    
     output_file = os.path.join(output_dir, "mae_rmse_single_predictors" + prefix + ".txt")
     with open(output_file, 'w') as f:
         f.write("Predictor\tMAE\tRMSE\n")
@@ -70,7 +67,10 @@ def variable_comparison(data_file, params_file, trasf=False) :
 
 
 
-variable_comparison(data_csv, parameters_file_csv)
+output_dir = os.path.join(conf_output_path)
+os.makedirs(output_dir, exist_ok=True)
+
+variable_comparison(data_csv, parameters_file_csv, output_dir)
 
 file_output_dir = open("/tmp/output_dir_" + id + ".json", "w")
 file_output_dir.write(json.dumps(output_dir))
