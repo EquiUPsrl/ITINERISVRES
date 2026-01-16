@@ -230,6 +230,14 @@ test_data <- dati[-train_index, ]
 cat("Size of training set:", nrow(train_data), "\n")
 cat("Size of test set:", nrow(test_data), "\n")
 
+predictors <- setdiff(names(train_data), target_variable)
+
+train_data[, predictors] <- data.matrix(train_data[, predictors])
+test_data[, predictors]  <- data.matrix(test_data[, predictors])
+
+storage.mode(train_data[, predictors]) <- "double"
+storage.mode(test_data[, predictors])  <- "double"
+
 
 seeds <- vector(mode = "list", length = number + 1)
 set.seed(123)
