@@ -74,6 +74,10 @@ if (!requireNamespace("xgboost", quietly = TRUE)) {
 	install.packages("xgboost", repos="http://cran.us.r-project.org")
 }
 library(xgboost)
+if (!requireNamespace("remotes", quietly = TRUE)) {
+	install.packages("remotes", repos="http://cran.us.r-project.org")
+}
+library(remotes)
 if (!requireNamespace("tidyr", quietly = TRUE)) {
 	install.packages("tidyr", repos="http://cran.us.r-project.org")
 }
@@ -155,6 +159,16 @@ id <- gsub('"', '', opt$id)
 
 
 print("Running the cell")
+if (!requireNamespace("remotes", quietly = TRUE)) {
+  install.packages("remotes", repos = "https://cran.r-project.org")
+}
+
+remotes::install_version("xgboost", version = "1.7.11.1", repos = "https://cran.r-project.org")
+
+library(xgboost)
+
+packageVersion("xgboost")
+
 library(ggplot2)
 library(xgboost)
 library(Metrics)
@@ -231,27 +245,6 @@ cat("Size of training set:", nrow(train_data), "\n")
 cat("Size of test set:", nrow(test_data), "\n")
 
 
-
-
-
-predictors <- setdiff(names(train_data), target_variable)
-
-library(caret)
-dummies <- dummyVars(~ ., data = train_data[, predictors])
-
-train_matrix <- predict(dummies, newdata = train_data[, predictors])
-test_matrix  <- predict(dummies, newdata = test_data[, predictors])
-
-train_label <- train_data[[target_variable]]
-test_label  <- test_data[[target_variable]]
-
-cat("Train matrix dimensions:", dim(train_matrix), "\n")
-cat("Test matrix dimensions:", dim(test_matrix), "\n")
-
-
-
-
-
 seeds <- vector(mode = "list", length = number + 1)
 set.seed(123)
 for (i in 1:number) seeds[[i]] <- sample.int(1000, size = 5)
@@ -297,8 +290,7 @@ for (n_value in nrounds) {
                             
                             model_gbm <- train(
                                 as.formula(paste(target_variable, "~ .")),
-                                x = train_matrix,
-                                y = train_label,
+                                data = train_data,
                                 method = "xgbTree",
                                 trControl = ctrl,
                                 tuneGrid = tuneGrid_gbm,
