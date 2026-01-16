@@ -230,13 +230,26 @@ test_data <- dati[-train_index, ]
 cat("Size of training set:", nrow(train_data), "\n")
 cat("Size of test set:", nrow(test_data), "\n")
 
+
+
+
+
 predictors <- setdiff(names(train_data), target_variable)
 
-train_data[, predictors] <- data.matrix(train_data[, predictors])
-test_data[, predictors]  <- data.matrix(test_data[, predictors])
+library(caret)
+dummies <- dummyVars(~ ., data = train_data[, predictors])
 
-storage.mode(train_data[, predictors]) <- "double"
-storage.mode(test_data[, predictors])  <- "double"
+train_matrix <- predict(dummies, newdata = train_data[, predictors])
+test_matrix  <- predict(dummies, newdata = test_data[, predictors])
+
+train_label <- train_data[[target_variable]]
+test_label  <- test_data[[target_variable]]
+
+cat("Train matrix dimensions:", dim(train_matrix), "\n")
+cat("Test matrix dimensions:", dim(test_matrix), "\n")
+
+
+
 
 
 seeds <- vector(mode = "list", length = number + 1)
@@ -284,7 +297,8 @@ for (n_value in nrounds) {
                             
                             model_gbm <- train(
                                 as.formula(paste(target_variable, "~ .")),
-                                data = train_data,
+                                x = train_matrix,
+                                y = train_label,
                                 method = "xgbTree",
                                 trControl = ctrl,
                                 tuneGrid = tuneGrid_gbm,
