@@ -10,6 +10,7 @@ arg_parser = argparse.ArgumentParser()
 arg_parser.add_argument('--id', action='store', type=str, required=True, dest='id')
 
 
+arg_parser.add_argument('--param_config_file', action='store', type=str, required=True, dest='param_config_file')
 arg_parser.add_argument('--param_data_file', action='store', type=str, required=True, dest='param_data_file')
 arg_parser.add_argument('--param_modis_interval_8d', action='store', type=str, required=True, dest='param_modis_interval_8d')
 arg_parser.add_argument('--param_parameters_file', action='store', type=str, required=True, dest='param_parameters_file')
@@ -22,6 +23,7 @@ print(args)
 id = args.id
 
 
+param_config_file = args.param_config_file.replace('"','')
 param_data_file = args.param_data_file.replace('"','')
 param_modis_interval_8d = args.param_modis_interval_8d.replace('"','')
 param_parameters_file = args.param_parameters_file.replace('"','')
@@ -59,9 +61,13 @@ def download_file(url, dest_folder, file_name=None):
 raster_dataset_file = download_file(param_raster_dataset, input_dir)
 data_file = download_file(param_data_file, input_dir)
 parameters_file = download_file(param_parameters_file, input_dir)
+config_file = download_file(param_config_file, input_dir)
 shape_zip_file = download_file(param_shape_zip_file, input_dir)
 modis_interval_8d = download_file(param_modis_interval_8d, input_dir)
 
+file_config_file = open("/tmp/config_file_" + id + ".json", "w")
+file_config_file.write(json.dumps(config_file))
+file_config_file.close()
 file_data_file = open("/tmp/data_file_" + id + ".json", "w")
 file_data_file.write(json.dumps(data_file))
 file_data_file.close()
