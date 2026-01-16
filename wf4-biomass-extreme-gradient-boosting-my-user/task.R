@@ -74,6 +74,10 @@ if (!requireNamespace("xgboost", quietly = TRUE)) {
 	install.packages("xgboost", repos="http://cran.us.r-project.org")
 }
 library(xgboost)
+if (!requireNamespace("remotes", quietly = TRUE)) {
+	install.packages("remotes", repos="http://cran.us.r-project.org")
+}
+library(remotes)
 if (!requireNamespace("tidyr", quietly = TRUE)) {
 	install.packages("tidyr", repos="http://cran.us.r-project.org")
 }
@@ -155,7 +159,17 @@ id <- gsub('"', '', opt$id)
 
 
 print("Running the cell")
-cat("R version: ", R.version.string)
+cat("R version: ", R.version.string, "\n")
+
+if (!requireNamespace("remotes", quietly = TRUE)) {
+  install.packages("remotes", repos = "https://cran.r-project.org")
+}
+
+remotes::install_version("xgboost", version = "1.7.11.1", repos = "https://cran.r-project.org")
+
+library(xgboost)
+
+packageVersion("xgboost")
 
 library(ggplot2)
 library(xgboost)
