@@ -168,7 +168,6 @@ packages_to_install <- list(
   xgboost    = "1.7.11.1",
   Metrics    = "0.1.4",
   caret      = "7.0.1",
-  doParallel = "1.0.17",
   iml        = "0.11.4",
   e1071      = "1.7.16",
   readr      = "2.1.5",
