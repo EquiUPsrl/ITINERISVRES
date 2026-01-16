@@ -155,6 +155,8 @@ id <- gsub('"', '', opt$id)
 
 
 print("Running the cell")
+cat("R version: ", R.version.string)
+
 library(ggplot2)
 library(xgboost)
 library(Metrics)
