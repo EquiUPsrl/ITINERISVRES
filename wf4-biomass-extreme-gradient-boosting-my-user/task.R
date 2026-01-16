@@ -172,9 +172,8 @@ remotes::install_version("caret", version = "7.0.1", repos = "https://cran.r-pro
 library(xgboost)
 library(caret)
 
-cat("xgboost version: ", packageVersion("xgboost"), "\n")
-cat("caret version: ", packageVersion("caret"), "\n")
-
+print(paste("xgboost version:", as.character(packageVersion("xgboost"))))
+print(paste("caret version:", as.character(packageVersion("caret"))))
 
 library(ggplot2)
 library(xgboost)
