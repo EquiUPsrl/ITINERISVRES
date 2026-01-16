@@ -5,9 +5,10 @@ dependencies:
   - pip
   - python>=3.8
   - nbconvert
-  - requests
   - rasterio
-  - pandas
   - xarray
+  - requests
+  - netCDF4
+  - pandas
   - papermill
   - ipykernel

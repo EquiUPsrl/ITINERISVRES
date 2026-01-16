@@ -1,3 +1,4 @@
+import netCDF4
 from rasterio.transform import from_origin
 from pathlib import Path
 from urllib.parse import urlparse
@@ -56,6 +57,8 @@ products_types = oceancolor
 
 
 
+
+print(netCDF4.__version__)
 
 def nc_to_geotiff_jupyter(nc_file, variable_name, output_tiff, compress=True, dtype_out=None):
     ds = xr.open_dataset(nc_file)
