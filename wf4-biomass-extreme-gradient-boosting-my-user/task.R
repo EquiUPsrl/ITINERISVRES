@@ -74,10 +74,6 @@ if (!requireNamespace("xgboost", quietly = TRUE)) {
 	install.packages("xgboost", repos="http://cran.us.r-project.org")
 }
 library(xgboost)
-if (!requireNamespace("remotes", quietly = TRUE)) {
-	install.packages("remotes", repos="http://cran.us.r-project.org")
-}
-library(remotes)
 if (!requireNamespace("tidyr", quietly = TRUE)) {
 	install.packages("tidyr", repos="http://cran.us.r-project.org")
 }
@@ -159,37 +155,6 @@ id <- gsub('"', '', opt$id)
 
 
 print("Running the cell")
-if (!requireNamespace("remotes", quietly = TRUE)) {
-  install.packages("remotes", repos = "https://cran.r-project.org")
-}
-
-packages_to_install <- list(
-  ggplot2    = "4.0.0",
-  xgboost    = "1.7.11.1",
-  Metrics    = "0.1.4",
-  caret      = "7.0.1",
-  iml        = "0.11.4",
-  e1071      = "1.7.16",
-  readr      = "2.1.5",
-  tidyr      = "1.3.1"
-)
-
-for(pkg in names(packages_to_install)) {
-  version <- packages_to_install[[pkg]]
-  
-  if(pkg %in% rownames(installed.packages())) remove.packages(pkg)
-  
-  remotes::install_version(pkg, version = version, repos = "https://cran.r-project.org")
-}
-
-lapply(names(packages_to_install), library, character.only = TRUE)
-
-sapply(names(packages_to_install), function(pkg) as.character(packageVersion(pkg)))
-
-
-print(paste("xgboost version:", as.character(packageVersion("xgboost"))))
-print(paste("caret version:", as.character(packageVersion("caret"))))
-
 library(ggplot2)
 library(xgboost)
 library(Metrics)

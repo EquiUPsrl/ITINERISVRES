@@ -17,7 +17,6 @@ dependencies:
   - r-MASS
   - r-xgboost
   - r-tidyr
-  - r-remotes
   - r-randomForest
   - r-Metrics
   - r-doFuture
