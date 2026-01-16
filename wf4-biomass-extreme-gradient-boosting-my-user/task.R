@@ -163,11 +163,18 @@ if (!requireNamespace("remotes", quietly = TRUE)) {
   install.packages("remotes", repos = "https://cran.r-project.org")
 }
 
+if ("xgboost" %in% rownames(installed.packages())) remove.packages("xgboost")
+if ("caret"   %in% rownames(installed.packages())) remove.packages("caret")
+
 remotes::install_version("xgboost", version = "1.7.11.1", repos = "https://cran.r-project.org")
+remotes::install_version("caret", version = "7.0.1", repos = "https://cran.r-project.org")
 
 library(xgboost)
+library(caret)
 
-packageVersion("xgboost")
+cat("xgboost version: ", packageVersion("xgboost"), "\n")
+cat("caret version: ", packageVersion("caret"), "\n")
+
 
 library(ggplot2)
 library(xgboost)
