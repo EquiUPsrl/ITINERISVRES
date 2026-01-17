@@ -5,9 +5,9 @@ dependencies:
   - pip
   - python>=3.8
   - nbconvert
-  - geopandas
-  - pandas
-  - pyproj
   - shapely
+  - geopandas
+  - pyproj
+  - pandas
   - papermill
   - ipykernel

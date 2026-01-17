@@ -1,6 +1,6 @@
 from shapely.strtree import STRtree
-from shapely import make_valid
 import os
+from shapely import make_valid
 from shapely.geometry import GeometryCollection
 from shapely.geometry import Polygon
 from shapely.geometry import MultiPolygon
@@ -42,12 +42,6 @@ stats_file = args.stats_file.replace('"','')
 conf_output_path = conf_output_path = '/tmp/data/WF5/' + 'output'
 conf_input_path = conf_input_path = '/tmp/data/WF5/' + 'input'
 
-try:
-except ImportError:
-    make_valid = None
-
-
-
 def extract_zip_custom(zip_path, dest_folder, file_name):
 
     if not os.path.exists(dest_folder):
@@ -65,7 +59,7 @@ def extract_zip_custom(zip_path, dest_folder, file_name):
             files_to_extract = [f for f in all_files if not f.endswith('/')]
 
         for idx, file in enumerate(files_to_extract, 1):
-            original_ext = os.path.splitext(file)[1]  # Estensione originale
+            original_ext = os.path.splitext(file)[1]  # Original extension
             new_name = f"{file_name}{original_ext}"
             
             dest_path = os.path.join(dest_folder, new_name)
@@ -128,7 +122,7 @@ def polygonal_only(geom):
         if not polys:
             return None
         return unary_union(polys)
-    return None  # linee, punti, ecc. non utili per within
+    return None  # ines, points, etc. not useful for within
 
 def polygon_exteriors_to_lines(geom):
     """
@@ -235,11 +229,11 @@ for pt in gdf_punti.geometry.values:
         distanze.append(dist_m)
 
 gdf_out = gdf_punti.copy()
-gdf_out["dist_to_coast"] = distanze
-cols_out = list(punti.columns) + ["dist_to_coast"]
+gdf_out["distance_to_coast"] = distanze
+cols_out = list(punti.columns) + ["distance_to_coast"]
 gdf_out[cols_out].to_csv(out_csv, index=False, sep=';')
 
-print(f"File saved in: {out_csv}  (Added 'dist_to_coast' column)")
+print(f"File saved in: {out_csv}  (Added 'distance_to_coast' column)")
 
 input_with_distance = out_csv
 
