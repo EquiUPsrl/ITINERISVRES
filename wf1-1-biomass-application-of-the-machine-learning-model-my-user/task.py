@@ -1,4 +1,5 @@
 from rasterio.mask import mask
+import sklearn
 import os
 import joblib
 import numpy as np
@@ -32,6 +33,9 @@ model_path = args.model_path.replace('"','')
 
 conf_base_path = conf_base_path = '/tmp/data/WF1_1/work/'
 conf_tmp_path = conf_tmp_path = '/tmp/data/WF1_1/work/' + 'tmp'
+
+print(sklearn.__version__)
+
 
 work_path = conf_base_path
 tmp_dir = conf_tmp_path

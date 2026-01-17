@@ -6,8 +6,9 @@ dependencies:
   - python>=3.8
   - nbconvert
   - rasterio
-  - joblib
+  - scikit-learn
   - numpy
+  - joblib
   - matplotlib
   - pandas
   - papermill
