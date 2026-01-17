@@ -55,7 +55,7 @@ def download_file(url, dest_folder, file_name=None):
 
 
 raster_dataset_file = download_file(param_raster_dataset, input_dir)
-config_file = download_file(param_config_file, input_dir)
+config_file = download_file(param_config_file, input_dir, "config.csv")
 shape_zip_file = download_file(param_shape_zip_file, input_dir)
 modis_interval_8d = download_file(param_modis_interval_8d, input_dir)
 
