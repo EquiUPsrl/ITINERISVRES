@@ -730,6 +730,7 @@ else:
     EXOG_FILE_SELECTION_MODE = p.get("EXOG_FILE_SELECTION_MODE", EXOG_FILE_SELECTION_MODE)
     TARGET_VAR = p.get("TARGET_VAR", TARGET_VAR)
     TARGET_FILE_NAME = f"all_statistics_{TARGET_VAR}.csv"
+    forecast_time_in_years = int(p.get("forecast_time_in_years", forecast_time_in_years))
 
     value = p.get("EXOG_FILE_NAMES")
     if isinstance(value, str) and value.strip():
