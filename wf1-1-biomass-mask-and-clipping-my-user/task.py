@@ -15,9 +15,9 @@ arg_parser = argparse.ArgumentParser()
 arg_parser.add_argument('--id', action='store', type=str, required=True, dest='id')
 
 
-arg_parser.add_argument('--dataset_path', action='store', type=str, required=True, dest='dataset_path')
-
 arg_parser.add_argument('--shape_zip_file', action='store', type=str, required=True, dest='shape_zip_file')
+
+arg_parser.add_argument('--verified_dataset_path', action='store', type=str, required=True, dest='verified_dataset_path')
 
 
 args = arg_parser.parse_args()
@@ -25,8 +25,8 @@ print(args)
 
 id = args.id
 
-dataset_path = args.dataset_path.replace('"','')
 shape_zip_file = args.shape_zip_file.replace('"','')
+verified_dataset_path = args.verified_dataset_path.replace('"','')
 
 
 conf_base_path = conf_base_path = '/tmp/data/WF1_1/work/'
@@ -39,7 +39,7 @@ tmp_dir = conf_tmp_path
 print("EXTRACT RASTER PORTION OF INTEREST USING THE SHP FILE")
 
 
-input_dir = dataset_path
+input_dir = verified_dataset_path
 image_subset_base = os.path.join(tmp_dir, "ImageSubset")
 
 print("I delete the folder " + image_subset_base)
