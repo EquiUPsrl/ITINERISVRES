@@ -1,0 +1,16 @@
+name: venv
+channels:
+  - conda-forge
+dependencies:
+  - pip
+  - python>=3.8
+  - nbconvert
+  - scikit-learn
+  - numpy
+  - scipy
+  - matplotlib
+  - pandas
+  - statsmodels
+  - pmdarima
+  - papermill
+  - ipykernel
