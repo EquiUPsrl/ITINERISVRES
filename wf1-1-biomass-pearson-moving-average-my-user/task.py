@@ -57,14 +57,14 @@ m_map = {
     "MS": 12,      # 12 month in a year
     "D": 365,     # 365 days
     "W": 52,      # 52 weeks
-    "8D": 46,     # 8 giorni ~ 45 period/year
+    "8D": 46,     # 8 days ~ 45 period/year
     "15D": 24     # 15 days ~ 24 period/year
 }
 frequency = m_map.get(pd_freq, 12)  # Default 12 if key not found
 
 order_column = None
 
-csv_files = sorted(glob.glob(os.path.join(input_base_folder, "*.csv")))
+csv_files = sorted(glob(os.path.join(input_base_folder, "*.csv")))
 
 for csv_file in csv_files:
     df = pd.read_csv(csv_file)
