@@ -36,6 +36,7 @@ arg_parser.add_argument('--resolution', action='store', type=str, required=True,
 
 arg_parser.add_argument('--start_year', action='store', type=str, required=True, dest='start_year')
 
+arg_parser.add_argument('--param_oceancolor_app_key', action='store', type=str, required=True, dest='param_oceancolor_app_key')
 
 args = arg_parser.parse_args()
 print(args)
@@ -49,6 +50,7 @@ oceancolor = json.loads(args.oceancolor)
 resolution = args.resolution.replace('"','')
 start_year = args.start_year.replace('"','')
 
+param_oceancolor_app_key = args.param_oceancolor_app_key.replace('"','')
 
 conf_tmp_path = conf_tmp_path = '/tmp/data/WF1_2/work/' + 'tmp'
 
