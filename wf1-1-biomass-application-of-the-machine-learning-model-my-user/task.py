@@ -65,6 +65,9 @@ files = []
 for subfolder in subfolders:
     raster_dir = os.path.join(image_subset_path, subfolder)
     tif_files = sorted([f for f in os.listdir(raster_dir) if f.endswith(".tif")])
+
+    print(f"{subfolder}: {len(tif_files)} .tif files found in {raster_dir}")
+    
     if not tif_files:
         raise FileNotFoundError(f"No .tif files found in {raster_dir}")
     files.append(tif_files)
