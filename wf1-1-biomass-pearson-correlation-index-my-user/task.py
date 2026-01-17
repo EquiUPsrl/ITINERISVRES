@@ -3,7 +3,6 @@ import os
 from rasterio.mask import mask
 import pandas as pd
 import rasterio
-from glob import glob
 import numpy as np
 import shutil
 
@@ -82,8 +81,8 @@ for sub1, sub2 in combinations(subfolders, 2):
     
     folder1 = os.path.join(input_base_folder, sub1)
     folder2 = os.path.join(input_base_folder, sub2)
-    files1 = sorted(glob.glob(os.path.join(folder1, "*.tif")))
-    files2 = sorted(glob.glob(os.path.join(folder2, "*.tif")))
+    files1 = sorted(glob_module.glob(os.path.join(folder1, "*.tif")))
+    files2 = sorted(glob_module.glob(os.path.join(folder2, "*.tif")))
 
     N = min(len(files1), len(files2))
 
