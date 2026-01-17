@@ -5,8 +5,8 @@ dependencies:
   - pip
   - python>=3.8
   - nbconvert
+  - rasterio
   - numpy
   - pandas
-  - rasterio
   - papermill
   - ipykernel
