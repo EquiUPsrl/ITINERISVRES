@@ -1,5 +1,6 @@
 from sklearn.cluster import KMeans
 from scipy import stats
+import fiona
 import os
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
@@ -37,6 +38,9 @@ conf_output_path = conf_output_path = '/tmp/data/WF5/' + 'output'
                   
 
 
+
+print("Fiona:", fiona.__version__)
+print("GDAL:", fiona.env.get_gdal_release_name())
 
 output_dir = conf_output_path
 
@@ -170,7 +174,7 @@ if all(col in df_out.columns for col in ['LATITUDE', 'LONGITUDE']):
         crs='EPSG:4326'
     )
     shp_file = os.path.join(shp_dir, 'cluster_results.shp')
-    gdf.to_file(shp_file)
+    gdf.to_file(shp_file, engine="fiona")
     print(f"Shapefile saved in: {shp_file}")
 
 all_stats = []

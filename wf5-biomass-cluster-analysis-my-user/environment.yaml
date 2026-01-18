@@ -5,12 +5,13 @@ dependencies:
   - pip
   - python>=3.8
   - nbconvert
-  - pandas
-  - scikit-learn
-  - geopandas
   - shapely
-  - matplotlib
-  - scipy
+  - scikit-learn
+  - fiona
   - seaborn
+  - scipy
+  - geopandas
+  - matplotlib
+  - pandas
   - papermill
   - ipykernel
