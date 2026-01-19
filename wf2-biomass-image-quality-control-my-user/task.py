@@ -141,8 +141,8 @@ def filter_raster_by_qc(
 image_base = appeears_path 
 qc_base = appeears_qc_path
 
-dataset_path = os.path.join(conf_tmp_path, "dataset")
-os.makedirs(dataset_path, exist_ok=True)
+dataset_tmp_path = os.path.join(conf_tmp_path, "dataset")
+os.makedirs(dataset_tmp_path, exist_ok=True)
 
 df = pd.read_csv(appeears_raster_csv, sep=';')
 
@@ -177,7 +177,7 @@ for subdir in os.listdir(image_base):
 
     qc_folder_name = qc_value[0]
     qc_folder = Path(os.path.join(qc_base, qc_folder_name))
-    tmp_path = os.path.join(dataset_path, subdir)
+    tmp_path = os.path.join(dataset_tmp_path, subdir)
     os.makedirs(tmp_path, exist_ok=True)
     
 
@@ -201,6 +201,6 @@ for subdir in os.listdir(image_base):
                 print("QC not found. Copying the file to " + output_file)
     
 
-file_dataset_path = open("/tmp/dataset_path_" + id + ".json", "w")
-file_dataset_path.write(json.dumps(dataset_path))
-file_dataset_path.close()
+file_dataset_tmp_path = open("/tmp/dataset_tmp_path_" + id + ".json", "w")
+file_dataset_tmp_path.write(json.dumps(dataset_tmp_path))
+file_dataset_tmp_path.close()
