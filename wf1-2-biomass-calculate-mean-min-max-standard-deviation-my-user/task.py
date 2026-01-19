@@ -14,6 +14,8 @@ arg_parser.add_argument('--id', action='store', type=str, required=True, dest='i
 
 arg_parser.add_argument('--image_subset_base', action='store', type=str, required=True, dest='image_subset_base')
 
+arg_parser.add_argument('--interval', action='store', type=str, required=True, dest='interval')
+
 
 args = arg_parser.parse_args()
 print(args)
@@ -21,6 +23,7 @@ print(args)
 id = args.id
 
 image_subset_base = args.image_subset_base.replace('"','')
+interval = args.interval.replace('"','')
 
 
 conf_output_path = conf_output_path = '/tmp/data/WF1_2/work/' + 'output'
@@ -31,7 +34,7 @@ stats_path = os.path.join(output_dir, "Time Series Statistics")
 
 moving_average_column = "mean"
 
-pd_freq = "8D"  # "M" = monthly, "D" = daily, "W" = weekly, "8D", "15D", ecc.
+pd_freq = interval  # "M" = monthly, "D" = daily, "W" = weekly, "8D", "15D", ecc.
 freq_label_map = {
     "MS": "Monthly",
     "D": "Daily",
@@ -97,6 +100,9 @@ for gruppo in sorted(os.listdir(input_base_folder)):
 
 print("\nOperation completed!")
 
+file_output_dir = open("/tmp/output_dir_" + id + ".json", "w")
+file_output_dir.write(json.dumps(output_dir))
+file_output_dir.close()
 file_stats_path = open("/tmp/stats_path_" + id + ".json", "w")
 file_stats_path.write(json.dumps(stats_path))
 file_stats_path.close()
