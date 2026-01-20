@@ -8,13 +8,13 @@ import json
 import os
 arg_parser = argparse.ArgumentParser()
 
+secret_appeears_password = os.getenv('secret_appeears_password')
 
 arg_parser.add_argument('--id', action='store', type=str, required=True, dest='id')
 
 
 arg_parser.add_argument('--appeears_raster_csv', action='store', type=str, required=True, dest='appeears_raster_csv')
 
-arg_parser.add_argument('--param_appeears_password', action='store', type=str, required=True, dest='param_appeears_password')
 arg_parser.add_argument('--param_appeears_username', action='store', type=str, required=True, dest='param_appeears_username')
 
 args = arg_parser.parse_args()
@@ -24,13 +24,12 @@ id = args.id
 
 appeears_raster_csv = args.appeears_raster_csv.replace('"','')
 
-param_appeears_password = args.param_appeears_password.replace('"','')
 param_appeears_username = args.param_appeears_username.replace('"','')
 
 conf_tmp_path = conf_tmp_path = '/tmp/data/WF2/work/' + 'tmp'
 
 USERNAME = param_appeears_username
-PASSWORD = param_appeears_password
+PASSWORD = secret_appeears_password
 
 response = requests.post('https://appeears.earthdatacloud.nasa.gov/api/login', auth=(USERNAME, PASSWORD))
 res = response.json()
