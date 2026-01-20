@@ -14,9 +14,9 @@ arg_parser = argparse.ArgumentParser()
 arg_parser.add_argument('--id', action='store', type=str, required=True, dest='id')
 
 
-arg_parser.add_argument('--shape_files_dir', action='store', type=str, required=True, dest='shape_files_dir')
+arg_parser.add_argument('--dataset_path', action='store', type=str, required=True, dest='dataset_path')
 
-arg_parser.add_argument('--verified_dataset_path', action='store', type=str, required=True, dest='verified_dataset_path')
+arg_parser.add_argument('--shape_files_dir', action='store', type=str, required=True, dest='shape_files_dir')
 
 
 args = arg_parser.parse_args()
@@ -24,8 +24,8 @@ print(args)
 
 id = args.id
 
+dataset_path = args.dataset_path.replace('"','')
 shape_files_dir = args.shape_files_dir.replace('"','')
-verified_dataset_path = args.verified_dataset_path.replace('"','')
 
 
 conf_tmp_path = conf_tmp_path = '/tmp/data/WF2/work/' + 'tmp'
@@ -111,7 +111,7 @@ os.makedirs(image_subset_base, exist_ok=True)
 for nome_file in os.listdir(shape_files_dir):
         if nome_file.lower().endswith(".shp"):
             print("Raster clipping via shape file: " + nome_file)
-            mask_and_clipping(os.path.join(shape_files_dir, nome_file), verified_dataset_path, image_subset_base)
+            mask_and_clipping(os.path.join(shape_files_dir, nome_file), dataset_path, image_subset_base)
             
 
 file_image_subset_base = open("/tmp/image_subset_base_" + id + ".json", "w")
