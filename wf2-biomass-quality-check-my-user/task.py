@@ -16,7 +16,13 @@ arg_parser.add_argument('--id', action='store', type=str, required=True, dest='i
 
 arg_parser.add_argument('--appeears_raster_file', action='store', type=str, required=True, dest='appeears_raster_file')
 
-arg_parser.add_argument('--config_file', action='store', type=str, required=True, dest='config_file')
+arg_parser.add_argument('--config_recurrence_plot_file', action='store', type=str, required=True, dest='config_recurrence_plot_file')
+
+arg_parser.add_argument('--config_sarimax_file', action='store', type=str, required=True, dest='config_sarimax_file')
+
+arg_parser.add_argument('--config_spline_file', action='store', type=str, required=True, dest='config_spline_file')
+
+arg_parser.add_argument('--config_whittaker_file', action='store', type=str, required=True, dest='config_whittaker_file')
 
 arg_parser.add_argument('--raster_calculator_config', action='store', type=str, required=True, dest='raster_calculator_config')
 
@@ -31,7 +37,10 @@ print(args)
 id = args.id
 
 appeears_raster_file = args.appeears_raster_file.replace('"','')
-config_file = args.config_file.replace('"','')
+config_recurrence_plot_file = args.config_recurrence_plot_file.replace('"','')
+config_sarimax_file = args.config_sarimax_file.replace('"','')
+config_spline_file = args.config_spline_file.replace('"','')
+config_whittaker_file = args.config_whittaker_file.replace('"','')
 raster_calculator_config = args.raster_calculator_config.replace('"','')
 raster_calculator_formulas = args.raster_calculator_formulas.replace('"','')
 raster_zip_file = args.raster_zip_file.replace('"','')
@@ -166,7 +175,10 @@ def convert_csv(
 
 appeears_raster_csv = appeears_raster_file
 raster_zip_csv = raster_zip_file
-config_file_csv = config_file
+config_whittaker_file_csv = config_whittaker_file
+config_spline_file_csv = config_spline_file
+config_recurrence_plot_file_csv = config_recurrence_plot_file
+config_sarimax_file_csv = config_sarimax_file
 raster_calculator_config_csv = raster_calculator_config
 raster_calculator_formulas_csv = raster_calculator_formulas
 
@@ -174,7 +186,10 @@ raster_calculator_formulas_csv = raster_calculator_formulas
 files = [
     appeears_raster_csv,
     raster_zip_csv,
-    config_file_csv,
+    config_whittaker_file_csv,
+    config_spline_file_csv,
+    config_recurrence_plot_file_csv,
+    config_sarimax_file_csv,
     raster_calculator_config_csv,
     raster_calculator_formulas_csv
 ]
@@ -193,9 +208,6 @@ for file_csv in files:
 file_appeears_raster_csv = open("/tmp/appeears_raster_csv_" + id + ".json", "w")
 file_appeears_raster_csv.write(json.dumps(appeears_raster_csv))
 file_appeears_raster_csv.close()
-file_config_file_csv = open("/tmp/config_file_csv_" + id + ".json", "w")
-file_config_file_csv.write(json.dumps(config_file_csv))
-file_config_file_csv.close()
 file_raster_calculator_config_csv = open("/tmp/raster_calculator_config_csv_" + id + ".json", "w")
 file_raster_calculator_config_csv.write(json.dumps(raster_calculator_config_csv))
 file_raster_calculator_config_csv.close()
