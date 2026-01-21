@@ -1,6 +1,6 @@
+from glob import glob
 import pandas as pd
 import os
-from glob import glob
 import re
 
 import argparse
@@ -26,7 +26,7 @@ stats_path = args.stats_path.replace('"','')
 conf_output_path = conf_output_path = '/tmp/data/WF2/work/' + 'output'
 
 input_folder = stats_path #os.path.join("work", "output", "Time Series Statistics")
-csv_files = sorted(glob.glob(os.path.join(input_folder, "*.csv")))
+csv_files = sorted(glob(os.path.join(input_folder, "*.csv")))
 
 col_to_extract = "mean"
 
