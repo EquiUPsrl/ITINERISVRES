@@ -4,6 +4,7 @@ channels:
 dependencies:
   - pip
   - python>=3.8
+  - r-base=4.1.*
   - nbconvert
   - r-e1071
   - r-tidyr
@@ -12,7 +13,7 @@ dependencies:
   - r-MASS
   - r-doFuture
   - r-dplyr
-  - r-caret
+  - r-caret=6.0_94
   - r-jsonlite
   - r-ggplot2
   - r-nnet
