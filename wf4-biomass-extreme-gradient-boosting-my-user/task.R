@@ -157,6 +157,11 @@ id <- gsub('"', '', opt$id)
 print("Running the cell")
 cat("R version: ", R.version.string, "\n")
 
+cat("R_ENABLE_ALTREP =", Sys.getenv("R_ENABLE_ALTREP"), "\n")
+
+x <- 1:1e7  # vettore lungo
+typeof(x)    # deve essere "integer", non ALTREP pointer
+
 library(ggplot2)
 library(xgboost)
 library(Metrics)
