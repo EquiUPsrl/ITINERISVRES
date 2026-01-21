@@ -99,11 +99,11 @@ for c in cartelle:
         dir_to_use = upscaled_dir
     else:
         dir_to_use = base_dir
-    liste_file.append(files_ordinati(dir_to_use + c))
+    liste_file.append(files_ordinati(os.path.join(dir_to_use, c)))
 
 lunghezze = [len(lista) for lista in liste_file]
 if len(set(lunghezze)) != 1:
-    raise ValueError("Le cartelle non contengono lo stesso numero di file.")
+    raise ValueError("The folders do not contain the same number of files.")
 
 coppie = [
     tuple(os.path.join(cartelle[i], file[i]) for i in range(len(cartelle)))
