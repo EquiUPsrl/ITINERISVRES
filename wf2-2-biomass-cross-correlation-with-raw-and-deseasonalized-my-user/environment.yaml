@@ -5,11 +5,11 @@ dependencies:
   - pip
   - python>=3.8
   - nbconvert
-  - rasterio
   - numpy
-  - scipy
-  - matplotlib
+  - rasterio
   - pandas
   - statsmodels
+  - scipy
+  - matplotlib
   - papermill
   - ipykernel

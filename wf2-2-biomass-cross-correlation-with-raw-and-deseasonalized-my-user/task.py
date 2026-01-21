@@ -4,9 +4,9 @@ from itertools import combinations
 import os
 from scipy.stats import pearsonr
 from statsmodels.tsa.seasonal import STL
+from glob import glob
 import pandas as pd
 import matplotlib.pyplot as plt
-from glob import glob
 
 import argparse
 import json
@@ -17,7 +17,7 @@ arg_parser = argparse.ArgumentParser()
 arg_parser.add_argument('--id', action='store', type=str, required=True, dest='id')
 
 
-arg_parser.add_argument('--start_year', action='store', type=int, required=True, dest='start_year')
+arg_parser.add_argument('--start_year', action='store', type=str, required=True, dest='start_year')
 
 arg_parser.add_argument('--stats_path', action='store', type=str, required=True, dest='stats_path')
 
@@ -27,7 +27,7 @@ print(args)
 
 id = args.id
 
-start_year = args.start_year
+start_year = args.start_year.replace('"','')
 stats_path = args.stats_path.replace('"','')
 
 
@@ -249,7 +249,7 @@ def analyze_and_save(df_pair: pd.DataFrame,
         aligned_name = "aligned_inputs.csv" if not label_suffix else f"aligned_inputs{label_suffix}.csv"
         df_pair.to_csv(os.path.join(out_dir, aligned_name), index=False)
 
-csv_files = sorted(glob.glob(os.path.join(input_folder, "*.csv")))
+csv_files = sorted(glob(os.path.join(input_folder, "*.csv")))
 if len(csv_files) < 2:
     raise RuntimeError(f"At least two CSV files are required in: {os.path.abspath(input_folder)}")
 print(f"Found {len(csv_files)} CSV files.")
