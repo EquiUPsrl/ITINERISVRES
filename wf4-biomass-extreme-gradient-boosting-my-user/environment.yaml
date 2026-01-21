@@ -18,7 +18,7 @@ dependencies:
   - r-ggplot2
   - r-nnet
   - r-scales
-  - r-xgboost=1.6.0
+  - r-xgboost
   - r-iml
   - r-randomForest
   - r-readr
