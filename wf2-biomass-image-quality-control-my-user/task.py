@@ -1,3 +1,4 @@
+from rasterio.errors import RasterioIOError
 import os
 import pandas as pd
 from pathlib import Path
@@ -98,18 +99,28 @@ def filter_raster_by_qc(
     """
     Filters a raster based on QC.
 
-    Automatically retrieves the NoData value from the raster.
+    If the raster is corrupted or unreadable, it is removed and skipped.
     """
+
     raster_name = identify_raster_name(data_file)
     if raster_name is None:
         raise ValueError(f"Raster not recognized for QC: {data_file}")
 
     schema = QC_SCHEMAS[raster_name]
 
-    with rasterio.open(data_file) as src:
-        data = src.read(1)
-        profile = src.profile.copy()
-        nodata_value = src.nodatavals[0]
+    try:
+        with rasterio.open(data_file) as src:
+            data = src.read(1)
+            profile = src.profile.copy()
+            nodata_value = src.nodatavals[0]
+
+    except RasterioIOError as e:
+        print(f"[WARNING] Corrupted raster detected, removing file: {data_file}")
+        try:
+            os.remove(data_file)
+        except OSError as rm_err:
+            print(f"[ERROR] Unable to remove corrupted file {data_file}: {rm_err}")
+        return None
 
     with rasterio.open(qc_file) as src:
         qc = src.read(1)
