@@ -21,9 +21,9 @@ arg_parser = argparse.ArgumentParser()
 arg_parser.add_argument('--id', action='store', type=str, required=True, dest='id')
 
 
-arg_parser.add_argument('--end_year', action='store', type=int, required=True, dest='end_year')
+arg_parser.add_argument('--end_year', action='store', type=str, required=True, dest='end_year')
 
-arg_parser.add_argument('--start_year', action='store', type=int, required=True, dest='start_year')
+arg_parser.add_argument('--start_year', action='store', type=str, required=True, dest='start_year')
 
 arg_parser.add_argument('--stats_path', action='store', type=str, required=True, dest='stats_path')
 
@@ -33,8 +33,8 @@ print(args)
 
 id = args.id
 
-end_year = args.end_year
-start_year = args.start_year
+end_year = args.end_year.replace('"','')
+start_year = args.start_year.replace('"','')
 stats_path = args.stats_path.replace('"','')
 
 
