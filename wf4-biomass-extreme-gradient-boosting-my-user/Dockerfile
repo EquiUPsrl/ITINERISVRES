@@ -12,3 +12,5 @@ FROM ghcr.io/naavre/flavors/naavre-fl-vanilla-cell-runtime:v0.0.49 AS runtime
 COPY --from=build /venv /venv
 WORKDIR /app
 COPY . .
+ENV R_ENABLE_ALTREP=0
+ENV PATH=/venv/bin:$PATH
