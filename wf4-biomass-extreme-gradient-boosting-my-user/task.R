@@ -74,10 +74,6 @@ if (!requireNamespace("xgboost", quietly = TRUE)) {
 	install.packages("xgboost", repos="http://cran.us.r-project.org")
 }
 library(xgboost)
-if (!requireNamespace("remotes", quietly = TRUE)) {
-	install.packages("remotes", repos="http://cran.us.r-project.org")
-}
-library(remotes)
 if (!requireNamespace("tidyr", quietly = TRUE)) {
 	install.packages("tidyr", repos="http://cran.us.r-project.org")
 }
@@ -161,16 +157,6 @@ id <- gsub('"', '', opt$id)
 print("Running the cell")
 cat("R version: ", R.version.string, "\n")
 
-if (!requireNamespace("remotes", quietly = TRUE)) {
-  install.packages("remotes", repos = "https://cran.r-project.org")
-}
-
-remotes::install_version("xgboost", version = "1.7.11.1", repos = "https://cran.r-project.org")
-
-library(xgboost)
-
-packageVersion("xgboost")
-
 library(ggplot2)
 library(xgboost)
 library(Metrics)
@@ -238,8 +224,8 @@ if (tolower(as.character(params$value[params$Parameter == "metric_value_MAE"])) 
 if (tolower(as.character(params$value[params$Parameter == "metric_value_RMSE"])) == "true") metric <- 'RMSE'
 if (tolower(as.character(params$value[params$Parameter == "metric_value_Rsquared"])) == "true") metric <- 'Rsquared'
 
-set.seed(123)  # Seme globale per riproducibilità
-library(caret)  # Assicurati che il pacchetto caret sia installato
+set.seed(123)  # Global seed for reproducibility
+library(caret)  # Make sure the caret package is installed
 train_index <- createDataPartition(dati[[target_variable]], p = training_data_percentage, list = FALSE)
 train_data <- dati[train_index, ]
 test_data <- dati[-train_index, ]
@@ -327,9 +313,8 @@ if (!dir.exists(model_dir)) {
   dir.create(model_dir, recursive = TRUE)
 }  # <-- Close the if statement here
 
-
-
 predictions_gbm_test <- predict(best_model_gbm, newdata = test_data)
+
 results_gbm_test <- data.frame(Actual = test_data[[target_variable]], Predicted_gbm = predictions_gbm_test)
 
 plot_gbm_test <- ggplot(data = results_gbm_test, aes(x = Actual, y = Predicted_gbm)) +
@@ -346,6 +331,7 @@ ggsave(filename = plot_path_gbm, plot = plot_gbm_test, width = 8, height = 6)
 cat("Chart saved in: ", plot_path_gbm, "\n")
 
 train_gbm_preds <- predict(best_model_gbm, newdata = train_data)
+
 results_gbm_training_df <- data.frame(Actual = train_data[[target_variable]], Predicted_gbm = train_gbm_preds)
 
 plot_gbm_training <- ggplot(data = results_gbm_training_df, aes(x = Actual, y = Predicted_gbm)) +
@@ -419,8 +405,8 @@ print(results_gbm)
 
 
 
-library(e1071)  # Per il modello SVM
-library(readr)  # Per leggere i file
+library(e1071)
+library(readr)
 
 model_path <- file.path(model_dir, "best_model.rds")
 best_model_gbm <- readRDS(model_path)
