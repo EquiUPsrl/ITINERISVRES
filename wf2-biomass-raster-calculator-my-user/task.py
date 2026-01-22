@@ -125,7 +125,7 @@ for index, row in df_formulas.iterrows():
         idx = idx + 1
         
         raster_dict = {
-            chiave: f"{base_dir}{valore}" for chiave, valore in zip(cartelle_dict.keys(), gruppo)
+            chiave: os.path.join(base_dir,valore) for chiave, valore in zip(cartelle_dict.keys(), gruppo)
         }
         
         output_file = os.path.join(output_path, new_product + "_result_" + str(idx) + ".tif")
