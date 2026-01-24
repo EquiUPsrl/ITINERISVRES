@@ -21,22 +21,22 @@ arg_parser = argparse.ArgumentParser()
 arg_parser.add_argument('--id', action='store', type=str, required=True, dest='id')
 
 
-arg_parser.add_argument('--end_year', action='store', type=str, required=True, dest='end_year')
-
-arg_parser.add_argument('--start_year', action='store', type=str, required=True, dest='start_year')
-
 arg_parser.add_argument('--stats_path', action='store', type=str, required=True, dest='stats_path')
 
+arg_parser.add_argument('--param_end_year', action='store', type=str, required=True, dest='param_end_year')
+arg_parser.add_argument('--param_interval', action='store', type=str, required=True, dest='param_interval')
+arg_parser.add_argument('--param_start_year', action='store', type=str, required=True, dest='param_start_year')
 
 args = arg_parser.parse_args()
 print(args)
 
 id = args.id
 
-end_year = args.end_year.replace('"','')
-start_year = args.start_year.replace('"','')
 stats_path = args.stats_path.replace('"','')
 
+param_end_year = args.param_end_year.replace('"','')
+param_interval = args.param_interval.replace('"','')
+param_start_year = args.param_start_year.replace('"','')
 
 conf_output_path = conf_output_path = '/tmp/data/WF2/work/' + 'output'
 conf_input_path = conf_input_path = '/tmp/data/WF2/work/' + 'input'
@@ -63,6 +63,9 @@ os.makedirs(output_dir_base, exist_ok=True)
 
 print(input_base_folder)
 
+start_year = param_start_year
+end_year = param_end_year
+
 start_year = int(start_year)
 end_year = int(end_year)
 
@@ -70,7 +73,7 @@ start_date = str(start_year) + "-01-01"
 end_date = str(end_year) + "-12-31"
 
 col_name = "mean"
-pd_freq = "8D" #interval # 'MS', 'D', 'W', '8D', '15D', '16D'...
+pd_freq = param_interval #interval # 'MS', 'D', 'W', '8D', '15D', '16D'...
 alpha = 0.05         # -> 95% CI
 
 forecast_time_in_years = 5
