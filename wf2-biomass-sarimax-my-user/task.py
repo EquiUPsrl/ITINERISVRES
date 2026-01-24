@@ -21,22 +21,22 @@ arg_parser = argparse.ArgumentParser()
 arg_parser.add_argument('--id', action='store', type=str, required=True, dest='id')
 
 
-arg_parser.add_argument('--end_year', action='store', type=str, required=True, dest='end_year')
-
-arg_parser.add_argument('--start_year', action='store', type=int, required=True, dest='start_year')
-
 arg_parser.add_argument('--stats_output_path', action='store', type=str, required=True, dest='stats_output_path')
 
+arg_parser.add_argument('--param_end_year', action='store', type=str, required=True, dest='param_end_year')
+arg_parser.add_argument('--param_interval', action='store', type=str, required=True, dest='param_interval')
+arg_parser.add_argument('--param_start_year', action='store', type=str, required=True, dest='param_start_year')
 
 args = arg_parser.parse_args()
 print(args)
 
 id = args.id
 
-end_year = args.end_year.replace('"','')
-start_year = args.start_year
 stats_output_path = args.stats_output_path.replace('"','')
 
+param_end_year = args.param_end_year.replace('"','')
+param_interval = args.param_interval.replace('"','')
+param_start_year = args.param_start_year.replace('"','')
 
 conf_output_path = conf_output_path = '/tmp/data/WF2/work/' + 'output'
 conf_input_path = conf_input_path = '/tmp/data/WF2/work/' + 'input'
@@ -69,6 +69,9 @@ print("target_var:", target_var)
 print("exogenous_vars:", exogenous_vars)
 print("forecast_time_in_years:", forecast_time_in_years)
 
+start_year = param_start_year
+end_year = param_end_year
+
 start_year = int(start_year)
 end_year = int(end_year)
 
@@ -77,7 +80,7 @@ end_date = str(end_year) + "-12-31"
 
 TARGET_FILE_NAME = "all_statistics_" + target_var + ".csv"    # <--- TARGET FILE NAME (without path)
 TARGET_COL_NAME = "mean"       # numeric column to use
-COMMON_PD_FREQ = "8D"          # 'MS', 'D', 'W', '8D', '15D', '16D', ...
+COMMON_PD_FREQ = param_interval          # 'MS', 'D', 'W', '8D', '15D', '16D', ...
 
 alpha = 0.05                   # -> 95% CI
 
