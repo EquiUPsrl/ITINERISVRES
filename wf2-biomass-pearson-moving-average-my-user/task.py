@@ -66,7 +66,7 @@ frequency = m_map.get(pd_freq, 12)  # Default 12 if key not found
 
 order_column = None 
 
-csv_files = sorted(glob.glob(os.path.join(input_base_folder, "*.csv")))
+csv_files = sorted(glob(os.path.join(input_base_folder, "*.csv")))
 
 for csv_file in csv_files:
     print(f"Verifico File: {csv_file}")
