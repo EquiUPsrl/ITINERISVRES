@@ -14,22 +14,22 @@ arg_parser = argparse.ArgumentParser()
 arg_parser.add_argument('--id', action='store', type=str, required=True, dest='id')
 
 
-arg_parser.add_argument('--end_year', action='store', type=str, required=True, dest='end_year')
-
-arg_parser.add_argument('--start_year', action='store', type=int, required=True, dest='start_year')
-
 arg_parser.add_argument('--stats_output_path', action='store', type=str, required=True, dest='stats_output_path')
 
+arg_parser.add_argument('--param_end_year', action='store', type=str, required=True, dest='param_end_year')
+arg_parser.add_argument('--param_interval', action='store', type=str, required=True, dest='param_interval')
+arg_parser.add_argument('--param_start_year', action='store', type=str, required=True, dest='param_start_year')
 
 args = arg_parser.parse_args()
 print(args)
 
 id = args.id
 
-end_year = args.end_year.replace('"','')
-start_year = args.start_year
 stats_output_path = args.stats_output_path.replace('"','')
 
+param_end_year = args.param_end_year.replace('"','')
+param_interval = args.param_interval.replace('"','')
+param_start_year = args.param_start_year.replace('"','')
 
 conf_output_path = conf_output_path = '/tmp/data/WF2/work/' + 'output'
 conf_input_path = conf_input_path = '/tmp/data/WF2/work/' + 'input'
@@ -38,10 +38,13 @@ output_dir = conf_output_path
 input_dir = stats_output_path #os.path.join(work_path, "output/Time Series Statistics/", "corrected")
 output_dir_base = os.path.join(output_dir, "Recurrence_Plot")
 
+start_year = param_start_year
+end_year = param_end_year
+
 col_name = "mean"
 start_date = str(start_year) + '-01-01'      # Cambia la data di inizio se necessario
 end_date = str(end_year) + '-12-31'
-pd_freq = "8D"           # "MS", "M", "D", "W", "8D", "15D", ecc.
+pd_freq = param_interval           # "MS", "M", "D", "W", "8D", "15D", ecc.
 
 freq_label_map = {
     "MS": "Monthly",
