@@ -14,6 +14,7 @@ arg_parser.add_argument('--id', action='store', type=str, required=True, dest='i
 
 arg_parser.add_argument('--image_subset_base', action='store', type=str, required=True, dest='image_subset_base')
 
+arg_parser.add_argument('--param_interval', action='store', type=str, required=True, dest='param_interval')
 
 args = arg_parser.parse_args()
 print(args)
@@ -22,6 +23,7 @@ id = args.id
 
 image_subset_base = args.image_subset_base.replace('"','')
 
+param_interval = args.param_interval.replace('"','')
 
 conf_output_path = conf_output_path = '/tmp/data/WF2/work/' + 'output'
 
@@ -31,7 +33,7 @@ stats_path = os.path.join(output_dir, "Time Series Statistics")
 
 moving_average_column = "mean"
 
-pd_freq = "8D" #interval  # "M" = monthly, "D" = daily, "W" = weekly, "8D", "15D", ecc.
+pd_freq = param_interval #interval  # "M" = monthly, "D" = daily, "W" = weekly, "8D", "15D", ecc.
 freq_label_map = {
     "MS": "Monthly",
     "D": "Daily",
