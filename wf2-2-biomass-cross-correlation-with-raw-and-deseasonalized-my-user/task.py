@@ -17,19 +17,20 @@ arg_parser = argparse.ArgumentParser()
 arg_parser.add_argument('--id', action='store', type=str, required=True, dest='id')
 
 
-arg_parser.add_argument('--start_year', action='store', type=str, required=True, dest='start_year')
-
 arg_parser.add_argument('--stats_path', action='store', type=str, required=True, dest='stats_path')
 
+arg_parser.add_argument('--param_interval', action='store', type=str, required=True, dest='param_interval')
+arg_parser.add_argument('--param_start_year', action='store', type=str, required=True, dest='param_start_year')
 
 args = arg_parser.parse_args()
 print(args)
 
 id = args.id
 
-start_year = args.start_year.replace('"','')
 stats_path = args.stats_path.replace('"','')
 
+param_interval = args.param_interval.replace('"','')
+param_start_year = args.param_start_year.replace('"','')
 
 conf_output_path = conf_output_path = '/tmp/data/WF2/work/' + 'output'
 
@@ -57,8 +58,10 @@ output_dir = conf_output_path
 output_root  = os.path.join(output_dir, "Cross Correlation")       # Output root
 col_name     = "mean"            # Numeric column name in each CSV
 
+start_year = param_start_year
+
 start_date   = str(start_year) + "-01-01"      # Synthetic timeline start
-pd_freq      = "8D" #interval # "MS", "M", "D", "W", "8D", "15D", ...
+pd_freq      = param_interval #interval # "MS", "M", "D", "W", "8D", "15D", ...
 
 max_shift_map = {
     "MS": 12,   # months
