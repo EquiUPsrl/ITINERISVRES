@@ -16,6 +16,8 @@ arg_parser.add_argument('--id', action='store', type=str, required=True, dest='i
 arg_parser.add_argument('--appeears_raster_csv', action='store', type=str, required=True, dest='appeears_raster_csv')
 
 arg_parser.add_argument('--param_appeears_username', action='store', type=str, required=True, dest='param_appeears_username')
+arg_parser.add_argument('--param_end_year', action='store', type=str, required=True, dest='param_end_year')
+arg_parser.add_argument('--param_start_year', action='store', type=str, required=True, dest='param_start_year')
 
 args = arg_parser.parse_args()
 print(args)
@@ -25,11 +27,16 @@ id = args.id
 appeears_raster_csv = args.appeears_raster_csv.replace('"','')
 
 param_appeears_username = args.param_appeears_username.replace('"','')
+param_end_year = args.param_end_year.replace('"','')
+param_start_year = args.param_start_year.replace('"','')
 
 conf_tmp_path = conf_tmp_path = '/tmp/data/WF2/work/' + 'tmp'
 
 USERNAME = param_appeears_username
 PASSWORD = secret_appeears_password
+
+start_year = int(param_start_year)
+end_year = int(param_end_year)
 
 response = requests.post('https://appeears.earthdatacloud.nasa.gov/api/login', auth=(USERNAME, PASSWORD))
 res = response.json()
@@ -62,8 +69,19 @@ def get_dir(file_name, selected_vars):
 
     return variabile_trovata
 
+def extract_year_from_filename(filename):
+    """
+    Extracts the year from the substring 'doyYYYY...'
+    Returns int or None if not found.
+    """
+    try:
+        idx = filename.lower().index("doy")
+        return int(filename[idx + 3: idx + 7])
+    except (ValueError, IndexError):
+        return None
 
-def download_geotiff_files(task_id, variable, qc, appeears_path, appeears_qc_path, max_retries=10, delay=30):
+
+def download_geotiff_files(task_id, variable, qc, appeears_path, appeears_qc_path, start_year, end_year, max_retries=10, delay=30):
 
     bundle_url = f"https://appeears.earthdatacloud.nasa.gov/api/bundle/{task_id}"
 
@@ -86,14 +104,24 @@ def download_geotiff_files(task_id, variable, qc, appeears_path, appeears_qc_pat
         files = data["files"]
         for file in files:
             if file["file_type"] != "tif":
-                continue  # ignoriamo altri tipi di file
+                continue  # we ignore other file types
 
             filename = os.path.basename(file['file_name'])
+
+            year = extract_year_from_filename(filename)
+            if year is None:
+                print(f"[!] Year not found in filename, skipped: {filename}")
+                continue
+            
+            if not (start_year <= year <= end_year):
+                print(f"[→] Skipped (year {year} out of range): {filename}")
+                continue
+            
             is_qc = "_qc_" in filename.lower()
             target_var = qc if is_qc else variable
 
             if target_var.lower() not in filename.lower():
-                continue  # salta i file che non corrispondono
+                continue  # skip files that don't match
 
             folder_path = os.path.join(appeears_qc_path if is_qc else appeears_path, target_var)
             os.makedirs(folder_path, exist_ok=True)
@@ -111,7 +139,7 @@ def download_geotiff_files(task_id, variable, qc, appeears_path, appeears_qc_pat
                     f.write(chunk)
             print(f"[✔] Download completed: {output_path}")
 
-        return  # esce dopo aver processato i file disponibili
+        return  # exits after processing the available files
 
     print(f"[✘] Error: files not available for task {task_id} after {max_retries} attempts.")
 
@@ -132,7 +160,7 @@ for _, row in df_with_task.iterrows():
     task_id = row["TaskID"]
 
     print(f"\n=== Processing task: {task_id} | Variable: {variable} | QC: {qc} ===")
-    download_geotiff_files(task_id, variable, qc, appeears_path, appeears_qc_path)
+    download_geotiff_files(task_id, variable, qc, appeears_path, appeears_qc_path, start_year, end_year)
 
 file_appeears_path = open("/tmp/appeears_path_" + id + ".json", "w")
 file_appeears_path.write(json.dumps(appeears_path))
