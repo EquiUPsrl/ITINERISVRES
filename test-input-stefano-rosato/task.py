@@ -1,3 +1,4 @@
+from pathlib import Path
 
 import argparse
 import json
@@ -18,6 +19,11 @@ id = args.id
 
 
 test_input = "verifica-ambiente"
+
+
+test_file = Path("/tmp/data/test_gateway_workflow.txt")
+test_file.write_text("Output prodotto dal workflow NaaVRE\n", encoding="utf-8")
+print("File prodotto:", test_file)
 
 file_test_input = open("/tmp/test_input_" + id + ".json", "w")
 file_test_input.write(json.dumps(test_input))
