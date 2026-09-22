@@ -1,3 +1,4 @@
+from urllib.request import urlopen
 import os
 
 import argparse
@@ -30,4 +31,10 @@ for name in (
     "JUPYTERHUB_USER",
 ):
     print(f"{name}: {'presente' if os.getenv(name) else 'assente'}")
+
+
+url = "http://sftpgo-gateway.naavre.svc.cluster.local/health"
+
+with urlopen(url, timeout=10) as response:
+    print("Gateway:", response.status, response.read().decode())
 
